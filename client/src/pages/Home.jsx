@@ -8,6 +8,7 @@ import {
   Stack,
   Paper,
 } from "@mui/material";
+import ShieldIcon from "@mui/icons-material/Shield";
 import { Link } from "react-router-dom";
 import ProjectCard from "../components/Project/ProjectCard";
 import api from "../api/axios";
@@ -44,20 +45,20 @@ const Home = () => {
             {/* LEFT HERO */}
             <Grid item xs={12} md={6}>
               <Typography variant="overline" color="secondary.main">
-                College Project Store
+                Code | Learn | Submit | Succeed
               </Typography>
 
               <Typography variant="h3" fontWeight={800} sx={{ mt: 1, mb: 2 }}>
                 Ready-made{" "}
                 <Box component="span" sx={{ color: "primary.main" }}>
-                  MERN & Frontend
+                  MERN College
                 </Box>{" "}
                 projects for students.
               </Typography>
 
               <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                Get source code, documentation, PPT, installation guide, and
-                complete help. Submit confidently and learn real code.
+                CodeX offers secure instant delivery, verified payments, and
+                high-quality project resources for students and developers.
               </Typography>
 
               <Stack direction="row" spacing={2}>
@@ -82,7 +83,19 @@ const Home = () => {
                   </Button>
                 )}
               </Stack>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mt: 2 }}
+              >
+                <ShieldIcon sx={{ color: "lightgreen", fontSize: 20 }} />
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#b6c3cdff", opacity: 0.9 }}
+                >
+                  Secure Payments • Instant Access
+                </Typography>
+              </Box>
             </Grid>
+            
 
             {/* RIGHT FEATURED PROJECT */}
             <Grid item xs={12} md={6}>

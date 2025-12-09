@@ -10,7 +10,7 @@ import {
 import { Link } from "react-router-dom";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import InstagramIcon from "@mui/icons-material/Instagram";
+import XIcon from "@mui/icons-material/Twitter";
 
 const Footer = () => {
   return (
@@ -75,8 +75,9 @@ const Footer = () => {
                 CodeX
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Ready-made college projects with source code, documentation and
-                PPT — built to submit and easy to learn from.
+                CodeX is a curated platform providing high-quality academic and
+                full-stack development projects, complete with source code,
+                documentation, and presentation files.
               </Typography>
             </Grid>
 
@@ -92,7 +93,6 @@ const Footer = () => {
                   { name: "About", to: "/about" },
                   { name: "All Projects", to: "/projects" },
                   { name: "Explore", to: "/explore" },
-                  { name: "Login", to: "/login" },
                 ].map((item) => (
                   <MuiLink
                     key={item.to}
@@ -145,25 +145,47 @@ const Footer = () => {
               </Typography>
 
               <Box sx={{ display: "flex", gap: 1 }}>
-                {[GitHubIcon, LinkedInIcon, InstagramIcon].map((Icon, idx) => (
-                  <IconButton
-                    size="small"
-                    sx={{
-                      color: "text.primary", // <<< WHITE ICON COLOR
-                      borderRadius: 2,
-                      border: "1px solid rgba(148,163,184,0.4)",
-                      transition:
-                        "transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease",
-                      "&:hover": {
-                        transform: "translateY(-2px) scale(1.04)",
-                        borderColor: "primary.main",
-                        background: "rgba(79,70,229,0.25)",
-                        boxShadow: "0 10px 25px rgba(79,70,229,0.55)",
-                      },
-                    }}
+                {[
+                  {
+                    icon: GitHubIcon,
+                    link: "https://github.com/tufailsarovar",
+                  },
+                  {
+                    icon: LinkedInIcon,
+                    link: "https://linkedin.com/in/tufailsarovar",
+                  },
+                  {
+                    icon: XIcon,
+                    link: "https://x.com/tufailsarovar",
+                  },
+                ].map((item, idx) => (
+                  <a
+                    key={idx}
+                    href={item.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: "none" }}
                   >
-                    <GitHubIcon fontSize="small" sx={{ color: "white" }} />
-                  </IconButton>
+                    <IconButton
+                      size="small"
+                      sx={{
+                        color: "white",
+                        borderRadius: 2,
+                        border: "1px solid rgba(148,163,184,0.4)",
+                        transition:
+                          "transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease",
+                        "&:hover": {
+                          transform: "translateY(-2px) scale(1.04)",
+                          borderColor: "primary.main",
+                          background: "rgba(79,70,229,0.25)",
+                          boxShadow: "0 10px 25px rgba(79,70,229,0.55)",
+                        },
+                      }}
+                    >
+                      {/* use dynamic icon */}
+                      <item.icon fontSize="small" sx={{ color: "white" }} />
+                    </IconButton>
+                  </a>
                 ))}
               </Box>
             </Grid>

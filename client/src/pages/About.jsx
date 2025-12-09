@@ -9,12 +9,23 @@ const About = () => {
           About CodeX
         </Typography>
         <Typography variant="body1" color="text.secondary" paragraph>
-          CodeX is a digital store focused on college project selling. It is built as a MERN full-stack application
-          where students can purchase ready-to-use academic projects with full source code, documentation and PPT.
+          CodeX is a digital store focused on college project selling. It is
+          built as a MERN full-stack application where students can purchase
+          ready-to-use academic projects with full source code, documentation
+          and PPT.
         </Typography>
         <Typography variant="body1" color="text.secondary" paragraph>
-          This platform is designed as a final year college project itself, showcasing real-world features like
-          authentication, payment flow, secured downloads and email notifications.
+          This platform is designed as a final year college project itself,
+          showcasing real-world features like authentication, payment flow,
+          secured downloads and email notifications.
+        </Typography>
+        <Typography variant="body1" color="text.secondary" paragraph>
+          <Typography variant="body1" color="text.secondary" paragraph>
+            Purchase any project securely through Razorpay and get immediate
+            access to the full project bundle — including source code,
+            documentation, setup guide, and PPT — delivered instantly to your
+            registered email.
+          </Typography>
         </Typography>
 
         <Grid container spacing={3} sx={{ mt: 2 }}>
@@ -25,8 +36,8 @@ const About = () => {
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 • Get complete, working projects with clean code. <br />
-                • Learn MERN and frontend by reading real projects. <br />
-                • Submit high-quality work with documentation and PPT.
+                • Learn MERN and frontend by reading real projects. <br />•
+                Submit high-quality work with documentation and PPT.
               </Typography>
             </Paper>
           </Grid>
@@ -37,8 +48,8 @@ const About = () => {
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 • Showcases secure user authentication. <br />
-                • Demonstrates mock payment and order handling. <br />
-                • Implements secure download access via backend.
+                • Demonstrates mock payment and order handling. <br />•
+                Implements secure download access on your Email.
               </Typography>
             </Paper>
           </Grid>

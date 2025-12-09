@@ -12,7 +12,7 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
-  useScrollTrigger
+  useScrollTrigger,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
@@ -26,7 +26,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 const ElevationScroll = ({ children }) => {
   const trigger = useScrollTrigger({
     disableHysteresis: true,
-    threshold: 10
+    threshold: 10,
   });
 
   return React.cloneElement(children, {
@@ -39,8 +39,8 @@ const ElevationScroll = ({ children }) => {
       boxShadow: trigger
         ? "0 18px 45px rgba(15,23,42,0.8)"
         : "0 1px 0 rgba(148,163,184,0.35)",
-      borderBottom: "1px solid rgba(148,163,184,0.25)"
-    }
+      borderBottom: "1px solid rgba(148,163,184,0.25)",
+    },
   });
 };
 
@@ -61,8 +61,12 @@ const Navbar = () => {
   const menuItems = [
     { text: "Home", to: "/", icon: <HomeIcon fontSize="small" /> },
     { text: "About", to: "/about", icon: <InfoIcon fontSize="small" /> },
-    { text: "All Projects", to: "/projects", icon: <DashboardIcon fontSize="small" /> },
-    { text: "Explore", to: "/explore", icon: <ExploreIcon fontSize="small" /> }
+    {
+      text: "All Projects",
+      to: "/projects",
+      icon: <DashboardIcon fontSize="small" />,
+    },
+    { text: "Explore", to: "/explore", icon: <ExploreIcon fontSize="small" /> },
   ];
 
   const isActive = (path) =>
@@ -83,7 +87,7 @@ const Navbar = () => {
               minHeight: 70,
               display: "flex",
               justifyContent: "space-between",
-              gap: 2
+              gap: 2,
             }}
           >
             {/* Logo */}
@@ -91,29 +95,21 @@ const Navbar = () => {
               sx={{
                 display: "flex",
                 alignItems: "center",
-                gap: 1
+                gap: 1,
               }}
             >
               <Box
+                component="img"
+                src="images/logo.png" 
+                alt="CodeX Logo"
                 sx={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 2,
-                  background:
-                    "conic-gradient(from 180deg at 50% 50%, #6366F1, #F97316, #22C55E, #6366F1)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  boxShadow: "0 12px 30px rgba(79,70,229,0.7)"
+                  height: 50, 
+                  width: 50,
+                  objectFit: "cover",
+                  cursor: "pointer",
                 }}
-              >
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 800, color: "#0B1120", fontSize: 14 }}
-                >
-                  CX
-                </Typography>
-              </Box>
+                onClick={() => navigate("/")}
+              />
 
               <Box>
                 <Typography
@@ -126,16 +122,19 @@ const Navbar = () => {
                     fontSize: 22,
                     background: "linear-gradient(90deg, #E5E7EB, #A5B4FC)",
                     WebkitBackgroundClip: "text",
-                    color: "transparent"
+                    color: "transparent",
                   }}
                 >
                   CodeX
                 </Typography>
                 <Typography
                   variant="caption"
-                  sx={{ color: "text.secondary", display: { xs: "none", sm: "block" } }}
+                  sx={{
+                    color: "text.secondary",
+                    display: { xs: "none", sm: "block" },
+                  }}
                 >
-                  College Project Store
+                  Code | Learn | Submit | Succeed
                 </Typography>
               </Box>
             </Box>
@@ -145,7 +144,7 @@ const Navbar = () => {
               sx={{
                 display: { xs: "none", md: "flex" },
                 alignItems: "center",
-                gap: 1.5
+                gap: 1.5,
               }}
             >
               {menuItems.map((item) => (
@@ -159,7 +158,9 @@ const Navbar = () => {
                     px: 1.5,
                     py: 0.5,
                     fontSize: 14,
-                    color: isActive(item.to) ? "primary.main" : "text.secondary",
+                    color: isActive(item.to)
+                      ? "primary.main"
+                      : "text.secondary",
                     textTransform: "none",
                     "&::after": {
                       content: '""',
@@ -170,15 +171,15 @@ const Navbar = () => {
                       height: 2,
                       borderRadius: 999,
                       bgcolor: "primary.main",
-                      transition: "width 0.25s ease-out"
+                      transition: "width 0.25s ease-out",
                     },
                     "&:hover::after": {
-                      width: "100%"
+                      width: "100%",
                     },
                     "&:hover": {
                       color: "primary.main",
-                      backgroundColor: "transparent"
-                    }
+                      backgroundColor: "transparent",
+                    },
                   }}
                 >
                   {item.text}
@@ -199,8 +200,8 @@ const Navbar = () => {
                       color: "text.primary",
                       "&:hover": {
                         borderColor: "primary.main",
-                        backgroundColor: "rgba(79,70,229,0.1)"
-                      }
+                        backgroundColor: "rgba(79,70,229,0.1)",
+                      },
                     }}
                     startIcon={<LoginIcon fontSize="small" />}
                   >
@@ -222,8 +223,8 @@ const Navbar = () => {
                       "&:hover": {
                         background:
                           "linear-gradient(90deg, #4F46E5, #7C3AED, #EA580C)",
-                        boxShadow: "0 18px 40px rgba(79,70,229,0.9)"
-                      }
+                        boxShadow: "0 18px 40px rgba(79,70,229,0.9)",
+                      },
                     }}
                   >
                     Sign Up
@@ -242,8 +243,8 @@ const Navbar = () => {
                     color: "error.light",
                     "&:hover": {
                       borderColor: "error.main",
-                      backgroundColor: "rgba(239,68,68,0.1)"
-                    }
+                      backgroundColor: "rgba(239,68,68,0.1)",
+                    },
                   }}
                 >
                   Logout
@@ -272,8 +273,8 @@ const Navbar = () => {
           sx: {
             width: 270,
             bgcolor: "#020617",
-            borderLeft: "1px solid rgba(148,163,184,0.35)"
-          }
+            borderLeft: "1px solid rgba(148,163,184,0.35)",
+          },
         }}
       >
         <Box sx={{ p: 2, pb: 1 }}>
@@ -300,13 +301,13 @@ const Navbar = () => {
                 mb: 0.5,
                 bgcolor: isActive(item.to)
                   ? "rgba(79,70,229,0.16)"
-                  : "transparent"
+                  : "transparent",
               }}
             >
               <ListItemIcon
                 sx={{
                   minWidth: 36,
-                  color: isActive(item.to) ? "primary.main" : "text.secondary"
+                  color: isActive(item.to) ? "primary.main" : "text.secondary",
                 }}
               >
                 {item.icon}
@@ -315,7 +316,7 @@ const Navbar = () => {
                 primary={item.text}
                 primaryTypographyProps={{
                   fontSize: 14,
-                  fontWeight: isActive(item.to) ? 600 : 400
+                  fontWeight: isActive(item.to) ? 600 : 400,
                 }}
               />
             </ListItemButton>
@@ -352,7 +353,7 @@ const Navbar = () => {
                   borderRadius: 2,
                   mb: 0.5,
                   background:
-                    "linear-gradient(90deg, rgba(99,102,241,0.15), rgba(248,113,113,0.18))"
+                    "linear-gradient(90deg, rgba(99,102,241,0.15), rgba(248,113,113,0.18))",
                 }}
               >
                 <ListItemIcon sx={{ minWidth: 36 }}>
@@ -362,7 +363,7 @@ const Navbar = () => {
                   primary="Create Account"
                   primaryTypographyProps={{
                     fontSize: 14,
-                    fontWeight: 600
+                    fontWeight: 600,
                   }}
                 />
               </ListItemButton>
@@ -376,7 +377,7 @@ const Navbar = () => {
               sx={{
                 borderRadius: 2,
                 mb: 0.5,
-                bgcolor: "rgba(239,68,68,0.14)"
+                bgcolor: "rgba(239,68,68,0.14)",
               }}
             >
               <ListItemIcon sx={{ minWidth: 36, color: "error.light" }}>
@@ -387,7 +388,7 @@ const Navbar = () => {
                 primaryTypographyProps={{
                   fontSize: 14,
                   fontWeight: 600,
-                  color: "error.light"
+                  color: "error.light",
                 }}
               />
             </ListItemButton>
