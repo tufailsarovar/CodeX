@@ -47,7 +47,7 @@ const ProjectCard = ({ project }) => {
           {project.description}
         </Typography>
         <Stack direction="row" spacing={0.5} flexWrap="wrap" sx={{ mb: 1 }}>
-          {project.techStack?.slice(0, 3).map((tech) => (
+          {project.techStack?.slice(0, 4).map((tech) => (
             <Chip key={tech} label={tech} size="small" variant="outlined" />
           ))}
         </Stack>
