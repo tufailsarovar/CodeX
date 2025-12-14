@@ -34,6 +34,12 @@ const ProjectCard = ({ project }) => {
           height="160"
           image={project.screenshotUrl}
           alt={project.title}
+          sx={{
+            transition: "transform 0.4s ease",
+            "&:hover": {
+              transform: "scale(1.08)",
+            },
+          }}
         />
       )}
       <CardContent sx={{ flexGrow: 1 }}>
