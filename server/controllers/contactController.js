@@ -1,25 +1,31 @@
 import nodemailer from "nodemailer";
 
 export const sendContact = async (req, res) => {
-  const { name, email, subject, message } = req.body;
-
-  if (!name || !email || !subject || !message) {
-    return res.status(400).json({ message: "All fields required" });
-  }
-
   try {
+    const { name, email, subject, message } = req.body;
+
+    if (!name || !email || !subject || !message) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.CONTACT_EMAIL,
         pass: process.env.CONTACT_EMAIL_PASS,
       },
     });
 
+    // ✅ VERIFY CONNECTION
+    await transporter.verify();
+
     await transporter.sendMail({
-      from: email,
+      from: `"CodeX Contact" <${process.env.CONTACT_EMAIL}>`,
       to: process.env.CONTACT_EMAIL,
-      subject: `CodeX Contact: ${subject}`,
+      replyTo: email,
+      subject: `Contact: ${subject}`,
       html: `
         <h3>New Contact Message</h3>
         <p><b>Name:</b> ${name}</p>
@@ -28,8 +34,9 @@ export const sendContact = async (req, res) => {
       `,
     });
 
-    res.status(200).json({ message: "Message sent" });
+    res.status(200).json({ message: "Message sent successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Email failed" });
+    console.error("CONTACT ERROR:", error);
+    res.status(500).json({ message: "Email sending failed" });
   }
 };

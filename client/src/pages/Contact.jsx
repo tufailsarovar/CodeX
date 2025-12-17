@@ -6,116 +6,107 @@ import {
   Typography,
   Button,
   Paper,
-  Stack
+  Stack,
 } from "@mui/material";
+import emailjs from "@emailjs/browser";
+
+emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
 
 const Contact = () => {
   const [form, setForm] = useState({
     name: "",
     email: "",
     subject: "",
-    message: ""
+    message: "",
   });
-
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setSuccess("");
+    setError("");
 
-    // 🔹 Later you can connect backend or email service here
-    setTimeout(() => {
-      setSuccess("Your message has been sent successfully!");
+    try {
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        {
+          name: form.name,
+          email: form.email,
+          subject: form.subject,
+          message: form.message,
+        },
+      );
+
+      setSuccess("Message sent successfully!");
       setForm({ name: "", email: "", subject: "", message: "" });
+    } catch (err) {
+      console.error("EmailJS error:", err);
+      setError("Failed to send message. Try again.");
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   };
 
   return (
     <Box sx={{ py: 8 }}>
       <Container maxWidth="sm">
         <Paper sx={{ p: 4, bgcolor: "rgba(15,23,42,0.9)" }}>
-          <Typography variant="h4" fontWeight={700} mb={1}>
+          <Typography variant="h4" fontWeight={700} mb={2}>
             Contact Us
-          </Typography>
-
-          <Typography variant="body2" color="text.secondary" mb={3}>
-            Have questions or need support? Get in touch with us.
           </Typography>
 
           <Box component="form" onSubmit={handleSubmit}>
             <Stack spacing={2}>
               <TextField
-                label="Your Name"
+                label="Name"
                 name="name"
-                fullWidth
                 required
                 value={form.name}
                 onChange={handleChange}
               />
-
               <TextField
-                label="Email Address"
+                label="Email"
                 name="email"
                 type="email"
-                fullWidth
                 required
                 value={form.email}
                 onChange={handleChange}
               />
-
               <TextField
                 label="Subject"
                 name="subject"
-                fullWidth
                 required
                 value={form.subject}
                 onChange={handleChange}
               />
-
               <TextField
-                label="Description"
+                label="Message"
                 name="message"
-                fullWidth
-                required
                 multiline
                 rows={4}
+                required
                 value={form.message}
                 onChange={handleChange}
               />
 
               {success && (
-                <Typography color="success.main" variant="body2">
-                  {success}
-                </Typography>
+                <Typography color="success.main">{success}</Typography>
               )}
+              {error && <Typography color="error">{error}</Typography>}
 
-              <Button
-                type="submit"
-                variant="contained"
-                size="large"
-                disabled={loading}
-              >
+              <Button type="submit" variant="contained" disabled={loading}>
                 {loading ? "Sending..." : "Send Message"}
               </Button>
             </Stack>
           </Box>
-
-          {/* Razorpay-friendly owner info */}
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            display="block"
-            mt={3}
-            textAlign="center"
-          >
-            Managed by <strong>Tufail Sarovar</strong> | CEO, CodeX
-          </Typography>
         </Paper>
       </Container>
     </Box>
