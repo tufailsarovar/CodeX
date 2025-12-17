@@ -10,8 +10,12 @@ const About = () => {
         </Typography>
         <Typography variant="body1" color="text.secondary" paragraph>
          Tufail Sarovar is the Founder & CEO of CodeX, a digital platform dedicated to providing high-quality coding projects and learning resources for students and developers. With a strong passion for full-stack development and modern web technologies, he focuses on building secure, user-friendly, and scalable digital products.
-          
-Under his leadership, CodeX aims to simplify access to practical projects, source code, documentation, and presentations, helping learners enhance their real-world technical skills.
+        </Typography>
+        <Typography variant="body1" color="text.secondary" paragraph>
+          Under his leadership, CodeX aims to simplify access to practical projects, source code, documentation, and presentations, helping learners enhance their real-world technical skills.
+        </Typography>
+        <Typography variant="body1" color="text.secondary" paragraph>
+          © 2025 CodeX | CEO: Tufail Sarovar
         </Typography>
         <Typography variant="h4" fontWeight={700} marginTop={5} gutterBottom>
           About CodeX
