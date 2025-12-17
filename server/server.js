@@ -8,6 +8,8 @@ import authRoutes from "./routes/authRoutes.js";
 import projectRoutes from "./routes/projectRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import downloadRoutes from "./routes/downloadRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
+
 
 dotenv.config();
 console.log("MONGO_URI from env:", process.env.MONGO_URI?.slice(0, 40) + "...");
@@ -35,6 +37,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/download", downloadRoutes);
+app.use("/api/contact", contactRoutes);
+
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

@@ -7,22 +7,26 @@ import {
   Box,
   IconButton,
   Drawer,
-  List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Divider,
   useScrollTrigger,
 } from "@mui/material";
+
 import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
 import InfoIcon from "@mui/icons-material/Info";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ExploreIcon from "@mui/icons-material/TravelExplore";
+import ContactMailIcon from "@mui/icons-material/ContactMail";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+/* ---------- Elevation Scroll ---------- */
 const ElevationScroll = ({ children }) => {
   const trigger = useScrollTrigger({
     disableHysteresis: true,
@@ -44,19 +48,20 @@ const ElevationScroll = ({ children }) => {
   });
 };
 
+/* ---------- Navbar ---------- */
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const token = localStorage.getItem("codex_token");
   const [open, setOpen] = useState(false);
 
+  const toggleDrawer = () => setOpen((prev) => !prev);
+
   const handleLogout = () => {
     localStorage.removeItem("codex_token");
     localStorage.removeItem("codex_user");
-    navigate("/login");
+    navigate("/");
   };
-
-  const toggleDrawer = () => setOpen((prev) => !prev);
 
   const menuItems = [
     { text: "Home", to: "/", icon: <HomeIcon fontSize="small" /> },
@@ -67,6 +72,11 @@ const Navbar = () => {
       icon: <DashboardIcon fontSize="small" />,
     },
     { text: "Explore", to: "/explore", icon: <ExploreIcon fontSize="small" /> },
+    {
+      text: "Contact",
+      to: "/contact",
+      icon: <ContactMailIcon fontSize="small" />,
+    },
   ];
 
   const isActive = (path) =>
@@ -87,99 +97,46 @@ const Navbar = () => {
               minHeight: 70,
               display: "flex",
               justifyContent: "space-between",
-              gap: 2,
             }}
           >
             {/* Logo */}
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-              }}
-            >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Box
                 component="img"
-                src="images/logo.png" 
+                src="images/logo.png"
                 alt="CodeX Logo"
-                sx={{
-                  height: 50, 
-                  width: 50,
-                  objectFit: "cover",
-                  cursor: "pointer",
-                }}
+                sx={{ height: 50, width: 50, cursor: "pointer" }}
                 onClick={() => navigate("/")}
               />
-
-              <Box>
-                <Typography
-                  component={Link}
-                  to="/"
-                  sx={{
-                    textDecoration: "none",
-                    fontWeight: 800,
-                    letterSpacing: 1,
-                    fontSize: 22,
-                    background: "linear-gradient(90deg, #E5E7EB, #A5B4FC)",
-                    WebkitBackgroundClip: "text",
-                    color: "transparent",
-                  }}
-                >
-                  CodeX
-                </Typography>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: "text.secondary",
-                    display: { xs: "none", sm: "block" },
-                  }}
-                >
-                  Code | Learn | Submit | Succeed
-                </Typography>
-              </Box>
+              <Typography
+                component={Link}
+                to="/"
+                sx={{
+                  textDecoration: "none",
+                  fontWeight: 800,
+                  fontSize: 22,
+                  background: "linear-gradient(90deg,#E5E7EB,#A5B4FC)",
+                  WebkitBackgroundClip: "text",
+                  color: "transparent",
+                }}
+              >
+                CodeX
+              </Typography>
             </Box>
 
-            {/* Desktop Menu */}
-            <Box
-              sx={{
-                display: { xs: "none", md: "flex" },
-                alignItems: "center",
-                gap: 1.5,
-              }}
-            >
+            {/* Desktop Menu (unchanged) */}
+            <Box sx={{ display: { xs: "none", md: "flex" }, gap: 1.5 }}>
               {menuItems.map((item) => (
                 <Button
                   key={item.to}
                   component={Link}
                   to={item.to}
-                  disableRipple
                   sx={{
-                    position: "relative",
-                    px: 1.5,
-                    py: 0.5,
                     fontSize: 14,
+                    textTransform: "none",
                     color: isActive(item.to)
                       ? "primary.main"
                       : "text.secondary",
-                    textTransform: "none",
-                    "&::after": {
-                      content: '""',
-                      position: "absolute",
-                      left: 0,
-                      bottom: 0,
-                      width: isActive(item.to) ? "100%" : 0,
-                      height: 2,
-                      borderRadius: 999,
-                      bgcolor: "primary.main",
-                      transition: "width 0.25s ease-out",
-                    },
-                    "&:hover::after": {
-                      width: "100%",
-                    },
-                    "&:hover": {
-                      color: "primary.main",
-                      backgroundColor: "transparent",
-                    },
                   }}
                 >
                   {item.text}
@@ -192,41 +149,11 @@ const Navbar = () => {
                     component={Link}
                     to="/login"
                     variant="outlined"
-                    sx={{
-                      borderRadius: 999,
-                      fontSize: 14,
-                      textTransform: "none",
-                      borderColor: "rgba(148,163,184,0.7)",
-                      color: "text.primary",
-                      "&:hover": {
-                        borderColor: "primary.main",
-                        backgroundColor: "rgba(79,70,229,0.1)",
-                      },
-                    }}
-                    startIcon={<LoginIcon fontSize="small" />}
+                    startIcon={<LoginIcon />}
                   >
                     Login
                   </Button>
-                  <Button
-                    component={Link}
-                    to="/signup"
-                    variant="contained"
-                    sx={{
-                      borderRadius: 999,
-                      fontSize: 14,
-                      textTransform: "none",
-                      px: 2.6,
-                      background:
-                        "linear-gradient(90deg, #6366F1, #8B5CF6, #F97316)",
-                      boxShadow:
-                        "0 14px 30px rgba(88,80,236,0.7), 0 0 0 1px rgba(15,23,42,0.4)",
-                      "&:hover": {
-                        background:
-                          "linear-gradient(90deg, #4F46E5, #7C3AED, #EA580C)",
-                        boxShadow: "0 18px 40px rgba(79,70,229,0.9)",
-                      },
-                    }}
-                  >
+                  <Button component={Link} to="/signup" variant="contained">
                     Sign Up
                   </Button>
                 </>
@@ -234,29 +161,17 @@ const Navbar = () => {
                 <Button
                   onClick={handleLogout}
                   variant="outlined"
-                  startIcon={<LogoutIcon fontSize="small" />}
-                  sx={{
-                    borderRadius: 999,
-                    fontSize: 14,
-                    textTransform: "none",
-                    borderColor: "rgba(248,113,113,0.8)",
-                    color: "error.light",
-                    "&:hover": {
-                      borderColor: "error.main",
-                      backgroundColor: "rgba(239,68,68,0.1)",
-                    },
-                  }}
+                  startIcon={<LogoutIcon />}
                 >
                   Logout
                 </Button>
               )}
             </Box>
 
-            {/* Mobile Menu Icon */}
+            {/* Mobile Menu Icon (WHITE) */}
             <IconButton
-              sx={{ display: { xs: "flex", md: "none" } }}
               onClick={toggleDrawer}
-              color="inherit"
+              sx={{ display: { xs: "flex", md: "none" }, color: "#ffffff" }}
             >
               <MenuIcon />
             </IconButton>
@@ -273,21 +188,18 @@ const Navbar = () => {
           sx: {
             width: 270,
             bgcolor: "#020617",
-            borderLeft: "1px solid rgba(148,163,184,0.35)",
           },
         }}
       >
-        <Box sx={{ p: 2, pb: 1 }}>
-          <Typography variant="h6" sx={{ fontWeight: 700 }}>
+        <Box sx={{ p: 2 }}>
+          <Typography fontWeight={700} color="white">
             CodeX Menu
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            Navigate through the store
           </Typography>
         </Box>
 
-        <Divider sx={{ borderColor: "rgba(148,163,184,0.25)" }} />
+        <Divider />
 
+        {/* Main Links */}
         <Box sx={{ p: 1 }}>
           {menuItems.map((item) => (
             <ListItemButton
@@ -307,15 +219,18 @@ const Navbar = () => {
               <ListItemIcon
                 sx={{
                   minWidth: 36,
-                  color: isActive(item.to) ? "primary.main" : "text.secondary",
+                  color: isActive(item.to)
+                    ? "primary.main"
+                    : "rgba(203,213,225,0.7)",
                 }}
               >
                 {item.icon}
               </ListItemIcon>
+
               <ListItemText
                 primary={item.text}
                 primaryTypographyProps={{
-                  fontSize: 14,
+                  color: "white",
                   fontWeight: isActive(item.to) ? 600 : 400,
                 }}
               />
@@ -323,9 +238,10 @@ const Navbar = () => {
           ))}
         </Box>
 
-        <Divider sx={{ my: 1, borderColor: "rgba(148,163,184,0.25)" }} />
+        <Divider />
 
-        <Box sx={{ p: 1, pb: 2 }}>
+        {/* Auth Section */}
+        <Box sx={{ p: 1 }}>
           {!token ? (
             <>
               <ListItemButton
@@ -333,14 +249,13 @@ const Navbar = () => {
                   navigate("/login");
                   toggleDrawer();
                 }}
-                sx={{ borderRadius: 2, mb: 0.5 }}
               >
-                <ListItemIcon sx={{ minWidth: 36 }}>
-                  <LoginIcon fontSize="small" />
+                <ListItemIcon sx={{ color: "rgba(203,213,225,0.7)" }}>
+                  <LoginIcon />
                 </ListItemIcon>
                 <ListItemText
                   primary="Login"
-                  primaryTypographyProps={{ fontSize: 14 }}
+                  primaryTypographyProps={{ color: "white" }}
                 />
               </ListItemButton>
 
@@ -349,20 +264,14 @@ const Navbar = () => {
                   navigate("/signup");
                   toggleDrawer();
                 }}
-                sx={{
-                  borderRadius: 2,
-                  mb: 0.5,
-                  background:
-                    "linear-gradient(90deg, rgba(99,102,241,0.15), rgba(248,113,113,0.18))",
-                }}
               >
-                <ListItemIcon sx={{ minWidth: 36 }}>
-                  <ExploreIcon fontSize="small" />
+                <ListItemIcon sx={{ color: "rgba(203,213,225,0.7)" }}>
+                  <PersonAddIcon />
                 </ListItemIcon>
                 <ListItemText
                   primary="Create Account"
                   primaryTypographyProps={{
-                    fontSize: 14,
+                    color: "white",
                     fontWeight: 600,
                   }}
                 />
@@ -374,22 +283,13 @@ const Navbar = () => {
                 handleLogout();
                 toggleDrawer();
               }}
-              sx={{
-                borderRadius: 2,
-                mb: 0.5,
-                bgcolor: "rgba(239,68,68,0.14)",
-              }}
             >
-              <ListItemIcon sx={{ minWidth: 36, color: "error.light" }}>
-                <LogoutIcon fontSize="small" />
+              <ListItemIcon sx={{ color: "rgba(203,213,225,0.7)" }}>
+                <LogoutIcon />
               </ListItemIcon>
               <ListItemText
                 primary="Logout"
-                primaryTypographyProps={{
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: "error.light",
-                }}
+                primaryTypographyProps={{ color: "white" }}
               />
             </ListItemButton>
           )}

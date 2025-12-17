@@ -10,6 +10,7 @@ import Signup from "./pages/Auth/Signup";
 import AllProjects from "./pages/Projects/AllProjects";
 import ExploreProjects from "./pages/Projects/ExploreProjects";
 import ProjectDetails from "./pages/Projects/ProjectDetails";
+import Contact from "./pages/Contact";
 
 const App = () => {
   return (
@@ -32,6 +33,7 @@ const App = () => {
           <Route path="/projects" element={<AllProjects />} />
           <Route path="/explore" element={<ExploreProjects />} />
           <Route path="/projects/:id" element={<ProjectDetails />} />
+          <Route path="/contact" element={<Contact />} />
         </Routes>
       </Box>
       <Footer />
