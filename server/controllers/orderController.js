@@ -101,7 +101,7 @@ export const verifyPayment = async (req, res) => {
         <h2>Payment Successful ✅</h2>
         <p>Thank you for purchasing <b>${project.title}</b>.</p>
         <p>
-          <a href="${project.zipUrl}" target="_blank">
+          <a href="${project.zipFileUrl}" target="_blank">
             👉 Download your ZIP file
           </a>
         </p>
