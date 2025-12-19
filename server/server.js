@@ -1,8 +1,8 @@
-import express from "express";
 import dotenv from "dotenv";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import morgan from "morgan";
+dotenv.config();
+// import cookieParser from "cookie-parser";
+// import morgan from "morgan";
+import express from "express";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import projectRoutes from "./routes/projectRoutes.js";
@@ -11,22 +11,44 @@ import downloadRoutes from "./routes/downloadRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 
 
-dotenv.config();
+
 console.log("MONGO_URI from env:", process.env.MONGO_URI?.slice(0, 40) + "...");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // DB
 connectDB();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Middleware
-app.use(cors({
-  origin: process.env.CLIENT_URL || "http://localhost:5173",
-  credentials: true
-}));
-app.use(express.json());
-app.use(cookieParser());
-app.use(morgan("dev"));
+import cors from "cors";
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://codex-tufail.vercel.app",
+  "https://code-x-eight-murex.vercel.app"
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow server-to-server / Postman
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+
 
 // Routes
 app.get("/", (req, res) => {

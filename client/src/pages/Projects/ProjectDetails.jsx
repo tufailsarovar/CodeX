@@ -55,7 +55,7 @@ const ProjectDetails = () => {
         alert("Razorpay SDK not loaded. Check internet.");
         return;
       }
-
+      const razorpayOrder = data.order;
       const options = {
         key: data.key,
         amount: data.order.amount,
@@ -68,7 +68,7 @@ const ProjectDetails = () => {
           try {
             // 2) Verify payment on backend
             await api.post("/orders/verify", {
-              razorpay_order_id: response.razorpay_order_id,
+              razorpay_order_id: razorpayOrder.id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
               projectId: id
