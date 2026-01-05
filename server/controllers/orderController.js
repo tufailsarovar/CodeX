@@ -81,7 +81,7 @@ export const verifyPayment = async (req, res) => {
         }
       });
 
-      const downloadLink = `${process.env.CLIENT_URL}/download/${project._id}`;
+      const downloadLink = project.zipFileUrl;
 
       await transporter.sendMail({
         from: process.env.SMTP_FROM,
