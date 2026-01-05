@@ -1,119 +1,109 @@
 import crypto from "crypto";
-import nodemailer from "nodemailer";
 import { razorpay } from "../config/razorpay.js";
 import { Order } from "../models/Order.js";
 import { Project } from "../models/Project.js";
+import nodemailer from "nodemailer";
 
-/**
- * CREATE PAYMENT ORDER
- */
+// CREATE PAYMENT ORDER (Frontend will open Razorpay checkout)
 export const createPaymentOrder = async (req, res) => {
   try {
     const { projectId } = req.body;
+    const userId = req.user._id;
 
     const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found" });
-    }
+    if (!project) return res.status(404).json({ message: "Project not found" });
 
     const options = {
-      amount: project.price * 100, // paise
+      amount: project.price * 100,       // Rupees to Paise
       currency: "INR",
-      receipt: `receipt_${Date.now()}`,
+      receipt: "rcpt_" + Date.now(),
     };
 
     const order = await razorpay.orders.create(options);
 
-    res.json({
+    res.status(200).json({
       success: true,
-      razorpayOrderId: order.id,
-      amount: order.amount,
-      currency: order.currency,
+      order,
+      project,
+      key: process.env.RAZORPAY_KEY_ID
     });
-  } catch (error) {
-    console.error("CreatePaymentOrder Error:", error);
-    res.status(500).json({ message: "Unable to create order" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Razorpay order creation failed" });
   }
 };
 
-/**
- * VERIFY PAYMENT + SAVE ORDER + SEND EMAIL
- */
+// VERIFY PAYMENT SIGNATURE
 export const verifyPayment = async (req, res) => {
   try {
     const {
-      razorpay_payment_id,
       razorpay_order_id,
-      razorpay_signature,
-      projectId,
+      razorpay_payment_id,
+      razorpay_signature
     } = req.body;
 
-    console.log("ORDER:", razorpay_order_id);
-    console.log("PAYMENT:", razorpay_payment_id);
-    console.log("SIGNATURE:", razorpay_signature);
-    console.log("SECRET:", process.env.RAZORPAY_KEY_SECRET);
+    // ✅ FIX: define projectId (was causing ReferenceError)
+    const projectId = req.body.project;
+    const userId = req.user._id;
 
-    if (!req.user) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
+    const sign = razorpay_order_id + "|" + razorpay_payment_id;
 
-    // ✅ 1. Verify signature
-    const body = `${razorpay_order_id}|${razorpay_payment_id}`;
-    const expectedSignature = crypto
+    const expectedSign = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-      .update(body)
+      .update(sign)
       .digest("hex");
 
-    if (expectedSignature !== razorpay_signature) {
-      return res.status(400).json({ message: "Invalid payment signature" });
+    if (expectedSign !== razorpay_signature) {
+      return res.status(400).json({ message: "Payment verification failed" });
     }
 
-    // ✅ 2. Get project
+    // Payment Verified → Save order in DB
     const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found" });
+    const order = await Order.create({
+      user: userId,
+      project: projectId,
+      amount: project.price,
+      paymentStatus: "paid",
+      paymentProvider: "razorpay",
+      paymentId: razorpay_payment_id,
+    });
+
+    // SEND EMAIL (ZIP LINK)
+    const userEmail = req.user.email;
+
+    try {
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS
+        }
+      });
+
+      const downloadLink = `${process.env.CLIENT_URL}/download/${project._id}`;
+
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM,
+        to: userEmail,
+        subject: `Your CodeX Purchase: ${project.title}`,
+        html: `
+          <h2>Payment Successful!</h2>
+          <p>You purchased: <strong>${project.title}</strong></p>
+          <p>Amount Paid: ₹${project.price}</p>
+          <p>Download your ZIP file:</p>
+          <a href="${downloadLink}">Click here to download</a>
+        `
+      });
+    } catch (emailErr) {
+      console.log("Email error:", emailErr);
     }
 
-    // ✅ 3. Save order
-    const order = await Order.create({
-      user: req.user._id,
-      project: project._id,
-      paymentId: razorpay_payment_id,
-      orderId: razorpay_order_id,
-      amount: project.price,
-      status: "paid",
-    });
+    res.status(200).json({ success: true, message: "Payment verified" });
 
-    // ✅ 4. Send email with ZIP link
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-
-    await transporter.sendMail({
-      from: `"CodeX" <${process.env.SMTP_USER}>`,
-      to: req.user.email,
-      subject: "Your CodeX Project Download",
-      html: `
-        <h2>Payment Successful ✅</h2>
-        <p>Thank you for purchasing <b>${project.title}</b>.</p>
-        <p>
-          <a href="${project.zipFileUrl}" target="_blank">
-            👉 Download your ZIP file
-          </a>
-        </p>
-      `,
-    });
-
-    res.json({
-      success: true,
-      orderId: order._id,
-    });
-  } catch (error) {
-    console.error("VerifyPayment Error:", error);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Payment verification failed" });
   }
 };
+

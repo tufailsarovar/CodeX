@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
+import cors from "cors";
 // import cookieParser from "cookie-parser";
 // import morgan from "morgan";
 import express from "express";
@@ -18,21 +19,16 @@ const PORT = process.env.PORT || 5000;
 
 // DB
 connectDB();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Middleware
-import cors from "cors";
-
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://codex-tufail.vercel.app",
-  "https://code-x-eight-murex.vercel.app"
+  "https://codex-tufail.vercel.app"
 ];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
+    origin: (origin, callback) => {
       // allow server-to-server / Postman
       if (!origin) return callback(null, true);
 
@@ -43,18 +39,14 @@ app.use(
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-
 
 // Routes
 app.get("/", (req, res) => {
   res.json({ message: "CodeX API running" });
 });
-
+app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/orders", orderRoutes);

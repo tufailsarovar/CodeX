@@ -6,9 +6,9 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://code-x-eight-murex.vercel.app",
+        target: "http://localhost:5000",
         changeOrigin: true,
-        secure: true,
+        secure: false,
       },
     },
   },

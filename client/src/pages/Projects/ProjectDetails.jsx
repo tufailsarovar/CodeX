@@ -8,7 +8,7 @@ import {
   Chip,
   Stack,
   Button,
-  Paper
+  Paper,
 } from "@mui/material";
 import api from "../../api/axios";
 
@@ -36,10 +36,22 @@ const ProjectDetails = () => {
     fetchProject();
   }, [id]);
 
+  // ✅ RAZORPAY SDK LOADER (FIX)
+  const loadRazorpay = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   // ============================
   // REAL RAZORPAY PAYMENT HANDLER
   // ============================
   const handleBuy = async () => {
+    const token = localStorage.getItem("codex_token");
     if (!token) {
       navigate("/login");
       return;
@@ -48,14 +60,16 @@ const ProjectDetails = () => {
     try {
       // 1) Create order on backend
       const { data } = await api.post("/orders/create-order", {
-        projectId: id
+        projectId: id,
       });
 
-      if (!window.Razorpay) {
+      // ✅ FIX: Load Razorpay SDK
+      const loaded = await loadRazorpay();
+      if (!loaded) {
         alert("Razorpay SDK not loaded. Check internet.");
         return;
       }
-      const razorpayOrder = data.order;
+
       const options = {
         key: data.key,
         amount: data.order.amount,
@@ -68,10 +82,11 @@ const ProjectDetails = () => {
           try {
             // 2) Verify payment on backend
             await api.post("/orders/verify", {
-              razorpay_order_id: razorpayOrder.id,
+              razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
-              projectId: id
+              project: id,
+              amount: project.price,
             });
 
             alert(
@@ -79,13 +94,11 @@ const ProjectDetails = () => {
             );
           } catch (err) {
             console.error("Verification failed:", err);
-            alert(
-              "Payment captured but verification failed. Contact support."
-            );
+            alert("Payment captured but verification failed. Contact support.");
           }
         },
 
-        theme: { color: "#6366F1" }
+        theme: { color: "#6366F1" },
       };
 
       const rzp = new window.Razorpay(options);
@@ -152,9 +165,7 @@ const ProjectDetails = () => {
               {project.livePreviewUrl && (
                 <Button
                   variant="outlined"
-                  onClick={() =>
-                    window.open(project.livePreviewUrl, "_blank")
-                  }
+                  onClick={() => window.open(project.livePreviewUrl, "_blank")}
                 >
                   Live Preview
                 </Button>
@@ -173,7 +184,7 @@ const ProjectDetails = () => {
                 overflow: "hidden",
                 borderRadius: 3,
                 border: "1px solid rgba(148,163,184,0.4)",
-                mb: 2
+                mb: 2,
               }}
             >
               {project.screenshotUrl ? (
@@ -198,13 +209,12 @@ const ProjectDetails = () => {
               </Typography>
 
               <Typography variant="body2" color="text.secondary">
-                • Complete source code  
+                • Complete source code
                 <br />
-                • Documentation (DOC/PDF)  
+                • Documentation (DOC/PDF)
                 <br />
-                • PPT  
-                <br />
-                • Setup instructions  
+                • PPT
+                <br />• Setup instructions
               </Typography>
             </Paper>
           </Grid>

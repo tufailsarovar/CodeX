@@ -1,19 +1,18 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL:
-    import.meta.env.MODE === "development"
-      ? "/api"
-      : "https://code-x-eight-murex.vercel.app/api",
-  withCredentials: true,
+  baseURL: "/api"
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("codex_token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("codex_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export default api;

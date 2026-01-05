@@ -13,7 +13,7 @@ const projectSchema = new mongoose.Schema(
     price: { type: Number, required: true },
     screenshotUrl: { type: String },
     livePreviewUrl: { type: String },
-    zipFileUrl: { type: String, required: true }, // URL/path to the zip stored e.g. on Cloud or local
+    zipFileUrl: { type: String }, // URL/path to the zip stored e.g. on Cloud or local
   },
   { timestamps: true }
 );
