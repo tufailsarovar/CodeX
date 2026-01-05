@@ -44,6 +44,9 @@ const Home = () => {
           <Grid container spacing={6} alignItems="center">
             {/* LEFT HERO */}
             <Grid item xs={12} md={6}>
+              <Typography variant="body1" color="text.secondary" style={{fontSize: "12px"}}>
+                CodeX | Tufail Sarovar
+              </Typography>
               <Typography variant="overline" color="secondary.main">
                 Code | Learn | Submit | Succeed
               </Typography>

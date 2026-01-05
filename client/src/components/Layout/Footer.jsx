@@ -205,7 +205,10 @@ const Footer = () => {
             }}
           >
             <Typography variant="caption" color="text.secondary">
-              © {new Date().getFullYear()} Tufail Sarovar. All rights reserved.
+              © {new Date().getFullYear()} CodeX. All rights reserved.
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              CodeX | Tufail Sarovar
             </Typography>
             <Typography variant="caption" color="text.secondary">
               Built as a MERN full-stack college project.
