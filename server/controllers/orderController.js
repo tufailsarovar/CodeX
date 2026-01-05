@@ -93,6 +93,10 @@ export const verifyPayment = async (req, res) => {
           <p>Amount Paid: ₹${project.price}</p>
           <p>Download your ZIP file:</p>
           <a href="${downloadLink}">Click here to download</a>
+          <p>Thanks for Purhasing</p>
+          <hr>
+          <p>© 2026 CodeX. All rights reserved.</p>
+          <p>By Tufail Sarovar</p>
         `
       });
     } catch (emailErr) {
