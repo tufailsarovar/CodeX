@@ -23,6 +23,7 @@ import ContactMailIcon from "@mui/icons-material/ContactMail";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -52,7 +53,11 @@ const ElevationScroll = ({ children }) => {
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
   const token = localStorage.getItem("codex_token");
+  const user = JSON.parse(localStorage.getItem("codex_user"));
+  const isAdmin = user?.isAdmin;
+
   const [open, setOpen] = useState(false);
 
   const toggleDrawer = () => setOpen((prev) => !prev);
@@ -124,7 +129,7 @@ const Navbar = () => {
               </Typography>
             </Box>
 
-            {/* Desktop Menu (unchanged) */}
+            {/* Desktop Menu */}
             <Box sx={{ display: { xs: "none", md: "flex" }, gap: 1.5 }}>
               {menuItems.map((item) => (
                 <Button
@@ -142,6 +147,29 @@ const Navbar = () => {
                   {item.text}
                 </Button>
               ))}
+
+              {/* ✅ ADMIN ICON (BETTER UI) */}
+              {token && isAdmin && (
+                <IconButton
+                  onClick={() => navigate("/admin/dashboard")}
+                  sx={{
+                    ml: 1,
+                    width: 42,
+                    height: 42,
+                    borderRadius: "12px",
+                    bgcolor: "rgba(99,102,241,0.15)",
+                    color: "primary.main",
+                    transition: "all 0.25s ease",
+                    "&:hover": {
+                      bgcolor: "rgba(99,102,241,0.3)",
+                      transform: "scale(1.08)",
+                    },
+                  }}
+                  title="Admin Dashboard"
+                >
+                  <AdminPanelSettingsIcon sx={{ fontSize: 24 }} />
+                </IconButton>
+              )}
 
               {!token ? (
                 <>
@@ -168,7 +196,7 @@ const Navbar = () => {
               )}
             </Box>
 
-            {/* Mobile Menu Icon (WHITE) */}
+            {/* Mobile Menu Icon */}
             <IconButton
               onClick={toggleDrawer}
               sx={{ display: { xs: "flex", md: "none" }, color: "#ffffff" }}
@@ -179,7 +207,7 @@ const Navbar = () => {
         </AppBar>
       </ElevationScroll>
 
-      {/* Mobile Drawer */}
+      {/* ✅ MOBILE DRAWER (FIXED) */}
       <Drawer
         anchor="right"
         open={open}
@@ -199,7 +227,6 @@ const Navbar = () => {
 
         <Divider />
 
-        {/* Main Links */}
         <Box sx={{ p: 1 }}>
           {menuItems.map((item) => (
             <ListItemButton
@@ -208,39 +235,43 @@ const Navbar = () => {
                 navigate(item.to);
                 toggleDrawer();
               }}
-              sx={{
-                borderRadius: 2,
-                mb: 0.5,
-                bgcolor: isActive(item.to)
-                  ? "rgba(79,70,229,0.16)"
-                  : "transparent",
-              }}
+              sx={{ borderRadius: 2, mb: 0.5 }}
             >
-              <ListItemIcon
-                sx={{
-                  minWidth: 36,
-                  color: isActive(item.to)
-                    ? "primary.main"
-                    : "rgba(203,213,225,0.7)",
-                }}
-              >
+              <ListItemIcon sx={{ minWidth: 36, color: "primary.main" }}>
                 {item.icon}
               </ListItemIcon>
-
               <ListItemText
                 primary={item.text}
-                primaryTypographyProps={{
-                  color: "white",
-                  fontWeight: isActive(item.to) ? 600 : 400,
-                }}
+                primaryTypographyProps={{ color: "white" }}
               />
             </ListItemButton>
           ))}
+
+          {/* ADMIN OPTION (MOBILE) */}
+          {token && isAdmin && (
+            <ListItemButton
+              onClick={() => {
+                navigate("/admin/dashboard");
+                toggleDrawer();
+              }}
+              sx={{ borderRadius: 2, mb: 0.5 }}
+            >
+              <ListItemIcon sx={{ minWidth: 36, color: "primary.main" }}>
+                <AdminPanelSettingsIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Admin Dashboard"
+                primaryTypographyProps={{
+                  color: "white",
+                  fontWeight: 600,
+                }}
+              />
+            </ListItemButton>
+          )}
         </Box>
 
         <Divider />
 
-        {/* Auth Section */}
         <Box sx={{ p: 1 }}>
           {!token ? (
             <>
@@ -265,15 +296,12 @@ const Navbar = () => {
                   toggleDrawer();
                 }}
               >
-                <ListItemIcon sx={{ color: "rgba(203,213,225,0.7)" }}>
+                <ListItemIcon sx={{ color: "rgba(203,213225,0.7)" }}>
                   <PersonAddIcon />
                 </ListItemIcon>
                 <ListItemText
                   primary="Create Account"
-                  primaryTypographyProps={{
-                    color: "white",
-                    fontWeight: 600,
-                  }}
+                  primaryTypographyProps={{ color: "white" }}
                 />
               </ListItemButton>
             </>

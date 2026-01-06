@@ -10,6 +10,8 @@ import projectRoutes from "./routes/projectRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import downloadRoutes from "./routes/downloadRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
+import adminAuthRoutes from "./routes/adminAuthRoutes.js";
+import adminProjectRoutes from "./routes/adminProjectRoutes.js";
 
 
 
@@ -52,6 +54,8 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/download", downloadRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/admin/auth", adminAuthRoutes);
+app.use("/api/admin/projects", adminProjectRoutes);
 
 
 app.use((err, req, res, next) => {

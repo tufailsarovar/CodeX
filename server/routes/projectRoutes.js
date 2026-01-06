@@ -1,11 +1,14 @@
 import express from "express";
-import { createProject, getProjects, getProjectById } from "../controllers/projectController.js";
-import { protect, adminOnly } from "../middleware/authMiddleware.js";
+import {
+  createProject,
+  getProjects,
+  getProjectById,
+} from "../controllers/projectController.js";
 
 const router = express.Router();
 
+// PUBLIC ROUTES
 router.get("/", getProjects);
 router.get("/:id", getProjectById);
-router.post("/", protect, adminOnly, createProject);
 
 export default router;

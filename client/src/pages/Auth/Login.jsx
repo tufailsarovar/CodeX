@@ -6,7 +6,7 @@ import {
   Typography,
   Button,
   Paper,
-  Stack
+  Stack,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
@@ -29,7 +29,11 @@ const Login = () => {
       const res = await api.post("/auth/login", form);
       localStorage.setItem("codex_token", res.data.token);
       localStorage.setItem("codex_user", JSON.stringify(res.data));
-      navigate("/");
+      if (res.data.isAdmin) {
+        navigate("/admin/dashboard"); // ADMIN LOGIN
+      } else {
+        navigate("/"); // NORMAL USER
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
     } finally {
