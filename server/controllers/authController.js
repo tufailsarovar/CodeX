@@ -2,13 +2,17 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { User } from "../models/User.js";
 
-const generateToken = (id, isAdmin) => {
+const generateToken = (user) => {
   return jwt.sign(
-    { id, isAdmin },
+    {
+      id: user._id,
+      isAdmin: user.isAdmin,
+    },
     process.env.JWT_SECRET,
     { expiresIn: "7d" }
   );
 };
+
 
 export default generateToken;
 
@@ -34,7 +38,7 @@ export const registerUser = async (req, res) => {
       password: hashed
     });
 
-    const token = generateToken(user._id, user.isAdmin);
+    const token = generateToken(user);
     res.status(201).json({
       _id: user._id,
       name: user.name,

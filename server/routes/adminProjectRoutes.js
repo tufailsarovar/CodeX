@@ -1,29 +1,20 @@
 import express from "express";
-import adminMiddleware from "../middleware/adminMiddleware.js";
-import { Project } from "../models/Project.js";
+import { protect, adminOnly } from "../middleware/authMiddleware.js";
+import {
+  createProject,
+  updateProject,
+  deleteProject,
+} from "../controllers/projectController.js";
 
 const router = express.Router();
 
 /* CREATE PROJECT */
-router.post("/", adminMiddleware, async (req, res) => {
-  const project = await Project.create(req.body);
-  res.status(201).json(project);
-});
+router.post("/", protect, adminOnly, createProject);
 
 /* UPDATE PROJECT */
-router.put("/:id", adminMiddleware, async (req, res) => {
-  const project = await Project.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    { new: true }
-  );
-  res.json(project);
-});
+router.put("/:id", protect, adminOnly, updateProject);
 
 /* DELETE PROJECT */
-router.delete("/:id", adminMiddleware, async (req, res) => {
-  await Project.findByIdAndDelete(req.params.id);
-  res.json({ message: "Project deleted" });
-});
+router.delete("/:id", protect, adminOnly, deleteProject);
 
 export default router;

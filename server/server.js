@@ -17,6 +17,9 @@ import adminProjectRoutes from "./routes/adminProjectRoutes.js";
 
 console.log("MONGO_URI from env:", process.env.MONGO_URI?.slice(0, 40) + "...");
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 const PORT = process.env.PORT || 5000;
 
 // DB
