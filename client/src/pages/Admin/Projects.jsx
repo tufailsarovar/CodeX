@@ -44,7 +44,6 @@ const AdminProjects = () => {
           Authorization: `Bearer ${localStorage.getItem("codex_token")}`,
         },
       });
-
       setProjects((prev) => prev.filter((p) => p._id !== id));
     } catch (err) {
       alert("Failed to delete project");
@@ -79,56 +78,61 @@ const AdminProjects = () => {
         </Button>
       </Stack>
 
-      {/* CONTENT */}
       {loading && <Typography>Loading projects...</Typography>}
-
       {!loading && projects.length === 0 && (
         <Typography>No projects found.</Typography>
       )}
 
-      <Grid container spacing={3}>
+      <Stack spacing={2}>
         {projects.map((project) => (
-          <Grid item xs={12} md={6} lg={4} key={project._id}>
-            <Paper sx={{ p: 2, height: "100%" }}>
-              {/* IMAGE */}
-              <Box
-                sx={{
-                  width: "100%",
-                  height: 180,
-                  mb: 2,
-                  borderRadius: 1,
-                  bgcolor: "#020617",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  overflow: "hidden",
-                }}
-              >
-                {project.screenshotUrl ? (
-                  <Box
-                    component="img"
-                    src={project.screenshotUrl}
-                    alt={project.title}
-                    sx={{
-                      maxWidth: "100%",
-                      maxHeight: "100%",
-                      objectFit: "contain",
-                    }}
-                  />
-                ) : (
-                  <Typography variant="caption" color="text.secondary">
-                    No Image
-                  </Typography>
-                )}
-              </Box>
+          <Paper
+            key={project._id}
+            sx={{
+              p: 2,
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            {/* IMAGE */}
+            <Box
+              sx={{
+                width: 140,
+                height: 80,
+                borderRadius: 1,
+                bgcolor: "#020617",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+                flexShrink: 0,
+              }}
+            >
+              {project.screenshotUrl ? (
+                <Box
+                  component="img"
+                  src={project.screenshotUrl}
+                  alt={project.title}
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              ) : (
+                <Typography variant="caption" color="text.secondary">
+                  No Image
+                </Typography>
+              )}
+            </Box>
 
-              {/* TITLE */}
-              <Typography fontWeight={700} mb={0.5}>
+            {/* DETAILS */}
+            <Box sx={{ flex: 1 }}>
+              <Typography fontWeight={700}>
                 {project.title}
               </Typography>
 
-              {/* CATEGORY + PRICE */}
-              <Stack direction="row" spacing={1} mb={1} flexWrap="wrap">
+              <Stack direction="row" spacing={1} mt={0.5} flexWrap="wrap">
                 <Chip size="small" label={project.category} />
                 <Chip
                   size="small"
@@ -141,18 +145,16 @@ const AdminProjects = () => {
                 />
               </Stack>
 
-              {/* TECH STACK */}
               {project.techStack?.length > 0 && (
                 <Typography
                   variant="body2"
                   color="text.secondary"
-                  mb={1}
+                  mt={0.5}
                 >
                   Tech: {project.techStack.join(", ")}
                 </Typography>
               )}
 
-              {/* LINKS */}
               {project.livePreviewUrl && (
                 <Typography
                   variant="caption"
@@ -161,34 +163,32 @@ const AdminProjects = () => {
                   Preview: {project.livePreviewUrl}
                 </Typography>
               )}
+            </Box>
 
-              <Divider sx={{ my: 2 }} />
+            {/* ACTIONS */}
+            <Stack direction="row" spacing={1}>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() =>
+                  navigate(`/admin/projects/edit/${project._id}`)
+                }
+              >
+                Edit
+              </Button>
 
-              {/* ACTIONS */}
-              <Stack direction="row" spacing={1}>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  onClick={() =>
-                    navigate(`/admin/projects/edit/${project._id}`)
-                  }
-                >
-                  Edit
-                </Button>
-
-                <Button
-                  size="small"
-                  variant="outlined"
-                  color="error"
-                  onClick={() => handleDelete(project._id)}
-                >
-                  Delete
-                </Button>
-              </Stack>
-            </Paper>
-          </Grid>
+              <Button
+                size="small"
+                variant="outlined"
+                color="error"
+                onClick={() => handleDelete(project._id)}
+              >
+                Delete
+              </Button>
+            </Stack>
+          </Paper>
         ))}
-      </Grid>
+      </Stack>
     </Box>
   );
 };

@@ -5,13 +5,21 @@ import { Project } from "../models/Project.js";
 ========================= */
 export const getAllProjects = async (req, res) => {
   try {
-    const projects = await Project.find().sort({ createdAt: -1 });
+    const { category } = req.query;
+
+    const filter = {};
+    if (category) {
+      filter.category = category;
+    }
+
+    const projects = await Project.find(filter).sort({ createdAt: -1 });
     res.json(projects);
   } catch (error) {
     console.error("Get projects error:", error);
     res.status(500).json({ message: "Failed to fetch projects" });
   }
 };
+
 
 /* =========================
    GET PROJECT BY ID

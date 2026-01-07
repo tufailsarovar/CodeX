@@ -35,78 +35,81 @@ const AdminDashboard = () => {
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 } }}>
-      {/* WELCOME */}
-      <Box mb={4}>
+      {/* HEADER */}
+      <Box mb={5}>
         <Typography variant="h4" fontWeight={800}>
           Welcome back, Admin 👋
         </Typography>
         <Typography color="text.secondary">
-          Here’s an overview of what’s happening in CodeX today.
+          Here’s a quick snapshot of CodeX today.
         </Typography>
       </Box>
 
       {/* STATS */}
-      <Grid container spacing={3} mb={5}>
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="body2" color="text.secondary">
-              Total Projects
-            </Typography>
-            <Typography variant="h3" fontWeight={800}>
-              {totalProjects}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              All projects available on CodeX
-            </Typography>
-          </Paper>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="body2" color="text.secondary">
-              Free Projects
-            </Typography>
-            <Typography variant="h3" fontWeight={800}>
-              {freeProjects}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Zero-cost learning resources
-            </Typography>
-          </Paper>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="body2" color="text.secondary">
-              Paid Projects
-            </Typography>
-            <Typography variant="h3" fontWeight={800}>
-              {paidProjects}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Revenue-generating projects
-            </Typography>
-          </Paper>
-        </Grid>
+      <Grid container spacing={3} mb={6}>
+        {[
+          {
+            label: "Total Projects",
+            value: totalProjects,
+            desc: "All projects available",
+          },
+          {
+            label: "Free Projects",
+            value: freeProjects,
+            desc: "Zero-cost learning resources",
+          },
+          {
+            label: "Paid Projects",
+            value: paidProjects,
+            desc: "Revenue-generating projects",
+          },
+        ].map((item, i) => (
+          <Grid item xs={12} md={4} key={i}>
+            <Paper
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                height: "100%",
+              }}
+            >
+              <Typography variant="body2" color="text.secondary">
+                {item.label}
+              </Typography>
+              <Typography variant="h3" fontWeight={800} mt={1}>
+                {item.value}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {item.desc}
+              </Typography>
+            </Paper>
+          </Grid>
+        ))}
       </Grid>
 
       {/* QUICK ACTIONS */}
-      <Paper sx={{ p: 3, mb: 5 }}>
+      <Box mb={6}>
         <Typography variant="h6" fontWeight={700} mb={2}>
           Quick Actions
         </Typography>
 
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
             <Paper
-              variant="outlined"
-              sx={{ p: 2, height: "100%" }}
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                height: "100%",
+              }}
             >
-              <Typography fontWeight={600}>
+              <Typography fontWeight={700} mb={1}>
                 ➕ Add New Project
               </Typography>
-              <Typography variant="body2" color="text.secondary" mb={2}>
-                Create and publish a new college project for students.
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                mb={3}
+              >
+                Publish a new college project for students.
               </Typography>
               <Button
                 variant="contained"
@@ -117,42 +120,48 @@ const AdminDashboard = () => {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} md={6}>
             <Paper
-              variant="outlined"
-              sx={{ p: 2, height: "100%" }}
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                height: "100%",
+              }}
             >
-              <Typography fontWeight={600}>
+              <Typography fontWeight={700} mb={1}>
                 🛠 Manage Projects
               </Typography>
-              <Typography variant="body2" color="text.secondary" mb={2}>
-                Edit, delete, or update existing projects.
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                mb={3}
+              >
+                Edit, update, or remove existing projects.
               </Typography>
               <Button
                 variant="outlined"
                 onClick={() => navigate("/admin/projects")}
               >
-                Manage
+                Manage Projects
               </Button>
             </Paper>
           </Grid>
         </Grid>
-      </Paper>
+      </Box>
 
-      {/* ABOUT ADMIN */}
-      <Paper sx={{ p: 3 }}>
+      {/* ADMIN PROFILE */}
+      <Paper sx={{ p: 4, borderRadius: 3 }}>
         <Typography variant="h6" fontWeight={700} mb={3}>
           About Admin
         </Typography>
 
-        <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
+        <Stack direction={{ xs: "column", md: "row" }} spacing={4}>
           <Avatar
             sx={{
-              width: 110,
-              height: 110,
-              fontSize: 36,
+              width: 120,
+              height: 120,
+              fontSize: 40,
               fontWeight: 800,
-              bgcolor: "primary.main",
             }}
           >
             TS
@@ -163,18 +172,22 @@ const AdminDashboard = () => {
               Tufail Sarovar
             </Typography>
 
-            <Typography variant="body2" color="text.secondary" mb={1}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              mb={2}
+            >
               Founder & Full-Stack Developer — CodeX
             </Typography>
 
-            <Typography variant="body2" mb={2}>
-              I design, build, and manage real-world college projects
+            <Typography variant="body2" mb={3}>
+              I design, build, and maintain real-world college projects
               for students using modern web technologies.
-              This admin dashboard helps me maintain quality,
-              pricing, and content consistency across CodeX.
+              This admin dashboard helps manage pricing, quality,
+              and content across CodeX.
             </Typography>
 
-            <Divider sx={{ my: 2 }} />
+            <Divider sx={{ mb: 2 }} />
 
             <Stack direction="row" spacing={1} flexWrap="wrap">
               <Chip label="MERN Stack" />

@@ -52,11 +52,11 @@ const Home = () => {
               </Typography>
 
               <Typography variant="h3" fontWeight={800} sx={{ mt: 1, mb: 2 }}>
-                Ready-made{" "}
+                Structured and Scalable{" "}
                 <Box component="span" sx={{ color: "primary.main" }}>
-                  MERN College
+                  Projects
                 </Box>{" "}
-                projects for students.
+                designed to achieve Academic excellence
               </Typography>
 
               <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
