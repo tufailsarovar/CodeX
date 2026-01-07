@@ -5,6 +5,35 @@ const About = () => {
   return (
     <Box sx={{ py: 6 }}>
       <Container maxWidth="md">
+
+        {/* ===== Admin Portfolio Section (ADDED AT TOP) ===== */}
+        <Paper
+          sx={{
+            p: 3,
+            mb: 4,
+            bgcolor: "rgba(15,23,42,0.8)",
+            textAlign: "center",
+          }}
+        >
+          <Typography variant="h6" fontWeight={700} gutterBottom>
+            Admin Portfolio
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            View the developer portfolio of CodeX Admin
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            <a
+              href="https://tufail-sarovar.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "#38bdf8", textDecoration: "none" }}
+            >
+              Visit Admin Portfolio →
+            </a>
+          </Typography>
+        </Paper>
+        {/* ===== Admin Portfolio Section END ===== */}
+
         <Typography variant="h4" fontWeight={700} marginTop={5} gutterBottom>
           About CodeX
         </Typography>
@@ -20,12 +49,10 @@ const About = () => {
           secured downloads and email notifications.
         </Typography>
         <Typography variant="body1" color="text.secondary" paragraph>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            Purchase any project securely through Razorpay and get immediate
-            access to the full project bundle — including source code,
-            documentation, setup guide, and PPT — delivered instantly to your
-            registered email.
-          </Typography>
+          Purchase any project securely through Razorpay and get immediate
+          access to the full project bundle — including source code,
+          documentation, setup guide, and PPT — delivered instantly to your
+          registered email.
         </Typography>
 
         <Grid container spacing={3} sx={{ mt: 2 }}>
@@ -36,8 +63,8 @@ const About = () => {
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 • Get complete, working projects with clean code. <br />
-                • Learn MERN and frontend by reading real projects. <br />•
-                Submit high-quality work with documentation and PPT.
+                • Learn MERN and frontend by reading real projects. <br />
+                • Submit high-quality work with documentation and PPT.
               </Typography>
             </Paper>
           </Grid>
@@ -48,68 +75,67 @@ const About = () => {
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 • Showcases secure user authentication. <br />
-                • Demonstrates mock payment and order handling. <br />•
-                Implements secure download access on your Email.
+                • Demonstrates mock payment and order handling. <br />
+                • Implements secure download access on your Email.
               </Typography>
             </Paper>
           </Grid>
         </Grid>
 
+        {/* ===== TERMS & CONDITIONS (UNCHANGED) ===== */}
         <Typography variant="h5" fontWeight={700} marginTop={5} gutterBottom>
           Terms & Conditions – CodeX
         </Typography>
+
         <Typography variant="body1" color="text.secondary" paragraph>
           <b>1. Digital Products Only</b> <br />
           CodeX sells digital coding projects, source code, documentation, and
           files. No physical items are shipped.
         </Typography>
+
         <Typography variant="body1" color="text.secondary" paragraph>
           <b>2. No Refunds</b>
           <br /> All purchases are final. Refunds are only given if the download
           link does not work and we cannot fix it.
         </Typography>
+
         <Typography variant="body1" color="text.secondary" paragraph>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            <b>3. Usage Rights</b>
-            <br /> You may use the purchased project for learning, college work,
-            or personal use. You may not resell, share, or claim the project as
-            your own.
-          </Typography>
+          <b>3. Usage Rights</b>
+          <br /> You may use the purchased project for learning, college work,
+          or personal use. You may not resell, share, or claim the project as
+          your own.
         </Typography>
+
         <Typography variant="body1" color="text.secondary" paragraph>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            <b>4. Payments</b>
-            <br /> All payments must be completed online. Prices may change at
-            any time.
-          </Typography>
+          <b>4. Payments</b>
+          <br /> All payments must be completed online. Prices may change at
+          any time.
         </Typography>
+
         <Typography variant="body1" color="text.secondary" paragraph>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            <b>5. Account Safety</b> <br />
-            You are responsible for keeping your account and password safe.
-          </Typography>
+          <b>5. Account Safety</b> <br />
+          You are responsible for keeping your account and password safe.
         </Typography>
+
         <Typography variant="body1" color="text.secondary" paragraph>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            <b> 6. Intellectual Property </b> <br />
-            All products, designs, and content belong to CodeX. Unauthorized
-            sharing or copying is not allowed.
-          </Typography>
+          <b>6. Intellectual Property</b> <br />
+          All products, designs, and content belong to CodeX. Unauthorized
+          sharing or copying is not allowed.
         </Typography>
+
         <Typography variant="body1" color="text.secondary" paragraph>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            <b>7. Liability</b>
-            <br /> CodeX is not responsible for any issues, errors, or damage
-            caused by using the purchased code
-          </Typography>
+          <b>7. Liability</b>
+          <br /> CodeX is not responsible for any issues, errors, or damage
+          caused by using the purchased code.
         </Typography>
+
         <Typography variant="body1" color="text.secondary" paragraph>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            <b>8. Updates</b>
-            <br /> We may update these terms anytime. Continued use of the site
-            means you accept the changes.
-          </Typography>
+          <b>8. Updates</b>
+          <br /> We may update these terms anytime. Continued use of the site
+          means you accept the changes.
         </Typography>
+        {/* ===== TERMS & CONDITIONS END ===== */}
+
       </Container>
     </Box>
   );
