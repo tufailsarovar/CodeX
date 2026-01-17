@@ -12,6 +12,7 @@ import ShieldIcon from "@mui/icons-material/Shield";
 import { Link } from "react-router-dom";
 import ProjectCard from "../components/Project/ProjectCard";
 import api from "../api/axios";
+
 const token = localStorage.getItem("codex_token");
 
 const Home = () => {
@@ -22,6 +23,19 @@ const Home = () => {
       try {
         const res = await api.get("/projects");
         setProjects(res.data);
+        // ✅ sort: AVAILABLE first, LOCKED later
+        const sortedProjects = res.data.sort((a, b) => {
+          const aAvailable = Object.values(a.files || {}).some(
+            (url) => typeof url === "string" && url.trim() !== ""
+          );
+          const bAvailable = Object.values(b.files || {}).some(
+            (url) => typeof url === "string" && url.trim() !== ""
+          );
+
+          return Number(bAvailable) - Number(aAvailable);
+        });
+
+        setProjects(sortedProjects);
       } catch (err) {
         console.error(err);
       }
@@ -30,6 +44,13 @@ const Home = () => {
   }, []);
 
   const featured = projects[0]; // pick first project as featured
+
+  // ✅ helper: check if ANY file url exists
+  const isAnyFileAvailable = (files = {}) => {
+    return Object.values(files).some(
+      (url) => typeof url === "string" && url.trim() !== ""
+    );
+  };
 
   return (
     <Box>
@@ -51,6 +72,7 @@ const Home = () => {
               >
                 CodeX | Tufail Sarovar
               </Typography>
+
               <Typography variant="overline" color="secondary.main">
                 Code | Learn | Submit | Succeed
               </Typography>
@@ -78,7 +100,6 @@ const Home = () => {
                   Explore Projects
                 </Button>
 
-                {/* SHOW only if user is NOT logged in */}
                 {!token && (
                   <Button
                     component={Link}
@@ -90,9 +111,8 @@ const Home = () => {
                   </Button>
                 )}
               </Stack>
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1, mt: 2 }}
-              >
+
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 2 }}>
                 <ShieldIcon sx={{ color: "lightgreen", fontSize: 20 }} />
                 <Typography
                   variant="body2"
@@ -143,6 +163,7 @@ const Home = () => {
                       {featured.description?.slice(0, 140)}...
                     </Typography>
 
+                    {/* ✅ PRICE + AVAILABILITY (ONLY ADDITION) */}
                     <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>
                       {featured.originalPrice && (
                         <span
@@ -158,6 +179,21 @@ const Home = () => {
                         </span>
                       )}
                       <span>₹{featured.price}</span>
+
+                      <span
+                        style={{
+                          marginLeft: "10px",
+                          fontSize: "13px",
+                          fontWeight: 600,
+                          color: isAnyFileAvailable(featured.files)
+                            ? "#22c55e"
+                            : "#facc15",
+                        }}
+                      >
+                        {isAnyFileAvailable(featured.files)
+                          ? "Available"
+                          : "Coming soon"}
+                      </span>
                     </Typography>
 
                     <Stack direction="row" spacing={2}>
