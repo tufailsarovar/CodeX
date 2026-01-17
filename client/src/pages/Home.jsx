@@ -26,10 +26,10 @@ const Home = () => {
         // ✅ sort: AVAILABLE first, LOCKED later
         const sortedProjects = res.data.sort((a, b) => {
           const aAvailable = Object.values(a.files || {}).some(
-            (url) => typeof url === "string" && url.trim() !== ""
+            (url) => typeof url === "string" && url.trim() !== "",
           );
           const bAvailable = Object.values(b.files || {}).some(
-            (url) => typeof url === "string" && url.trim() !== ""
+            (url) => typeof url === "string" && url.trim() !== "",
           );
 
           return Number(bAvailable) - Number(aAvailable);
@@ -48,7 +48,7 @@ const Home = () => {
   // ✅ helper: check if ANY file url exists
   const isAnyFileAvailable = (files = {}) => {
     return Object.values(files).some(
-      (url) => typeof url === "string" && url.trim() !== ""
+      (url) => typeof url === "string" && url.trim() !== "",
     );
   };
 
@@ -77,9 +77,28 @@ const Home = () => {
                 Code | Learn | Submit | Succeed
               </Typography>
 
-              <Typography variant="h3" fontWeight={800} sx={{ mt: 1, mb: 2 }}>
+              <Typography
+                fontWeight={800}
+                sx={{
+                  mt: 1,
+                  mb: 2,
+                  fontSize: {
+                    xs: "1.8rem", // mobile
+                    sm: "2.2rem", // small tablets
+                    md: "2.8rem", // laptops
+                    lg: "3.2rem", // desktops
+                  },
+                  lineHeight: 1.2,
+                }}
+              >
                 Structured and Scalable{" "}
-                <Box component="span" sx={{ color: "primary.main" }}>
+                <Box
+                  component="span"
+                  sx={{
+                    color: "primary.main",
+                    display: "inline-block",
+                  }}
+                >
                   Projects
                 </Box>{" "}
                 designed to achieve Academic excellence
@@ -112,7 +131,9 @@ const Home = () => {
                 )}
               </Stack>
 
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 2 }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mt: 2 }}
+              >
                 <ShieldIcon sx={{ color: "lightgreen", fontSize: 20 }} />
                 <Typography
                   variant="body2"
