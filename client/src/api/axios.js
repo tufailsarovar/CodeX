@@ -1,9 +1,11 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL:
+    import.meta.env.VITE_API_URL ||
+    "https://code-x-eight-murex.vercel.app",
   withCredentials: true,
-  timeout: 30000, // 🔥 prevents hanging requests
+  timeout: 30000,
 });
 
 // Attach token
