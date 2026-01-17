@@ -1,4 +1,5 @@
 import Project from "../models/Project.js";
+import mongoose from "mongoose";
 
 /* =========================
    GET ALL PROJECTS
@@ -13,7 +14,7 @@ export const getAllProjects = async (req, res) => {
     const projects = await Project
       .find(filter)
       .sort({ createdAt: -1 })
-      .lean(); // 🔥 FAST & STABLE
+      .lean();
 
     res.json(projects);
   } catch (error) {
@@ -25,8 +26,6 @@ export const getAllProjects = async (req, res) => {
 /* =========================
    GET PROJECT BY ID
 ========================= */
-import mongoose from "mongoose";
-
 export const getProjectById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -47,7 +46,6 @@ export const getProjectById = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch project" });
   }
 };
-
 
 /* =========================
    CREATE PROJECT (ADMIN)
