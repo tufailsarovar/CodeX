@@ -1,4 +1,4 @@
-import { Project } from "../models/Project.js";
+import Project  from "../models/Project.js";
 import { Order } from "../models/Order.js";
 
 export const downloadProject = async (req, res) => {

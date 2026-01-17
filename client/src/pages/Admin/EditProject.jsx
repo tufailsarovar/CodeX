@@ -118,29 +118,49 @@ const EditProject = () => {
   // UPDATE PROJECT
   // ========================
   const handleUpdate = async () => {
-    try {
-      await api.put(
-        `/admin/projects/${id}`,
-        {
-          ...form,
-          techStack: form.techStack
-            .split(",")
-            .map((t) => t.trim())
-            .filter(Boolean),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  console.log("✅ SAVE CLICKED");
 
-      navigate("/admin/projects");
-    } catch (err) {
-      alert("Failed to update project");
-      console.error(err);
-    }
-  };
+  try {
+    const payload = {
+      ...form,
+      techStack: form.techStack
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean),
+    };
+
+    console.log("📦 PAYLOAD:", payload);
+
+    // 🔥 IMPORTANT: store axios response
+    const res = await api.put(
+      `/admin/projects/${id}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    // ✅ DO NOT manually check status unless needed
+    console.log("✅ UPDATE SUCCESS:", res.data);
+
+    alert("Project updated successfully");
+    navigate("/admin/projects");
+
+  } catch (error) {
+    console.error("❌ UPDATE ERROR:", error);
+
+    // ✅ SAFE error handling
+    const message =
+      error?.response?.data?.message ||
+      error?.message ||
+      "Update failed";
+
+    alert(message);
+  }
+};
+
 
   if (loading) {
     return <Typography sx={{ p: 4 }}>Loading...</Typography>;
@@ -268,9 +288,15 @@ const EditProject = () => {
             onChange={handleChange}
           />
 
-          <Button variant="contained" size="large" onClick={handleUpdate}>
-            Save Changes
-          </Button>
+          <Button
+  variant="contained"
+  size="large"
+  onClick={() => handleUpdate()}
+  sx={{ pointerEvents: "auto", zIndex: 10 }}
+>
+  Save Changes
+</Button>
+
         </Stack>
       </Paper>
     </Box>

@@ -1,4 +1,4 @@
-import { Project } from "../models/Project.js";
+import Project  from "../models/Project.js";
 
 /* =========================
    GET ALL PROJECTS
@@ -57,22 +57,55 @@ export const createProject = async (req, res) => {
 ========================= */
 export const updateProject = async (req, res) => {
   try {
-    const project = await Project.findByIdAndUpdate(
+    // 🔥 FIX: parse itemPrices if it comes as string
+    let itemPrices = req.body.itemPrices;
+    if (typeof itemPrices === "string") {
+      itemPrices = JSON.parse(itemPrices);
+    }
+
+    let files = req.body.files;
+    if (typeof files === "string") {
+      files = JSON.parse(files);
+    }
+
+    const updatedProject = await Project.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      {
+        title: req.body.title,
+        category: req.body.category,
+        description: req.body.description,
+        techStack: req.body.techStack,
+        price: req.body.price,
+        originalPrice: req.body.originalPrice,
+        screenshotUrl: req.body.screenshotUrl,
+        livePreviewUrl: req.body.livePreviewUrl,
+
+        // ✅ NOW THIS WILL UPDATE
+        itemPrices: {
+          sourceCode: Number(itemPrices?.sourceCode || 0),
+          ppt: Number(itemPrices?.ppt || 0),
+          documentation: Number(itemPrices?.documentation || 0),
+        },
+
+        files: {
+          sourceCode: files?.sourceCode || "",
+          ppt: files?.ppt || "",
+          documentation: files?.documentation || "",
+          fullBundle: files?.fullBundle || "",
+        },
+      },
       { new: true }
     );
 
-    if (!project) {
-      return res.status(404).json({ message: "Project not found" });
-    }
-
-    res.json(project);
+    console.log("✅ UPDATED itemPrices:", updatedProject.itemPrices);
+    res.json(updatedProject);
   } catch (error) {
-    console.error("Update project error:", error);
-    res.status(500).json({ message: "Failed to update project" });
+    console.error("❌ UPDATE ERROR:", error);
+    res.status(500).json({ message: "Project update failed" });
   }
 };
+
+
 
 /* =========================
    DELETE PROJECT (ADMIN)

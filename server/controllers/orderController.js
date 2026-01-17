@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { razorpay } from "../config/razorpay.js";
 import { Order } from "../models/Order.js";
-import { Project } from "../models/Project.js";
+import Project  from "../models/Project.js";
 import nodemailer from "nodemailer";
 
 // CREATE PAYMENT ORDER (Frontend will open Razorpay checkout)
