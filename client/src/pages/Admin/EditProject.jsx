@@ -96,10 +96,13 @@ const EditProject = () => {
 
     if (name.startsWith("itemPrices.")) {
       const key = name.split(".")[1];
-      setForm({
-        ...form,
-        itemPrices: { ...form.itemPrices, [key]: Number(value) },
-      });
+      setForm((prev) => ({
+        ...prev,
+        itemPrices: {
+          ...prev.itemPrices,
+          [key]: value === "" ? "" : Number(value),
+        },
+      }));
     } else if (name.startsWith("files.")) {
       const key = name.split(".")[1];
       setForm({
@@ -151,8 +154,18 @@ const EditProject = () => {
 
       <Paper sx={{ p: 3, maxWidth: 900 }}>
         <Stack spacing={2}>
-          <TextField label="Title" name="title" value={form.title} onChange={handleChange} />
-          <TextField label="Category" name="category" value={form.category} onChange={handleChange} />
+          <TextField
+            label="Title"
+            name="title"
+            value={form.title}
+            onChange={handleChange}
+          />
+          <TextField
+            label="Category"
+            name="category"
+            value={form.category}
+            onChange={handleChange}
+          />
           <TextField
             label="Description"
             name="description"
@@ -192,21 +205,23 @@ const EditProject = () => {
             label="Source Code Price"
             name="itemPrices.sourceCode"
             type="number"
-            value={form.itemPrices.sourceCode}
+            value={form.itemPrices.sourceCode ?? ""}
             onChange={handleChange}
           />
+
           <TextField
             label="PPT Price"
             name="itemPrices.ppt"
             type="number"
-            value={form.itemPrices.ppt}
+            value={form.itemPrices.ppt ?? ""}
             onChange={handleChange}
           />
+
           <TextField
             label="Documentation Price"
             name="itemPrices.documentation"
             type="number"
-            value={form.itemPrices.documentation}
+            value={form.itemPrices.documentation ?? ""}
             onChange={handleChange}
           />
 
