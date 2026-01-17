@@ -3,9 +3,10 @@ import axios from "axios";
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
+  timeout: 8000, // 🔥 prevents hanging requests
 });
 
-// ✅ Attach token
+// Attach token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("codex_token");
@@ -17,7 +18,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ✅ HANDLE TOKEN EXPIRY
+// Handle token expiry
 api.interceptors.response.use(
   (response) => response,
   (error) => {

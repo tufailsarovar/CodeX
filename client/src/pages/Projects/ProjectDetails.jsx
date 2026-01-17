@@ -30,18 +30,25 @@ const ProjectDetails = () => {
   const token = localStorage.getItem("codex_token");
 
   useEffect(() => {
-    const fetchProject = async () => {
-      try {
-        const res = await api.get(`/projects/${id}`);
-        setProject(res.data);
-      } catch (err) {
-        setError("Failed to load project");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProject();
-  }, [id]);
+  let mounted = true;
+
+  const fetchProject = async () => {
+    try {
+      const res = await api.get(`/projects/${id}`);
+      if (mounted) setProject(res.data);
+    } catch {
+      if (mounted) setError("Failed to load project");
+    } finally {
+      if (mounted) setLoading(false);
+    }
+  };
+
+  fetchProject();
+  return () => {
+    mounted = false;
+  };
+}, [id]);
+
 
   // ✅ PRICE CALCULATION
   const calculatePrice = () => {

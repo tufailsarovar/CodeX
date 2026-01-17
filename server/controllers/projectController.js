@@ -1,4 +1,4 @@
-import Project  from "../models/Project.js";
+import Project from "../models/Project.js";
 
 /* =========================
    GET ALL PROJECTS
@@ -8,11 +8,13 @@ export const getAllProjects = async (req, res) => {
     const { category } = req.query;
 
     const filter = {};
-    if (category) {
-      filter.category = category;
-    }
+    if (category) filter.category = category;
 
-    const projects = await Project.find(filter).sort({ createdAt: -1 });
+    const projects = await Project
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .lean(); // 🔥 FAST & STABLE
+
     res.json(projects);
   } catch (error) {
     console.error("Get projects error:", error);
@@ -20,13 +22,12 @@ export const getAllProjects = async (req, res) => {
   }
 };
 
-
 /* =========================
    GET PROJECT BY ID
 ========================= */
 export const getProjectById = async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findById(req.params.id).lean(); // 🔥 FAST
 
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
@@ -57,16 +58,11 @@ export const createProject = async (req, res) => {
 ========================= */
 export const updateProject = async (req, res) => {
   try {
-    // 🔥 FIX: parse itemPrices if it comes as string
     let itemPrices = req.body.itemPrices;
-    if (typeof itemPrices === "string") {
-      itemPrices = JSON.parse(itemPrices);
-    }
+    if (typeof itemPrices === "string") itemPrices = JSON.parse(itemPrices);
 
     let files = req.body.files;
-    if (typeof files === "string") {
-      files = JSON.parse(files);
-    }
+    if (typeof files === "string") files = JSON.parse(files);
 
     const updatedProject = await Project.findByIdAndUpdate(
       req.params.id,
@@ -79,14 +75,11 @@ export const updateProject = async (req, res) => {
         originalPrice: req.body.originalPrice,
         screenshotUrl: req.body.screenshotUrl,
         livePreviewUrl: req.body.livePreviewUrl,
-
-        // ✅ NOW THIS WILL UPDATE
         itemPrices: {
           sourceCode: Number(itemPrices?.sourceCode || 0),
           ppt: Number(itemPrices?.ppt || 0),
           documentation: Number(itemPrices?.documentation || 0),
         },
-
         files: {
           sourceCode: files?.sourceCode || "",
           ppt: files?.ppt || "",
@@ -97,15 +90,12 @@ export const updateProject = async (req, res) => {
       { new: true }
     );
 
-    console.log("✅ UPDATED itemPrices:", updatedProject.itemPrices);
     res.json(updatedProject);
   } catch (error) {
-    console.error("❌ UPDATE ERROR:", error);
+    console.error("Update project error:", error);
     res.status(500).json({ message: "Project update failed" });
   }
 };
-
-
 
 /* =========================
    DELETE PROJECT (ADMIN)
