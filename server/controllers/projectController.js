@@ -6,20 +6,23 @@ import mongoose from "mongoose";
 ========================= */
 export const getAllProjects = async (req, res) => {
   try {
-    const { category } = req.query;
+    // ✅ prevent crash if DB not connected yet (serverless cold start)
+    if (mongoose.connection.readyState !== 1) {
+      return res.json([]); // return empty list instead of 500
+    }
 
+    const { category } = req.query;
     const filter = {};
     if (category) filter.category = category;
 
-    const projects = await Project
-      .find(filter)
+    const projects = await Project.find(filter)
       .sort({ createdAt: -1 })
       .lean();
 
     res.json(projects);
   } catch (error) {
     console.error("Get projects error:", error);
-    res.status(500).json({ message: "Failed to fetch projects" });
+    res.json([]); // ✅ never throw 500 to frontend
   }
 };
 
@@ -28,6 +31,10 @@ export const getAllProjects = async (req, res) => {
 ========================= */
 export const getProjectById = async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -43,7 +50,7 @@ export const getProjectById = async (req, res) => {
     res.json(project);
   } catch (error) {
     console.error("Get project error:", error);
-    res.status(500).json({ message: "Failed to fetch project" });
+    res.status(404).json({ message: "Project not found" });
   }
 };
 
