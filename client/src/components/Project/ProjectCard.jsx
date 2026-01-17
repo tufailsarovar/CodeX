@@ -14,7 +14,15 @@ import { useNavigate } from "react-router-dom";
 const ProjectCard = ({ project }) => {
   const navigate = useNavigate();
 
-  // ✅ WHOLE / BUNDLE PRICE
+  // ✅ check if ANY file exists
+  const isAnyFileAvailable = () => {
+    const files = project.files || {};
+    return Object.values(files).some(
+      (url) => typeof url === "string" && url.trim() !== ""
+    );
+  };
+
+  // ✅ whole / bundle price (unchanged logic)
   const wholePrice =
     project.price ||
     (project.itemPrices
@@ -43,10 +51,6 @@ const ProjectCard = ({ project }) => {
           height="160"
           image={project.screenshotUrl}
           alt={project.title}
-          sx={{
-            transition: "transform 0.4s ease",
-            "&:hover": { transform: "scale(1.08)" },
-          }}
         />
       )}
 
@@ -60,8 +64,8 @@ const ProjectCard = ({ project }) => {
           {project.category === "mern"
             ? "MERN Full Stack"
             : project.category === "frontend"
-              ? "Frontend"
-              : "Project"}
+            ? "Frontend"
+            : "Project"}
         </Typography>
 
         <Typography variant="h6" gutterBottom>
@@ -83,14 +87,13 @@ const ProjectCard = ({ project }) => {
           ))}
         </Stack>
 
-        {/* ✅ WHOLE PRICE DISPLAY */}
+        {/* ✅ PRICE + AVAILABILITY (ONLY THIS SHOWN) */}
         <Typography variant="subtitle1" fontWeight={700}>
           {project.originalPrice && (
             <span
               style={{
                 textDecoration: "line-through",
                 marginRight: "8px",
-                fontWeight: 500,
                 opacity: 0.7,
                 fontSize: "14px",
               }}
@@ -98,7 +101,19 @@ const ProjectCard = ({ project }) => {
               ₹{project.originalPrice}
             </span>
           )}
-          <span>₹{wholePrice}</span>
+
+          ₹{wholePrice}
+
+          <span
+            style={{
+              marginLeft: "10px",
+              fontSize: "13px",
+              fontWeight: 600,
+              color: isAnyFileAvailable() ? "#22c55e" : "#facc15",
+            }}
+          >
+            {isAnyFileAvailable() ? "Available" : "Coming soon"}
+          </span>
         </Typography>
       </CardContent>
 
@@ -112,6 +127,7 @@ const ProjectCard = ({ project }) => {
             Live Preview
           </Button>
         )}
+
         <Button
           size="small"
           variant="contained"
