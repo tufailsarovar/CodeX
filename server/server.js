@@ -13,8 +13,6 @@ import contactRoutes from "./routes/contactRoutes.js";
 import adminAuthRoutes from "./routes/adminAuthRoutes.js";
 import adminProjectRoutes from "./routes/adminProjectRoutes.js";
 
-
-
 console.log("MONGO_URI from env:", process.env.MONGO_URI?.slice(0, 40) + "...");
 const app = express();
 app.use(express.json());
@@ -28,7 +26,9 @@ connectDB();
 // Middleware
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://codex-tufail.vercel.app"
+  "https://codex-tufail.vercel.app",
+  "https://www.projectcodex.in",
+  "https://projectcodex.in"
 ];
 
 app.use(
@@ -44,7 +44,7 @@ app.use(
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
-  })
+  }),
 );
 
 // Routes
@@ -60,11 +60,10 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/admin/auth", adminAuthRoutes);
 app.use("/api/admin/projects", adminProjectRoutes);
 
-
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.statusCode || 500).json({
-    message: err.message || "Server error"
+    message: err.message || "Server error",
   });
 });
 
