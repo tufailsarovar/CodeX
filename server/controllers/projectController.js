@@ -25,9 +25,17 @@ export const getAllProjects = async (req, res) => {
 /* =========================
    GET PROJECT BY ID
 ========================= */
+import mongoose from "mongoose";
+
 export const getProjectById = async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id).lean(); // 🔥 FAST
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid project ID" });
+    }
+
+    const project = await Project.findById(id).lean();
 
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
@@ -39,6 +47,7 @@ export const getProjectById = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch project" });
   }
 };
+
 
 /* =========================
    CREATE PROJECT (ADMIN)
