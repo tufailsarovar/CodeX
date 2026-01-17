@@ -7,12 +7,21 @@ import {
   CardActions,
   Button,
   Chip,
-  Stack
+  Stack,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const ProjectCard = ({ project }) => {
   const navigate = useNavigate();
+
+  // ✅ WHOLE / BUNDLE PRICE
+  const wholePrice =
+    project.price ||
+    (project.itemPrices
+      ? (project.itemPrices.sourceCode || 0) +
+        (project.itemPrices.ppt || 0) +
+        (project.itemPrices.documentation || 0)
+      : 0);
 
   return (
     <Card
@@ -24,8 +33,8 @@ const ProjectCard = ({ project }) => {
         transition: "transform 0.2s ease, box-shadow 0.2s ease",
         "&:hover": {
           transform: "translateY(-4px)",
-          boxShadow: "0 20px 40px rgba(15,23,42,0.7)"
-        }
+          boxShadow: "0 20px 40px rgba(15,23,42,0.7)",
+        },
       }}
     >
       {project.screenshotUrl && (
@@ -36,31 +45,63 @@ const ProjectCard = ({ project }) => {
           alt={project.title}
           sx={{
             transition: "transform 0.4s ease",
-            "&:hover": {
-              transform: "scale(1.08)",
-            },
+            "&:hover": { transform: "scale(1.08)" },
           }}
         />
       )}
+
       <CardContent sx={{ flexGrow: 1 }}>
-        <Typography variant="subtitle2" color="secondary.main" fontWeight={600} gutterBottom>
-          {project.category === "mern" ? "MERN Full Stack" : project.category === "frontend" ? "Frontend" : "Project"}
+        <Typography
+          variant="subtitle2"
+          color="secondary.main"
+          fontWeight={600}
+          gutterBottom
+        >
+          {project.category === "mern"
+            ? "MERN Full Stack"
+            : project.category === "frontend"
+              ? "Frontend"
+              : "Project"}
         </Typography>
+
         <Typography variant="h6" gutterBottom>
           {project.title}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }} noWrap>
+
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ mb: 1.5 }}
+          noWrap
+        >
           {project.description}
         </Typography>
+
         <Stack direction="row" spacing={0.5} flexWrap="wrap" sx={{ mb: 1 }}>
           {project.techStack?.slice(0, 4).map((tech) => (
             <Chip key={tech} label={tech} size="small" variant="outlined" />
           ))}
         </Stack>
+
+        {/* ✅ WHOLE PRICE DISPLAY */}
         <Typography variant="subtitle1" fontWeight={700}>
-          ₹{project.price}
+          {project.originalPrice && (
+            <span
+              style={{
+                textDecoration: "line-through",
+                marginRight: "8px",
+                fontWeight: 500,
+                opacity: 0.7,
+                fontSize: "14px",
+              }}
+            >
+              ₹{project.originalPrice}
+            </span>
+          )}
+          <span>₹{wholePrice}</span>
         </Typography>
       </CardContent>
+
       <CardActions sx={{ px: 2, pb: 2, gap: 1 }}>
         {project.livePreviewUrl && (
           <Button

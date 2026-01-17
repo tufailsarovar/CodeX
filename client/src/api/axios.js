@@ -5,6 +5,7 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// ✅ Attach token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("codex_token");
@@ -14,6 +15,18 @@ api.interceptors.request.use(
     return config;
   },
   (error) => Promise.reject(error)
+);
+
+// ✅ HANDLE TOKEN EXPIRY
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("codex_token");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
 );
 
 export default api;

@@ -44,7 +44,11 @@ const Home = () => {
           <Grid container spacing={6} alignItems="center">
             {/* LEFT HERO */}
             <Grid item xs={12} md={6}>
-              <Typography variant="body1" color="text.secondary" style={{fontSize: "12px"}}>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                style={{ fontSize: "12px" }}
+              >
                 CodeX | Tufail Sarovar
               </Typography>
               <Typography variant="overline" color="secondary.main">
@@ -98,7 +102,6 @@ const Home = () => {
                 </Typography>
               </Box>
             </Grid>
-            
 
             {/* RIGHT FEATURED PROJECT */}
             <Grid item xs={12} md={6}>
@@ -141,7 +144,20 @@ const Home = () => {
                     </Typography>
 
                     <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>
-                      ₹{featured.price}
+                      {featured.originalPrice && (
+                        <span
+                          style={{
+                            textDecoration: "line-through",
+                            marginRight: "8px",
+                            fontWeight: 500,
+                            opacity: 0.7,
+                            fontSize: "15px",
+                          }}
+                        >
+                          ₹{featured.originalPrice}
+                        </span>
+                      )}
+                      <span>₹{featured.price}</span>
                     </Typography>
 
                     <Stack direction="row" spacing={2}>

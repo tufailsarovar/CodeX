@@ -7,7 +7,6 @@ import {
   Stack,
   Paper,
   Divider,
-  Chip,
 } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
@@ -17,20 +16,37 @@ const EditProject = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("codex_token");
 
+  const [loading, setLoading] = useState(true);
+
   const [form, setForm] = useState({
     title: "",
     category: "",
     description: "",
     techStack: "",
+
+    originalPrice: "",
     price: "",
+
+    itemPrices: {
+      sourceCode: "",
+      ppt: "",
+      documentation: "",
+    },
+
+    files: {
+      sourceCode: "",
+      ppt: "",
+      documentation: "",
+      fullBundle: "",
+    },
+
     screenshotUrl: "",
     livePreviewUrl: "",
-    zipFileUrl: "",
   });
 
-  const [original, setOriginal] = useState(null);
-  const [loading, setLoading] = useState(true);
-
+  // ========================
+  // FETCH PROJECT
+  // ========================
   useEffect(() => {
     const fetchProject = async () => {
       try {
@@ -41,15 +57,29 @@ const EditProject = () => {
           category: res.data.category || "",
           description: res.data.description || "",
           techStack: res.data.techStack?.join(", ") || "",
-          price: res.data.price || "",
+
+          originalPrice: res.data.originalPrice ?? "",
+          price: res.data.price ?? "",
+
+          itemPrices: {
+            sourceCode: res.data.itemPrices?.sourceCode ?? "",
+            ppt: res.data.itemPrices?.ppt ?? "",
+            documentation: res.data.itemPrices?.documentation ?? "",
+          },
+
+          files: {
+            sourceCode: res.data.files?.sourceCode ?? "",
+            ppt: res.data.files?.ppt ?? "",
+            documentation: res.data.files?.documentation ?? "",
+            fullBundle: res.data.files?.fullBundle ?? "",
+          },
+
           screenshotUrl: res.data.screenshotUrl || "",
           livePreviewUrl: res.data.livePreviewUrl || "",
-          zipFileUrl: res.data.zipFileUrl || "",
         });
-
-        setOriginal(res.data);
       } catch (err) {
-        console.error("Failed to load project", err);
+        alert("Failed to load project");
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -58,10 +88,32 @@ const EditProject = () => {
     fetchProject();
   }, [id]);
 
+  // ========================
+  // HANDLE CHANGE
+  // ========================
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name.startsWith("itemPrices.")) {
+      const key = name.split(".")[1];
+      setForm({
+        ...form,
+        itemPrices: { ...form.itemPrices, [key]: Number(value) },
+      });
+    } else if (name.startsWith("files.")) {
+      const key = name.split(".")[1];
+      setForm({
+        ...form,
+        files: { ...form.files, [key]: value },
+      });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
+  // ========================
+  // UPDATE PROJECT
+  // ========================
   const handleUpdate = async () => {
     try {
       await api.put(
@@ -93,128 +145,119 @@ const EditProject = () => {
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 } }}>
-      {/* HEADER */}
-      <Typography variant="h4" fontWeight={800} mb={1}>
+      <Typography variant="h4" fontWeight={800} mb={3}>
         Edit Project
       </Typography>
-      <Typography color="text.secondary" mb={4}>
-        Update project details and review current data side by side.
-      </Typography>
 
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", lg: "1.2fr 1fr" },
-          gap: 4,
-        }}
-      >
-        {/* LEFT — EDIT FORM */}
-        <Paper sx={{ p: 3 }}>
-          <Typography fontWeight={700} mb={2}>
-            Editable Fields
-          </Typography>
+      <Paper sx={{ p: 3, maxWidth: 900 }}>
+        <Stack spacing={2}>
+          <TextField label="Title" name="title" value={form.title} onChange={handleChange} />
+          <TextField label="Category" name="category" value={form.category} onChange={handleChange} />
+          <TextField
+            label="Description"
+            name="description"
+            multiline
+            rows={4}
+            value={form.description}
+            onChange={handleChange}
+          />
+          <TextField
+            label="Tech Stack (comma separated)"
+            name="techStack"
+            value={form.techStack}
+            onChange={handleChange}
+          />
 
-          <Stack spacing={2}>
-            <TextField label="Project Title" name="title" value={form.title} onChange={handleChange} />
-            <TextField label="Category" name="category" value={form.category} onChange={handleChange} />
-            <TextField
-              label="Description"
-              name="description"
-              multiline
-              rows={4}
-              value={form.description}
-              onChange={handleChange}
-            />
-            <TextField
-              label="Tech Stack (comma separated)"
-              name="techStack"
-              value={form.techStack}
-              onChange={handleChange}
-            />
-            <TextField label="Price" name="price" type="number" value={form.price} onChange={handleChange} />
-            <Divider />
-            <TextField label="Screenshot URL" name="screenshotUrl" value={form.screenshotUrl} onChange={handleChange} />
-            <TextField label="Live Preview URL" name="livePreviewUrl" value={form.livePreviewUrl} onChange={handleChange} />
-            <TextField label="ZIP File URL" name="zipFileUrl" value={form.zipFileUrl} onChange={handleChange} />
+          <Divider />
 
-            <Button variant="contained" size="large" onClick={handleUpdate}>
-              Save Changes
-            </Button>
-          </Stack>
-        </Paper>
+          <TextField
+            label="Original Price"
+            name="originalPrice"
+            type="number"
+            value={form.originalPrice}
+            onChange={handleChange}
+          />
+          <TextField
+            label="Final Price"
+            name="price"
+            type="number"
+            value={form.price}
+            onChange={handleChange}
+          />
 
-        {/* RIGHT — CURRENT PROJECT PREVIEW */}
-        <Paper sx={{ p: 3 }}>
-          <Typography fontWeight={700} mb={2}>
-            Current Project Preview
-          </Typography>
+          <Divider />
 
-          {/* IMAGE */}
-          <Box
-            sx={{
-              width: "100%",
-              height: 240,
-              mb: 2,
-              borderRadius: 1,
-              bgcolor: "#020617",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {original?.screenshotUrl ? (
-              <Box
-                component="img"
-                src={original.screenshotUrl}
-                alt={original.title}
-                sx={{
-                  maxWidth: "100%",
-                  maxHeight: "100%",
-                  objectFit: "contain",
-                }}
-              />
-            ) : (
-              <Typography variant="caption" color="text.secondary">
-                No Image
-              </Typography>
-            )}
-          </Box>
+          <Typography fontWeight={600}>Individual Item Prices</Typography>
+          <TextField
+            label="Source Code Price"
+            name="itemPrices.sourceCode"
+            type="number"
+            value={form.itemPrices.sourceCode}
+            onChange={handleChange}
+          />
+          <TextField
+            label="PPT Price"
+            name="itemPrices.ppt"
+            type="number"
+            value={form.itemPrices.ppt}
+            onChange={handleChange}
+          />
+          <TextField
+            label="Documentation Price"
+            name="itemPrices.documentation"
+            type="number"
+            value={form.itemPrices.documentation}
+            onChange={handleChange}
+          />
 
-          <Typography variant="h6" fontWeight={700}>
-            {original.title}
-          </Typography>
+          <Divider />
 
-          <Stack direction="row" spacing={1} my={1} flexWrap="wrap">
-            <Chip label={original.category} />
-            <Chip
-              color={Number(original.price) === 0 ? "success" : "primary"}
-              label={Number(original.price) === 0 ? "Free" : `₹${original.price}`}
-            />
-          </Stack>
+          <Typography fontWeight={600}>Download Files</Typography>
+          <TextField
+            label="Source Code ZIP URL"
+            name="files.sourceCode"
+            value={form.files.sourceCode}
+            onChange={handleChange}
+          />
+          <TextField
+            label="PPT ZIP URL"
+            name="files.ppt"
+            value={form.files.ppt}
+            onChange={handleChange}
+          />
+          <TextField
+            label="Documentation ZIP URL"
+            name="files.documentation"
+            value={form.files.documentation}
+            onChange={handleChange}
+          />
+          <TextField
+            label="Full Bundle ZIP URL"
+            name="files.fullBundle"
+            value={form.files.fullBundle}
+            onChange={handleChange}
+          />
 
-          <Typography variant="body2" color="text.secondary" mb={1}>
-            {original.description}
-          </Typography>
+          <Divider />
 
-          {original.techStack?.length > 0 && (
-            <Typography variant="body2" mb={1}>
-              <strong>Tech:</strong> {original.techStack.join(", ")}
-            </Typography>
-          )}
+          <TextField
+            label="Screenshot URL"
+            name="screenshotUrl"
+            value={form.screenshotUrl}
+            onChange={handleChange}
+          />
+          <TextField
+            label="Live Preview URL"
+            name="livePreviewUrl"
+            value={form.livePreviewUrl}
+            onChange={handleChange}
+          />
 
-          <Divider sx={{ my: 2 }} />
-
-          {original.livePreviewUrl && (
-            <Typography variant="caption" sx={{ wordBreak: "break-all" }}>
-              Preview: {original.livePreviewUrl}
-            </Typography>
-          )}
-
-          <Typography variant="caption" sx={{ wordBreak: "break-all", display: "block", mt: 1 }}>
-            ZIP: {original.zipFileUrl || "—"}
-          </Typography>
-        </Paper>
-      </Box>
+          <Button variant="contained" size="large" onClick={handleUpdate}>
+            Save Changes
+          </Button>
+        </Stack>
+      </Paper>
     </Box>
   );
 };

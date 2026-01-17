@@ -6,10 +6,20 @@ const projectSchema = new mongoose.Schema(
     category: String,
     description: String,
     techStack: [String],
+
     price: Number,
+    originalPrice: Number,
+
     screenshotUrl: String,
     livePreviewUrl: String,
-    zipFileUrl: String,
+
+    // ✅ INDIVIDUAL FILES
+    files: {
+      sourceCode: String,
+      ppt: String,
+      documentation: String,
+      fullBundle: String
+    }
   },
   { timestamps: true }
 );

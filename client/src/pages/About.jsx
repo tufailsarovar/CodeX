@@ -6,35 +6,7 @@ const About = () => {
     <Box sx={{ py: 6 }}>
       <Container maxWidth="md">
 
-        {/* ===== Admin Portfolio Section (ADDED AT TOP) ===== */}
-        <Paper
-          sx={{
-            p: 3,
-            mb: 4,
-            bgcolor: "rgba(15,23,42,0.8)",
-            textAlign: "center",
-          }}
-        >
-          <Typography variant="h6" fontWeight={700} gutterBottom>
-            Admin Portfolio
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            View the developer portfolio of CodeX Admin
-          </Typography>
-          <Typography variant="body2" sx={{ mt: 1 }}>
-            <a
-              href="https://tufail-sarovar.vercel.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: "#38bdf8", textDecoration: "none" }}
-            >
-              Visit Admin Portfolio →
-            </a>
-          </Typography>
-        </Paper>
-        {/* ===== Admin Portfolio Section END ===== */}
-
-        <Typography variant="h4" fontWeight={700} marginTop={5} gutterBottom>
+        <Typography variant="h4" fontWeight={700} gutterBottom>
           About CodeX
         </Typography>
         <Typography variant="body1" color="text.secondary" paragraph>

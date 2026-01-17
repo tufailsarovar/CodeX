@@ -7,14 +7,13 @@ import nodemailer from "nodemailer";
 // CREATE PAYMENT ORDER (Frontend will open Razorpay checkout)
 export const createPaymentOrder = async (req, res) => {
   try {
-    const { projectId } = req.body;
-    const userId = req.user._id;
+    const { projectId, amount } = req.body;
 
     const project = await Project.findById(projectId);
     if (!project) return res.status(404).json({ message: "Project not found" });
 
     const options = {
-      amount: project.price * 100,       // Rupees to Paise
+      amount: amount * 100,
       currency: "INR",
       receipt: "rcpt_" + Date.now(),
     };
@@ -25,13 +24,14 @@ export const createPaymentOrder = async (req, res) => {
       success: true,
       order,
       project,
-      key: process.env.RAZORPAY_KEY_ID
+      key: process.env.RAZORPAY_KEY_ID,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Razorpay order creation failed" });
+    res.status(500).json({ message: "Order creation failed" });
   }
 };
+
+
 
 // VERIFY PAYMENT SIGNATURE
 export const verifyPayment = async (req, res) => {

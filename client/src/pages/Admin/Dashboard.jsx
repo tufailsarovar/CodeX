@@ -177,7 +177,7 @@ const AdminDashboard = () => {
               color="text.secondary"
               mb={2}
             >
-              Founder & Full-Stack Developer — CodeX
+              Full-Stack Developer — CodeX
             </Typography>
 
             <Typography variant="body2" mb={3}>

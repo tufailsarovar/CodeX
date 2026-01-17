@@ -14,10 +14,18 @@ import api from "../../api/axios";
 
 const ProjectDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const navigate = useNavigate();
+
+  // ✅ NEW STATE
+  const [selectedItems, setSelectedItems] = useState({
+    sourceCode: true,
+    ppt: true,
+    documentation: true,
+  });
 
   const token = localStorage.getItem("codex_token");
 
@@ -28,7 +36,6 @@ const ProjectDetails = () => {
         setProject(res.data);
       } catch (err) {
         setError("Failed to load project");
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -36,118 +43,110 @@ const ProjectDetails = () => {
     fetchProject();
   }, [id]);
 
-  // ✅ RAZORPAY SDK LOADER (FIX)
-  const loadRazorpay = () => {
-    return new Promise((resolve) => {
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
+  // ✅ PRICE CALCULATION
+  const calculatePrice = () => {
+    let total = 0;
+
+    if (selectedItems.sourceCode && project.files?.sourceCode) {
+      total += project.itemPrices?.sourceCode || 0;
+    }
+
+    if (selectedItems.ppt && project.files?.ppt) {
+      total += project.itemPrices?.ppt || 0;
+    }
+
+    if (selectedItems.documentation && project.files?.documentation) {
+      total += project.itemPrices?.documentation || 0;
+    }
+
+    return total;
   };
 
-  // ============================
-  // REAL RAZORPAY PAYMENT HANDLER
-  // ============================
+  // =====================
+  // BUY HANDLER (SINGLE)
+  // =====================
   const handleBuy = async () => {
-    const token = localStorage.getItem("codex_token");
     if (!token) {
       navigate("/login");
       return;
     }
 
+    const amount = calculatePrice();
+    if (amount === 0) {
+      alert("Please select at least one item");
+      return;
+    }
+
     try {
-      // 1) Create order on backend
       const { data } = await api.post("/orders/create-order", {
         projectId: id,
+        items: selectedItems,
+        amount,
       });
 
-      // ✅ FIX: Load Razorpay SDK
-      const loaded = await loadRazorpay();
-      if (!loaded) {
-        alert("Razorpay SDK not loaded. Check internet.");
-        return;
-      }
-
-      const options = {
-        key: data.key,
-        amount: data.order.amount,
-        currency: "INR",
-        name: "CodeX",
-        description: data.project.title,
-        order_id: data.order.id,
-
-        handler: async function (response) {
-          try {
-            // 2) Verify payment on backend
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => {
+        const options = {
+          key: data.key,
+          amount: data.order.amount,
+          currency: "INR",
+          name: "CodeX",
+          description: project.title,
+          order_id: data.order.id,
+          handler: async function (response) {
             await api.post("/orders/verify", {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
               project: id,
-              amount: project.price,
+              items: selectedItems,
+              amount,
             });
 
-            alert(
-              "Payment successful! Download link has been sent to your registered email."
-            );
-          } catch (err) {
-            console.error("Verification failed:", err);
-            alert("Payment captured but verification failed. Contact support.");
-          }
-        },
+            alert("Payment successful! Download link sent to email.");
+          },
+          theme: { color: "#6366F1" },
+        };
 
-        theme: { color: "#6366F1" },
+        const rzp = new window.Razorpay(options);
+        rzp.open();
       };
-
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+      document.body.appendChild(script);
     } catch (err) {
-      console.error("Payment error:", err);
-      alert("Unable to start payment. Try again.");
+      alert("Payment failed");
     }
   };
 
-  if (loading) {
+  if (loading)
     return (
-      <Box sx={{ py: 6 }}>
-        <Container>
-          <Typography>Loading...</Typography>
-        </Container>
-      </Box>
+      <Container sx={{ py: 6 }}>
+        <Typography>Loading...</Typography>
+      </Container>
     );
-  }
 
-  if (error || !project) {
+  if (error || !project)
     return (
-      <Box sx={{ py: 6 }}>
-        <Container>
-          <Typography color="error">{error || "Project not found"}</Typography>
-        </Container>
-      </Box>
+      <Container sx={{ py: 6 }}>
+        <Typography color="error">Project not found</Typography>
+      </Container>
     );
-  }
 
   return (
     <Box sx={{ py: 6 }}>
       <Container maxWidth="lg">
         <Grid container spacing={4}>
-          {/* LEFT SECTION */}
+          {/* LEFT */}
           <Grid item xs={12} md={7}>
             <Typography variant="overline" color="secondary.main">
-              {project.category === "mern"
-                ? "MERN Full Stack"
-                : project.category === "frontend"
-                ? "Frontend"
-                : "Project"}
+              {project.category}
             </Typography>
 
             <Typography variant="h4" fontWeight={700} gutterBottom>
               {project.title}
             </Typography>
 
-            <Typography variant="body1" color="text.secondary" paragraph>
+            <Typography color="text.secondary" paragraph>
               {project.description}
             </Typography>
 
@@ -157,66 +156,167 @@ const ProjectDetails = () => {
               ))}
             </Stack>
 
+            {/* PRICE */}
             <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>
-              ₹{project.price}
+              {project.originalPrice && (
+                <span
+                  style={{
+                    textDecoration: "line-through",
+                    marginRight: "10px",
+                    fontWeight: 500,
+                    opacity: 0.7,
+                  }}
+                >
+                  ₹{project.originalPrice}
+                </span>
+              )}
+              <span>₹{calculatePrice()}</span>
             </Typography>
 
-            <Stack direction="row" spacing={2}>
-              {project.livePreviewUrl && (
-                <Button
-                  variant="outlined"
-                  onClick={() => window.open(project.livePreviewUrl, "_blank")}
+            {/* CHECKBOXES */}
+            <Stack spacing={1} sx={{ mb: 2 }}>
+              {/* SOURCE CODE */}
+              <label>
+                <input
+                  type="checkbox"
+                  disabled={!project.files?.sourceCode}
+                  checked={selectedItems.sourceCode}
+                  onChange={(e) =>
+                    setSelectedItems({
+                      ...selectedItems,
+                      sourceCode: e.target.checked,
+                    })
+                  }
+                />{" "}
+                <span
+                  style={{
+                    textDecoration: project.files?.sourceCode
+                      ? "none"
+                      : "line-through",
+                    opacity: project.files?.sourceCode ? 1 : 0.5,
+                  }}
                 >
-                  Live Preview
-                </Button>
-              )}
+                  Source Code (₹{project.itemPrices?.sourceCode})
+                </span>
+                {!project.files?.sourceCode && (
+                  <span
+                    style={{ marginLeft: 6, color: "#facc15", fontWeight: 500 }}
+                  >
+                    — Not available
+                  </span>
+                )}
+              </label>
 
-              <Button variant="contained" onClick={handleBuy}>
-                Buy & Get ZIP
-              </Button>
+              {/* PPT */}
+              <label>
+                <input
+                  type="checkbox"
+                  disabled={!project.files?.ppt}
+                  checked={selectedItems.ppt}
+                  onChange={(e) =>
+                    setSelectedItems({
+                      ...selectedItems,
+                      ppt: e.target.checked,
+                    })
+                  }
+                />{" "}
+                <span
+                  style={{
+                    textDecoration: project.files?.ppt
+                      ? "none"
+                      : "line-through",
+                    opacity: project.files?.ppt ? 1 : 0.5,
+                  }}
+                >
+                  PPT (₹{project.itemPrices?.ppt})
+                </span>
+                {!project.files?.ppt && (
+                  <span
+                    style={{ marginLeft: 6, color: "#facc15", fontWeight: 500 }}
+                  >
+                    — Not available
+                  </span>
+                )}
+              </label>
+
+              {/* DOCUMENTATION */}
+              <label>
+                <input
+                  type="checkbox"
+                  disabled={!project.files?.documentation}
+                  checked={selectedItems.documentation}
+                  onChange={(e) =>
+                    setSelectedItems({
+                      ...selectedItems,
+                      documentation: e.target.checked,
+                    })
+                  }
+                />{" "}
+                <span
+                  style={{
+                    textDecoration: project.files?.documentation
+                      ? "none"
+                      : "line-through",
+                    opacity: project.files?.documentation ? 1 : 0.5,
+                  }}
+                >
+                  Documentation (₹{project.itemPrices?.documentation})
+                </span>
+                {!project.files?.documentation && (
+                  <span
+                    style={{ marginLeft: 6, color: "#facc15", fontWeight: 500 }}
+                  >
+                    — Not available
+                  </span>
+                )}
+              </label>
             </Stack>
+
+            {/* SINGLE BUY BUTTON */}
+            <Button
+              variant="contained"
+              disabled={calculatePrice() === 0}
+              onClick={handleBuy}
+            >
+              Buy Now
+            </Button>
           </Grid>
 
-          {/* RIGHT SECTION */}
+          {/* RIGHT */}
           <Grid item xs={12} md={5}>
-            <Paper
-              sx={{
-                overflow: "hidden",
-                borderRadius: 3,
-                border: "1px solid rgba(148,163,184,0.4)",
-                mb: 2,
-              }}
-            >
-              {project.screenshotUrl ? (
-                <Box
-                  component="img"
+            <Box sx={{ position: "sticky", top: 80 }}>
+              {/* IMAGE */}
+              <Paper
+                sx={{
+                  overflow: "hidden",
+                  borderRadius: 3,
+                  mb: 2,
+                  border: "1px solid rgba(148,163,184,0.4)",
+                }}
+              >
+                <img
                   src={project.screenshotUrl}
                   alt={project.title}
-                  sx={{ width: "100%", display: "block" }}
+                  style={{ width: "100%", display: "block" }}
                 />
-              ) : (
-                <Box sx={{ p: 4 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Screenshot not available.
-                  </Typography>
-                </Box>
-              )}
-            </Paper>
+              </Paper>
 
-            <Paper sx={{ p: 3, bgcolor: "rgba(15,23,42,0.9)" }}>
-              <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-                What you will get
-              </Typography>
+              {/* WHAT YOU WILL GET (RESTORED) */}
+              <Paper sx={{ p: 3, bgcolor: "rgba(15,23,42,0.9)" }}>
+                <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+                  What you will get
+                </Typography>
 
-              <Typography variant="body2" color="text.secondary">
-                • Complete source code
-                <br />
-                • Documentation (DOC/PDF)
-                <br />
-                • PPT
-                <br />• Setup instructions
-              </Typography>
-            </Paper>
+                <Typography variant="body2" color="text.secondary">
+                  • Complete source code
+                  <br />
+                  • Documentation (DOC/PDF)
+                  <br />
+                  • PPT
+                  <br />• Setup instructions
+                </Typography>
+              </Paper>
+            </Box>
           </Grid>
         </Grid>
       </Container>

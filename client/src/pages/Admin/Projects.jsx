@@ -134,15 +134,31 @@ const AdminProjects = () => {
 
               <Stack direction="row" spacing={1} mt={0.5} flexWrap="wrap">
                 <Chip size="small" label={project.category} />
-                <Chip
-                  size="small"
-                  color={Number(project.price) === 0 ? "success" : "primary"}
-                  label={
-                    Number(project.price) === 0
-                      ? "Free"
-                      : `₹${project.price}`
-                  }
-                />
+                {Number(project.price) === 0 ? (
+  <Chip size="small" color="success" label="Free" />
+) : (
+  <Stack direction="row" spacing={1} alignItems="center">
+    {project.originalPrice && (
+      <Typography
+        variant="body2"
+        sx={{
+          textDecoration: "line-through",
+          opacity: 0.7,
+          fontWeight: 500,
+        }}
+      >
+        ₹{project.originalPrice}
+      </Typography>
+    )}
+
+    <Chip
+      size="small"
+      color="primary"
+      label={`₹${project.price}`}
+    />
+  </Stack>
+)}
+
               </Stack>
 
               {project.techStack?.length > 0 && (
