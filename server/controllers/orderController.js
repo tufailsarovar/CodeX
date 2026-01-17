@@ -78,7 +78,7 @@ export const verifyPayment = async (req, res) => {
       items?.documentation &&
       project.files?.fullBundle
     ) {
-      linksHtml = `<p>Full Bundle: <a href="${project.files.fullBundle}">Download All</a></p>`;
+      linksHtml = `<p>Full Bundle (Code,PPT,Docs): <a href="${project.files.fullBundle}">Download All</a></p>`;
     }
 
     const order = await Order.create({
@@ -113,7 +113,7 @@ export const verifyPayment = async (req, res) => {
           <h2>Payment Successful!</h2>
           <p>You purchased: <strong>${project.title}</strong></p>
           <p>Amount Paid: <b>₹${project.price}</b></p>
-          <p>Download your project file:</p>
+          <p>Download your Zip file:</p>
           ${linksHtml}
           <p>Thanks for Purhasing from CodeX</p>
           <hr>
