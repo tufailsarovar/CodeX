@@ -16,6 +16,7 @@ import api from "../../api/axios";
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
+  const [freeProjects, setFreeProjects] = useState([]);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -26,12 +27,24 @@ const AdminDashboard = () => {
         console.error("Dashboard load failed", err);
       }
     };
+
+    const fetchFreeProjects = async () => {
+      try {
+        const res = await api.get("/free-projects");
+        setFreeProjects(res.data);
+      } catch (err) {
+        console.error("Free projects load failed", err);
+      }
+    };
+
     fetchProjects();
+    fetchFreeProjects();
   }, []);
 
   const totalProjects = projects.length;
-  const freeProjects = projects.filter((p) => Number(p.price) === 0).length;
-  const paidProjects = projects.filter((p) => Number(p.price) > 0).length;
+  const paidProjects = projects.filter(
+    (p) => Number(p.price) > 0
+  ).length;
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 } }}>
@@ -45,62 +58,119 @@ const AdminDashboard = () => {
         </Typography>
       </Box>
 
-      {/* STATS */}
+      {/* MAIN STATS (UNCHANGED) */}
       <Grid container spacing={3} mb={6}>
-        {[
-          {
-            label: "Total Projects",
-            value: totalProjects,
-            desc: "All projects available",
-          },
-          {
-            label: "Free Projects",
-            value: freeProjects,
-            desc: "Zero-cost learning resources",
-          },
-          {
-            label: "Paid Projects",
-            value: paidProjects,
-            desc: "Revenue-generating projects",
-          },
-        ].map((item, i) => (
-          <Grid item xs={12} md={4} key={i}>
-            <Paper
-              sx={{
-                p: 3,
-                borderRadius: 3,
-                height: "100%",
-              }}
-            >
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 3, borderRadius: 3 }}>
+            <Typography variant="body2" color="text.secondary">
+              Total Projects
+            </Typography>
+            <Typography variant="h3" fontWeight={800} mt={1}>
+              {totalProjects}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              All projects available
+            </Typography>
+          </Paper>
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 3, borderRadius: 3 }}>
+            <Typography variant="body2" color="text.secondary">
+              Free Projects
+            </Typography>
+            <Typography variant="h3" fontWeight={800} mt={1}>
+              {freeProjects.length}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Zero-cost learning resources
+            </Typography>
+          </Paper>
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 3, borderRadius: 3 }}>
+            <Typography variant="body2" color="text.secondary">
+              Paid Projects
+            </Typography>
+            <Typography variant="h3" fontWeight={800} mt={1}>
+              {paidProjects}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Revenue-generating projects
+            </Typography>
+          </Paper>
+        </Grid>
+      </Grid>
+
+      {/* 🔥 FREE PROJECTS DASHBOARD (NEW) */}
+      <Box mb={6}>
+        <Typography variant="h6" fontWeight={700} mb={2}>
+          Free Projects Overview
+        </Typography>
+
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={4}>
+            <Paper sx={{ p: 3, borderRadius: 3 }}>
               <Typography variant="body2" color="text.secondary">
-                {item.label}
+                Total Free Projects
               </Typography>
               <Typography variant="h3" fontWeight={800} mt={1}>
-                {item.value}
+                {freeProjects.length}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {item.desc}
+                All free resources
               </Typography>
             </Paper>
           </Grid>
-        ))}
-      </Grid>
 
-      {/* QUICK ACTIONS */}
+          <Grid item xs={12} md={4}>
+            <Paper sx={{ p: 3, borderRadius: 3 }}>
+              <Typography variant="body2" color="text.secondary">
+                GitHub Linked
+              </Typography>
+              <Typography variant="h3" fontWeight={800} mt={1}>
+                {
+                  freeProjects.filter(
+                    (p) => p.githubLink && p.githubLink.trim() !== ""
+                  ).length
+                }
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Open-source repositories
+              </Typography>
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <Paper sx={{ p: 3, borderRadius: 3 }}>
+              <Typography variant="body2" color="text.secondary">
+                With Video Preview
+              </Typography>
+              <Typography variant="h3" fontWeight={800} mt={1}>
+                {
+                  freeProjects.filter(
+                    (p) => p.videoUrl && p.videoUrl.trim() !== ""
+                  ).length
+                }
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Demo-enabled projects
+              </Typography>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Box>
+
+      {/* QUICK ACTIONS (UNCHANGED) */}
       <Box mb={6}>
         <Typography variant="h6" fontWeight={700} mb={2}>
           Quick Actions
         </Typography>
 
         <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <Paper
-              sx={{
-                p: 3,
-                borderRadius: 3,
-                height: "100%",
-              }}
-            >
+          <Grid item xs={12} md={4}>
+            <Paper sx={{ p: 3, borderRadius: 3 }}>
               <Typography fontWeight={700} mb={1}>
                 ➕ Add New Project
               </Typography>
@@ -109,7 +179,7 @@ const AdminDashboard = () => {
                 color="text.secondary"
                 mb={3}
               >
-                Publish a new college project for students.
+                Publish a new paid project.
               </Typography>
               <Button
                 variant="contained"
@@ -120,14 +190,8 @@ const AdminDashboard = () => {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} md={6}>
-            <Paper
-              sx={{
-                p: 3,
-                borderRadius: 3,
-                height: "100%",
-              }}
-            >
+          <Grid item xs={12} md={4}>
+            <Paper sx={{ p: 3, borderRadius: 3 }}>
               <Typography fontWeight={700} mb={1}>
                 🛠 Manage Projects
               </Typography>
@@ -136,7 +200,7 @@ const AdminDashboard = () => {
                 color="text.secondary"
                 mb={3}
               >
-                Edit, update, or remove existing projects.
+                Edit or remove paid projects.
               </Typography>
               <Button
                 variant="outlined"
@@ -146,10 +210,45 @@ const AdminDashboard = () => {
               </Button>
             </Paper>
           </Grid>
+
+          <Grid item xs={12} md={4}>
+            <Paper sx={{ p: 3, borderRadius: 3 }}>
+              <Typography fontWeight={700} mb={1}>
+                🎁 Manage Free Projects
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                mb={3}
+              >
+                Control free open-source projects.
+              </Typography>
+              <Stack direction="row" spacing={1}>
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() =>
+                    navigate("/admin/free-projects/add")
+                  }
+                >
+                  Add Free
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() =>
+                    navigate("/admin/free-projects")
+                  }
+                >
+                  Manage
+                </Button>
+              </Stack>
+            </Paper>
+          </Grid>
         </Grid>
       </Box>
 
-      {/* ADMIN PROFILE */}
+      {/* ABOUT ADMIN (UNCHANGED) */}
       <Paper sx={{ p: 4, borderRadius: 3 }}>
         <Typography variant="h6" fontWeight={700} mb={3}>
           About Admin
@@ -181,8 +280,8 @@ const AdminDashboard = () => {
             </Typography>
 
             <Typography variant="body2" mb={3}>
-              I design, build, and maintain real-world college projects
-              for students using modern web technologies.
+              I design, build, and maintain real-world college
+              projects for students using modern web technologies.
               This admin dashboard helps manage pricing, quality,
               and content across CodeX.
             </Typography>

@@ -17,6 +17,19 @@ const token = localStorage.getItem("codex_token");
 
 const Home = () => {
   const [projects, setProjects] = useState([]);
+  const [freeProjects, setFreeProjects] = useState([]);
+
+  const fetchFreeProjects = async () => {
+  try {
+    const res = await api.get("/free-projects");
+    setFreeProjects(res.data);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+fetchFreeProjects();
+
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -291,6 +304,194 @@ const Home = () => {
           </Grid>
         </Container>
       </Box>
+    {/* FREE PROJECTS SECTION */}
+<Box sx={{ py: 6,my: 6, backgroundColor: "#020617" }}>
+  <Container maxWidth="lg">
+    {/* HEADER */}
+    <Box
+      sx={{
+        mb: 3,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+    >
+      <Box>
+        <Typography variant="h5" fontWeight={700}>
+          Free Projects
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Open-source projects you can download from GitHub.
+        </Typography>
+      </Box>
+
+      <Button
+        component={Link}
+        to="/free-projects"
+        size="small"
+        sx={{
+          textTransform: "none",
+          fontWeight: 600,
+          borderRadius: 999,
+          px: 2.5,
+          color: "#e0f2fe",
+          border: "1px solid rgba(148,163,184,0.35)",
+          "&:hover": {
+            borderColor: "primary.main",
+            background: "rgba(99,102,241,0.08)",
+          },
+        }}
+      >
+        See all free projects →
+      </Button>
+    </Box>
+
+    {/* SCROLL AREA */}
+    <Box
+      sx={{
+        display: "flex",
+        gap: 3,
+        overflowX: "auto",
+        pb: 3,
+        px: 1,
+        my: 5,
+        "&::-webkit-scrollbar": { height: 8 },
+        "&::-webkit-scrollbar-track": {
+          background: "rgba(148,163,184,0.12)",
+          borderRadius: 10,
+        },
+        "&::-webkit-scrollbar-thumb": {
+          background:
+            "linear-gradient(90deg, rgba(99,102,241,.8), rgba(34,211,238,.8))",
+          borderRadius: 10,
+        },
+      }}
+    >
+      {freeProjects.slice(0, 6).map((p) => (
+        <Paper
+          key={p._id}
+          sx={{
+            minWidth: 288,   // ↓ 20% smaller
+            maxWidth: 288,
+            position: "relative",
+            borderRadius: 4,
+            overflow: "hidden",
+            background:
+              "linear-gradient(180deg, rgba(15,23,42,0.88), rgba(2,6,23,0.95))",
+            border: "1px solid rgba(148,163,184,0.25)",
+            boxShadow: "0 8px 20px rgba(0,0,0,.25)",
+            transition: "box-shadow .35s ease, border-color .35s ease",
+            "&:hover": {
+              borderColor: "rgba(99,102,241,.6)",
+              boxShadow: "0 16px 40px rgba(79,70,229,.35)",
+            },
+          }}
+        >
+          {/* FREE RIBBON */}
+          <Box
+            sx={{
+              position: "absolute",
+              top: 10,
+              left: -36,
+              transform: "rotate(-45deg)",
+              background:
+                "linear-gradient(90deg, #22c55e, #4ade80)",
+              color: "#022c22",
+              px: 5,
+              py: 0.35,
+              fontSize: "10px",
+              fontWeight: 800,
+              letterSpacing: "0.8px",
+              zIndex: 2,
+            }}
+          >
+            FREE
+          </Box>
+
+          {/* VIDEO */}
+          {p.videoUrl && (
+            <video
+              src={p.videoUrl}
+              autoPlay
+              muted
+              loop
+              playsInline
+              style={{
+                width: "100%",
+                height: 152, // ↓ 20% smaller
+                objectFit: "cover",
+              }}
+            />
+          )}
+
+          {/* CONTENT */}
+          <Box sx={{ p: 2 }}>
+            <Typography fontWeight={800} sx={{ mb: 0.4 }}>
+              {p.title}
+            </Typography>
+
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mb: 1.2, lineHeight: 1.5 }}
+            >
+              {p.description?.slice(0, 90)}...
+            </Typography>
+
+            {/* TECH STACK */}
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.6, mb: 1.5 }}>
+              {p.techStack?.slice(0, 4).map((tech, i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    px: 1,
+                    py: 0.25,
+                    fontSize: "10px",
+                    borderRadius: 999,
+                    color: "#c7d2fe",
+                    background: "rgba(99,102,241,0.15)",
+                    border: "1px solid rgba(99,102,241,0.35)",
+                  }}
+                >
+                  {tech}
+                </Box>
+              ))}
+            </Box>
+
+            <Button
+              href={p.githubLink}
+              target="_blank"
+              fullWidth
+              size="small"
+              sx={{
+                borderRadius: 999,
+                fontWeight: 600,
+                textTransform: "none",
+                color: "#e0f2fe",
+                background:
+                  "linear-gradient(90deg, rgba(99,102,241,.85), rgba(34,211,238,.85))",
+                "&:hover": {
+                  background:
+                    "linear-gradient(90deg, rgba(99,102,241,1), rgba(34,211,238,1))",
+                },
+              }}
+            >
+              Download Code
+            </Button>
+          </Box>
+        </Paper>
+      ))}
+
+      {freeProjects.length === 0 && (
+        <Typography variant="body2" color="text.secondary">
+          No free projects yet.
+        </Typography>
+      )}
+    </Box>
+  </Container>
+</Box>
+
+
     </Box>
   );
 };

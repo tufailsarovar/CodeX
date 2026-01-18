@@ -17,6 +17,11 @@ import AdminProjects from "./pages/Admin/Projects";
 import AdminDashboard from "./pages/Admin/Dashboard";
 import EditProject from "./pages/Admin/EditProject";
 import AddProject from "./pages/Admin/AddProject";
+import AllFreeProjects from "./pages/AllFreeProjects";
+import AdminFreeProjects from "./pages/Admin/AdminFreeProjects";
+import AdminFreeProjectForm from "./pages/Admin/AdminFreeProjectForm";
+
+
 
 const App = () => {
   // ✅ ADD HERE
@@ -52,6 +57,17 @@ const App = () => {
           <Route path="/explore" element={<ExploreProjects />} />
           <Route path="/projects/:id" element={<ProjectDetails />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/free-projects" element={<AllFreeProjects />} />
+          <Route path="/admin/free-projects" element={<AdminFreeProjects />} />
+          <Route
+            path="/admin/free-projects/add"
+            element={<AdminFreeProjectForm />}
+          />
+          <Route
+            path="/admin/free-projects/edit/:id"
+            element={<AdminFreeProjectForm />}
+          />
+
           <Route
             path="/admin/projects/add"
             element={
