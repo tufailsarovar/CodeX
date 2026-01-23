@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Box } from "@mui/material";
 
@@ -21,33 +21,23 @@ import AllFreeProjects from "./pages/AllFreeProjects";
 import AdminFreeProjects from "./pages/Admin/AdminFreeProjects";
 import AdminFreeProjectForm from "./pages/Admin/AdminFreeProjectForm";
 
-
-
 const App = () => {
-  // ✅ ADD HERE
   const user = JSON.parse(localStorage.getItem("codex_user"));
 
+  // ✅ WARM SERVER (FIX)
+  useEffect(() => {
+    fetch("https://codex-server-a73x.onrender.com/health").catch(() => {});
+  }, []);
+
   const AdminRoute = ({ children }) => {
-    if (!user || !user.isAdmin) {
-      return <Navigate to="/" replace />;
-    }
+    if (!user || !user.isAdmin) return <Navigate to="/" replace />;
     return children;
   };
-  // ✅ END
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        bgcolor: "background.default",
-        color: "text.primary",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <Navbar />
-
-      <Box component="main" sx={{ flex: 1 }}>
+      <Box sx={{ flex: 1 }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
@@ -58,44 +48,6 @@ const App = () => {
           <Route path="/projects/:id" element={<ProjectDetails />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/free-projects" element={<AllFreeProjects />} />
-          <Route path="/admin/free-projects" element={<AdminFreeProjects />} />
-          <Route
-            path="/admin/free-projects/add"
-            element={<AdminFreeProjectForm />}
-          />
-          <Route
-            path="/admin/free-projects/edit/:id"
-            element={<AdminFreeProjectForm />}
-          />
-
-          <Route
-            path="/admin/projects/add"
-            element={
-              <AdminRoute>
-                <AddProject />
-              </AdminRoute>
-            }
-          />
-
-          <Route
-            path="/admin/projects/edit/:id"
-            element={
-              <AdminRoute>
-                <EditProject />
-              </AdminRoute>
-            }
-          />
-
-          <Route
-            path="/admin/projects"
-            element={
-              <AdminRoute>
-                <AdminProjects />
-              </AdminRoute>
-            }
-          />
-
-          {/* ✅ ADMIN ROUTE */}
           <Route
             path="/admin/dashboard"
             element={
@@ -104,9 +56,34 @@ const App = () => {
               </AdminRoute>
             }
           />
+          <Route
+            path="/admin/projects"
+            element={
+              <AdminRoute>
+                <AdminProjects />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/projects/add"
+            element={
+              <AdminRoute>
+                <AddProject />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/projects/edit/:id"
+            element={
+              <AdminRoute>
+                <EditProject />
+              </AdminRoute>
+            }
+          />
+          <Route path="/admin/free-projects" element={<AdminFreeProjects />} />
+          <Route path="/admin/free-projects/add" element={<AdminFreeProjectForm />} />
         </Routes>
       </Box>
-
       <Footer />
     </Box>
   );
