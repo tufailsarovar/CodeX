@@ -12,6 +12,7 @@ import ShieldIcon from "@mui/icons-material/Shield";
 import { Link } from "react-router-dom";
 import ProjectCard from "../components/Project/ProjectCard";
 import api from "../api/axios";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const token = localStorage.getItem("codex_token");
 
@@ -21,6 +22,9 @@ const Home = () => {
   // loaders (only for DB data)
   const [projectsLoading, setProjectsLoading] = useState(true);
   const [freeProjectsLoading, setFreeProjectsLoading] = useState(true);
+  // timeout flags (30s)
+  const [projectsTimedOut, setProjectsTimedOut] = useState(false);
+  const [freeProjectsTimedOut, setFreeProjectsTimedOut] = useState(false);
 
   useEffect(() => {
     const fetchFreeProjects = async () => {
@@ -39,6 +43,7 @@ const Home = () => {
     // 30s safety stop
     const timer = setTimeout(() => {
       setFreeProjectsLoading(false);
+      setFreeProjectsTimedOut(true);
     }, 30000);
 
     return () => clearTimeout(timer);
@@ -69,6 +74,7 @@ const Home = () => {
     fetchProjects();
     const timer = setTimeout(() => {
       setProjectsLoading(false);
+      setProjectsTimedOut(true);
     }, 30000);
 
     return () => clearTimeout(timer);
@@ -202,9 +208,9 @@ const Home = () => {
                 </Typography>
 
                 {projectsLoading ? (
-                  <Typography variant="body2" color="text.secondary">
-                    Loading featured project...
-                  </Typography>
+                  <Box sx={{ py: 4, textAlign: "center" }}>
+                    <CircularProgress size={26} />
+                  </Box>
                 ) : featured ? (
                   <>
                     <Typography variant="h5" fontWeight={700} sx={{ mt: 1 }}>
@@ -272,7 +278,9 @@ const Home = () => {
                   </>
                 ) : (
                   <Typography variant="body2" color="text.secondary">
-                    No featured project yet. Add some projects in admin.
+                    {projectsTimedOut
+                      ? "No project uploaded yet from admin"
+                      : "No featured project yet. Add some projects in admin."}
                   </Typography>
                 )}
               </Paper>
@@ -313,9 +321,9 @@ const Home = () => {
 
           <Grid container spacing={3}>
             {projectsLoading ? (
-              <Typography variant="body2" color="text.secondary">
-                Loading projects...
-              </Typography>
+              <Box sx={{ width: "100%", textAlign: "center", py: 4 }}>
+                <CircularProgress />
+              </Box>
             ) : (
               projects.slice(0, 6).map((p) => (
                 <Grid item xs={12} sm={6} md={4} key={p._id}>
@@ -326,7 +334,9 @@ const Home = () => {
 
             {projects.length === 0 && (
               <Typography variant="body2" color="text.secondary">
-                No projects yet. Add from admin.
+                {projectsTimedOut
+                  ? "No project uploaded yet from admin"
+                  : "No projects yet. Add from admin."}
               </Typography>
             )}
           </Grid>
@@ -396,9 +406,9 @@ const Home = () => {
             }}
           >
             {freeProjectsLoading ? (
-              <Typography variant="body2" color="text.secondary">
-                Loading free projects...
-              </Typography>
+              <Box sx={{ minWidth: 200, textAlign: "center", py: 4 }}>
+                <CircularProgress size={28} />
+              </Box>
             ) : (
               freeProjects.slice(0, 6).map((p) => (
                 <Paper
@@ -524,7 +534,9 @@ const Home = () => {
 
             {freeProjects.length === 0 && (
               <Typography variant="body2" color="text.secondary">
-                No free projects yet.
+                {freeProjectsTimedOut
+                  ? "No project uploaded yet from admin"
+                  : "No free projects yet."}
               </Typography>
             )}
           </Box>
