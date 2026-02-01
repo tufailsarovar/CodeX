@@ -27,29 +27,37 @@ const Home = () => {
   const [freeProjectsTimedOut, setFreeProjectsTimedOut] = useState(false);
 
   useEffect(() => {
+    // 30s safety timeout — DEFINE FIRST
+    let timeoutId = setTimeout(() => {
+      setFreeProjectsLoading(false);
+      setFreeProjectsTimedOut(true);
+    }, 30000);
+
     const fetchFreeProjects = async () => {
       try {
         const res = await api.get("/free-projects");
         setFreeProjects(res.data);
+        setFreeProjectsTimedOut(false);
       } catch (err) {
         console.error(err);
       } finally {
+        clearTimeout(timeoutId); // ✅ now safe
         setFreeProjectsLoading(false);
       }
     };
 
     fetchFreeProjects();
 
-    // 30s safety stop
-    const timer = setTimeout(() => {
-      setFreeProjectsLoading(false);
-      setFreeProjectsTimedOut(true);
-    }, 30000);
-
-    return () => clearTimeout(timer);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   useEffect(() => {
+    // 30s safety timeout — DEFINE FIRST
+    let timeoutId = setTimeout(() => {
+      setProjectsLoading(false);
+      setProjectsTimedOut(true);
+    }, 30000);
+
     const fetchProjects = async () => {
       try {
         const res = await api.get("/projects");
@@ -65,19 +73,18 @@ const Home = () => {
         });
 
         setProjects(sortedProjects);
+        setProjectsTimedOut(false); // ✅ reset timeout state
       } catch (err) {
         console.error(err);
       } finally {
+        clearTimeout(timeoutId); // ✅ now SAFE
         setProjectsLoading(false);
       }
     };
-    fetchProjects();
-    const timer = setTimeout(() => {
-      setProjectsLoading(false);
-      setProjectsTimedOut(true);
-    }, 30000);
 
-    return () => clearTimeout(timer);
+    fetchProjects();
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const featured = projects[0]; // pick first project as featured
@@ -210,6 +217,13 @@ const Home = () => {
                 {projectsLoading ? (
                   <Box sx={{ py: 4, textAlign: "center" }}>
                     <CircularProgress size={26} />
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mt: 1 }}
+                    >
+                      Loading featured project…
+                    </Typography>
                   </Box>
                 ) : featured ? (
                   <>
@@ -323,6 +337,13 @@ const Home = () => {
             {projectsLoading ? (
               <Box sx={{ width: "100%", textAlign: "center", py: 4 }}>
                 <CircularProgress />
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mt: 1 }}
+                >
+                  Loading projects from server…
+                </Typography>
               </Box>
             ) : (
               projects.slice(0, 6).map((p) => (
@@ -408,6 +429,13 @@ const Home = () => {
             {freeProjectsLoading ? (
               <Box sx={{ minWidth: 200, textAlign: "center", py: 4 }}>
                 <CircularProgress size={28} />
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mt: 1 }}
+                >
+                  Loading free projects…
+                </Typography>
               </Box>
             ) : (
               freeProjects.slice(0, 6).map((p) => (
