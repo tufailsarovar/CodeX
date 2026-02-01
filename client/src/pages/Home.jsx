@@ -294,7 +294,7 @@ const Home = () => {
                   <Typography variant="body2" color="text.secondary">
                     {projectsTimedOut
                       ? "No project uploaded yet from admin"
-                      : "No featured project yet. Add some projects in admin."}
+                      : "No featured project yet."}
                   </Typography>
                 )}
               </Paper>
@@ -357,7 +357,7 @@ const Home = () => {
               <Typography variant="body2" color="text.secondary">
                 {projectsTimedOut
                   ? "No project uploaded yet from admin"
-                  : "No projects yet. Add from admin."}
+                  : ""}
               </Typography>
             )}
           </Grid>
