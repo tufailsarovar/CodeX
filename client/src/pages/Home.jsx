@@ -564,7 +564,7 @@ const Home = () => {
               <Typography variant="body2" color="text.secondary">
                 {freeProjectsTimedOut
                   ? "No project uploaded yet from admin"
-                  : "No free projects yet."}
+                  : ""}
               </Typography>
             )}
           </Box>
