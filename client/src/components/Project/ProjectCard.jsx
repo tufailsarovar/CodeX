@@ -8,6 +8,7 @@ import {
   Button,
   Chip,
   Stack,
+  Box,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -18,7 +19,7 @@ const ProjectCard = ({ project }) => {
   const isAnyFileAvailable = () => {
     const files = project.files || {};
     return Object.values(files).some(
-      (url) => typeof url === "string" && url.trim() !== ""
+      (url) => typeof url === "string" && url.trim() !== "",
     );
   };
 
@@ -38,6 +39,8 @@ const ProjectCard = ({ project }) => {
         height: "100%",
         display: "flex",
         flexDirection: "column",
+        borderRadius: 3,
+        overflow: "hidden",
         transition: "transform 0.2s ease, box-shadow 0.2s ease",
         "&:hover": {
           transform: "translateY(-4px)",
@@ -45,13 +48,22 @@ const ProjectCard = ({ project }) => {
         },
       }}
     >
-      {project.screenshotUrl && (
-        <CardMedia
-          component="img"
-          height="160"
-          image={project.screenshotUrl}
-          alt={project.title}
-        />
+      {project.videoUrl && (
+        <Box sx={{ overflow: "hidden" }}>
+          <video
+            src={project.videoUrl}
+            autoPlay
+            muted
+            loop
+            playsInline
+            style={{
+              width: "100%",
+              height: "220px",
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+        </Box>
       )}
 
       <CardContent sx={{ flexGrow: 1 }}>
@@ -64,8 +76,8 @@ const ProjectCard = ({ project }) => {
           {project.category === "mern"
             ? "MERN Full Stack"
             : project.category === "frontend"
-            ? "Frontend"
-            : "Project"}
+              ? "Frontend"
+              : "Project"}
         </Typography>
 
         <Typography variant="h6" gutterBottom>
@@ -101,9 +113,7 @@ const ProjectCard = ({ project }) => {
               ₹{project.originalPrice}
             </span>
           )}
-
           ₹{wholePrice}
-
           <span
             style={{
               marginLeft: "10px",

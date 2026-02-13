@@ -30,25 +30,24 @@ const ProjectDetails = () => {
   const token = localStorage.getItem("codex_token");
 
   useEffect(() => {
-  let mounted = true;
+    let mounted = true;
 
-  const fetchProject = async () => {
-    try {
-      const res = await api.get(`/projects/${id}`);
-      if (mounted) setProject(res.data);
-    } catch {
-      if (mounted) setError("Failed to load project");
-    } finally {
-      if (mounted) setLoading(false);
-    }
-  };
+    const fetchProject = async () => {
+      try {
+        const res = await api.get(`/projects/${id}`);
+        if (mounted) setProject(res.data);
+      } catch {
+        if (mounted) setError("Failed to load project");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
 
-  fetchProject();
-  return () => {
-    mounted = false;
-  };
-}, [id]);
-
+    fetchProject();
+    return () => {
+      mounted = false;
+    };
+  }, [id]);
 
   // ✅ PRICE CALCULATION
   const calculatePrice = () => {
@@ -301,10 +300,17 @@ const ProjectDetails = () => {
                   border: "1px solid rgba(148,163,184,0.4)",
                 }}
               >
-                <img
-                  src={project.screenshotUrl}
-                  alt={project.title}
-                  style={{ width: "100%", display: "block" }}
+                <video
+                  src={project.videoUrl}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  style={{
+                    width: "100%",
+                    display: "block",
+                    objectFit: "cover",
+                  }}
                 />
               </Paper>
 
