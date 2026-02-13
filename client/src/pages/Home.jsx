@@ -13,21 +13,22 @@ import { Link } from "react-router-dom";
 import ProjectCard from "../components/Project/ProjectCard";
 import api from "../api/axios";
 import CircularProgress from "@mui/material/CircularProgress";
+import { motion } from "framer-motion";
 
+const MotionBox = motion(Box);
 const token = localStorage.getItem("codex_token");
 
 const Home = () => {
   const [projects, setProjects] = useState([]);
   const [freeProjects, setFreeProjects] = useState([]);
-  // loaders (only for DB data)
   const [projectsLoading, setProjectsLoading] = useState(true);
   const [freeProjectsLoading, setFreeProjectsLoading] = useState(true);
-  // timeout flags (30s)
   const [projectsTimedOut, setProjectsTimedOut] = useState(false);
   const [freeProjectsTimedOut, setFreeProjectsTimedOut] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
 
+  // ---------------- FETCH FREE PROJECTS ----------------
   useEffect(() => {
-    // 30s safety timeout — DEFINE FIRST
     let timeoutId = setTimeout(() => {
       setFreeProjectsLoading(false);
       setFreeProjectsTimedOut(true);
@@ -37,22 +38,20 @@ const Home = () => {
       try {
         const res = await api.get("/free-projects");
         setFreeProjects(res.data);
-        setFreeProjectsTimedOut(false);
       } catch (err) {
         console.error(err);
       } finally {
-        clearTimeout(timeoutId); // ✅ now safe
+        clearTimeout(timeoutId);
         setFreeProjectsLoading(false);
       }
     };
 
     fetchFreeProjects();
-
     return () => clearTimeout(timeoutId);
   }, []);
 
+  // ---------------- FETCH PROJECTS ----------------
   useEffect(() => {
-    // 30s safety timeout — DEFINE FIRST
     let timeoutId = setTimeout(() => {
       setProjectsLoading(false);
       setProjectsTimedOut(true);
@@ -73,32 +72,42 @@ const Home = () => {
         });
 
         setProjects(sortedProjects);
-        setProjectsTimedOut(false); // ✅ reset timeout state
       } catch (err) {
         console.error(err);
       } finally {
-        clearTimeout(timeoutId); // ✅ now SAFE
+        clearTimeout(timeoutId);
         setProjectsLoading(false);
       }
     };
 
     fetchProjects();
-
     return () => clearTimeout(timeoutId);
   }, []);
 
-  const featured = projects[0]; // pick first project as featured
+  // ---------------- CONTINUOUS CAROUSEL ----------------
+  useEffect(() => {
+    if (projects.length < 2) return;
 
-  // ✅ helper: check if ANY file url exists
-  const isAnyFileAvailable = (files = {}) => {
-    return Object.values(files).some(
+    const visible = projects.slice(0, 5);
+
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev === visible.length - 1 ? 0 : prev + 1));
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [projects]);
+
+  const isAnyFileAvailable = (files = {}) =>
+    Object.values(files).some(
       (url) => typeof url === "string" && url.trim() !== "",
     );
-  };
+
+  const visibleProjects = projects.slice(0, 5);
+  const total = visibleProjects.length;
 
   return (
     <Box>
-      {/* HERO + FEATURED */}
+      {/* HERO + CAROUSEL */}
       <Box
         sx={{
           py: 8,
@@ -107,69 +116,34 @@ const Home = () => {
       >
         <Container maxWidth="lg">
           <Grid container spacing={6} alignItems="center">
-            {/* LEFT HERO */}
+            {/* LEFT CONTENT */}
             <Grid item xs={12} md={6}>
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                style={{ fontSize: "12px" }}
-              >
-                CodeX | Tufail Sarovar
-              </Typography>
+              <Typography variant="body2">CodeX | Tufail Sarovar</Typography>
 
               <Typography variant="overline" color="secondary.main">
                 Code | Learn | Submit | Succeed
               </Typography>
 
-              <Typography
-                fontWeight={800}
-                sx={{
-                  mt: 1,
-                  mb: 2,
-                  fontSize: {
-                    xs: "1.8rem", // mobile
-                    sm: "2.2rem", // small tablets
-                    md: "2.8rem", // laptops
-                    lg: "3.2rem", // desktops
-                  },
-                  lineHeight: 1.2,
-                }}
-              >
+              <Typography fontWeight={800} sx={{ mt: 2, mb: 2 }} variant="h4">
                 Structured and Scalable{" "}
-                <Box
-                  component="span"
-                  sx={{
-                    color: "primary.main",
-                    display: "inline-block",
-                  }}
-                >
+                <Box component="span" sx={{ color: "primary.main" }}>
                   Projects
                 </Box>{" "}
                 designed to achieve Academic excellence
               </Typography>
 
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+              <Typography sx={{ mb: 3 }}>
                 CodeX offers secure instant delivery, verified payments, and
-                high-quality project resources for students and developers.
+                high-quality project resources.
               </Typography>
 
               <Stack direction="row" spacing={2}>
-                <Button
-                  component={Link}
-                  to="/explore"
-                  variant="contained"
-                  size="large"
-                >
+                <Button component={Link} to="/explore" variant="contained">
                   Explore Projects
                 </Button>
 
                 {!token && (
-                  <Button
-                    component={Link}
-                    to="/login"
-                    variant="outlined"
-                    size="large"
-                  >
+                  <Button component={Link} to="/login" variant="outlined">
                     Login to Buy
                   </Button>
                 )}
@@ -179,125 +153,114 @@ const Home = () => {
                 sx={{ display: "flex", alignItems: "center", gap: 1, mt: 2 }}
               >
                 <ShieldIcon sx={{ color: "lightgreen", fontSize: 20 }} />
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#b6c3cdff", opacity: 0.9 }}
-                >
+                <Typography variant="body2">
                   Secure Payments • Instant Access
                 </Typography>
               </Box>
             </Grid>
 
-            {/* RIGHT FEATURED PROJECT */}
+            {/* RIGHT CAROUSEL */}
             <Grid item xs={12} md={6}>
-              <Paper
-                elevation={0}
+              <Box
                 sx={{
-                  p: 3,
-                  borderRadius: 4,
-                  background: "rgba(15,23,42,0.85)",
-                  border: "1px solid rgba(148,163,184,0.3)",
-                  transition:
-                    "transform .3s ease, box-shadow .3s ease, border-color .3s ease",
-                  "&:hover": {
-                    transform: "translateY(-6px)",
-                    borderColor: "primary.main",
-                    boxShadow: "0 25px 60px rgba(79,70,229,0.45)",
-                  },
+                  position: "relative",
+                  height: 380,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
                 }}
               >
-                <Typography
-                  variant="subtitle1"
-                  fontWeight={600}
-                  color="primary.main"
-                >
-                  Featured Project
-                </Typography>
-
                 {projectsLoading ? (
-                  <Box sx={{ py: 4, textAlign: "center" }}>
-                    <CircularProgress size={26} />
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mt: 1 }}
-                    >
-                      Loading featured project…
-                    </Typography>
-                  </Box>
-                ) : featured ? (
-                  <>
-                    <Typography variant="h5" fontWeight={700} sx={{ mt: 1 }}>
-                      {featured.title}
-                    </Typography>
-
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mt: 1, mb: 2 }}
-                    >
-                      {featured.description?.slice(0, 140)}...
-                    </Typography>
-
-                    {/* ✅ PRICE + AVAILABILITY (ONLY ADDITION) */}
-                    <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>
-                      {featured.originalPrice && (
-                        <span
-                          style={{
-                            textDecoration: "line-through",
-                            marginRight: "8px",
-                            fontWeight: 500,
-                            opacity: 0.7,
-                            fontSize: "15px",
-                          }}
-                        >
-                          ₹{featured.originalPrice}
-                        </span>
-                      )}
-                      <span>₹{featured.price}</span>
-
-                      <span
-                        style={{
-                          marginLeft: "10px",
-                          fontSize: "13px",
-                          fontWeight: 600,
-                          color: isAnyFileAvailable(featured.files)
-                            ? "#22c55e"
-                            : "#facc15",
-                        }}
-                      >
-                        {isAnyFileAvailable(featured.files)
-                          ? "Available"
-                          : "Coming soon"}
-                      </span>
-                    </Typography>
-
-                    <Stack direction="row" spacing={2}>
-                      <Button
-                        component={Link}
-                        to={`/projects/${featured._id}`}
-                        variant="outlined"
-                      >
-                        View Details
-                      </Button>
-
-                      <Button
-                        component={Link}
-                        to={`/projects/${featured._id}`}
-                        variant="contained"
-                      >
-                        Buy Now
-                      </Button>
-                    </Stack>
-                  </>
-                ) : (
-                  <Typography variant="body2" color="text.secondary">
+                  <CircularProgress />
+                ) : projects.length === 0 ? (
+                  <Typography>
                     {projectsTimedOut
                       ? "No project uploaded yet from admin"
-                      : "No featured project yet."}
+                      : "No projects available."}
                   </Typography>
+                ) : (
+                  visibleProjects.map((project, index) => {
+                    const position =
+                      index === activeIndex
+                        ? 0
+                        : index === (activeIndex - 1 + total) % total
+                          ? -1
+                          : index === (activeIndex + 1) % total
+                            ? 1
+                            : 2;
+
+                    return (
+                      <MotionBox
+                        key={project._id}
+                        animate={{
+                          y: position === 0 ? 0 : position === -1 ? -120 : 120,
+                          scale: position === 0 ? 1 : 0.85,
+                          opacity: position === 0 ? 1 : 0.5,
+                        }}
+                        transition={{ duration: 0.6 }}
+                        sx={{
+                          position: "absolute",
+                          width: "92%",
+                          p: 3,
+                          borderRadius: 4,
+                          background: "linear-gradient(180deg,#0f172a,#020617)",
+                          border: "1px solid rgba(148,163,184,0.3)",
+                          color: "#fff",
+                          zIndex: position === 0 ? 3 : 1,
+                        }}
+                      >
+                        <Stack spacing={2}>
+                          <Typography fontWeight={700}>
+                            {project.title}
+                          </Typography>
+
+                          <Typography variant="body2">
+                            {project.description?.slice(0, 120)}...
+                          </Typography>
+
+                          <Typography fontWeight={700}>
+                            ₹{project.price}
+                          </Typography>
+
+                          <Typography
+                            sx={{
+                              fontSize: "13px",
+                              color: isAnyFileAvailable(project.files)
+                                ? "#22c55e"
+                                : "#facc15",
+                            }}
+                          >
+                            {isAnyFileAvailable(project.files)
+                              ? "Available"
+                              : "Coming soon"}
+                          </Typography>
+
+                          <Stack direction="row" spacing={2}>
+                            <Button
+                              component={Link}
+                              to={`/projects/${project._id}`}
+                              variant="outlined"
+                              size="small"
+                            >
+                              View
+                            </Button>
+
+                            <Button
+                              component={Link}
+                              to={`/projects/${project._id}`}
+                              variant="contained"
+                              size="small"
+                            >
+                              Buy
+                            </Button>
+                          </Stack>
+                        </Stack>
+                      </MotionBox>
+                    );
+                  })
                 )}
-              </Paper>
+              </Box>
             </Grid>
           </Grid>
         </Container>
@@ -355,9 +318,7 @@ const Home = () => {
 
             {projects.length === 0 && (
               <Typography variant="body2" color="text.secondary">
-                {projectsTimedOut
-                  ? "No project uploaded yet from admin"
-                  : ""}
+                {projectsTimedOut ? "No project uploaded yet from admin" : ""}
               </Typography>
             )}
           </Grid>
