@@ -7,16 +7,16 @@ const AllProjects = () => {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
-    const cached = localStorage.getItem("codex_projects");
-    if (cached) {
-      setProjects(JSON.parse(cached));
-      return;
-    }
+    const fetchProjects = async () => {
+      try {
+        const res = await api.get("/projects");
+        setProjects(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-    api.get("/projects").then((res) => {
-      localStorage.setItem("codex_projects", JSON.stringify(res.data));
-      setProjects(res.data);
-    });
+    fetchProjects();
   }, []);
 
   return (
@@ -26,9 +26,16 @@ const AllProjects = () => {
           All Projects
         </Typography>
 
-        <Grid container spacing={3}>
+        <Grid container spacing={3} alignItems="stretch">
           {projects.map((p) => (
-            <Grid item xs={12} sm={6} md={4} key={p._id}>
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+              key={p._id}
+              sx={{ display: "flex" }}
+            >
               <ProjectCard project={p} />
             </Grid>
           ))}
