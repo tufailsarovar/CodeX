@@ -25,6 +25,7 @@ JWT_SECRET=your_jwt_secret_here
 
 RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxx
 RAZORPAY_KEY_SECRET=xxxxxxxxxxxxxx
+SMTP_FROM="CodeX <abc@gmail.com>"
 
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
@@ -38,7 +39,6 @@ SMTP_PASS=your_app_password
 
 ```env
 VITE_API_URL=http://localhost:5000/api
-VITE_RAZORPAY_KEY=rzp_test_xxxxxxxxxx
 ```
 
 ⚠️ All frontend environment variables must start with `VITE_`.
