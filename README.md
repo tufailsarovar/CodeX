@@ -48,6 +48,7 @@ VITE_RAZORPAY_KEY=rzp_test_xxxxxxxxxx
 ## ▶️ How to Run the Project
 
 Backend:
+Code:- https://github.com/tufailsarovar/codex-server
 ```
 npm install
 npm run dev
