@@ -38,7 +38,10 @@ SMTP_PASS=your_app_password
 ## ✅ Frontend Environment Setup
 
 ```env
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:5173/api
+VITE_EMAILJS_SERVICE_ID=service_rotrhvs
+VITE_EMAILJS_TEMPLATE_ID=template_idghdif
+VITE_EMAILJS_PUBLIC_KEY=aruhriguhvaiur
 ```
 
 ⚠️ All frontend environment variables must start with `VITE_`.
