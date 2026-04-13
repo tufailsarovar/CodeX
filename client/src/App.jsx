@@ -26,7 +26,7 @@ const App = () => {
 
   // ✅ WARM SERVER (FIX)
   useEffect(() => {
-    fetch("https://codex-server-a73x.onrender.com/health").catch(() => {});
+    fetch("https://codex-server-eight.vercel.app/health").catch(() => {});
   }, []);
 
   const AdminRoute = ({ children }) => {
