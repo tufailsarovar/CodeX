@@ -3,7 +3,7 @@ import axios from "axios";
 const api = axios.create({
   baseURL:
     import.meta.env.VITE_API_URL ||
-    "https://codex-server-a73x.onrender.com/api",
+    "https://codex-server-eight.vercel.app/api",
   withCredentials: true,
   timeout: 30000,
 });
