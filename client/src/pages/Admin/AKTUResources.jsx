@@ -189,7 +189,7 @@ const AKTUResources = () => {
         JSON.parse(localStorage.getItem("codex_user") || "{}")?.token ||
         localStorage.getItem("adminToken");
 
-      const res = await api.post("/api/upload/aktu/image", data, {
+      const res = await api.post("/upload/aktu/image", data, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -255,7 +255,7 @@ const AKTUResources = () => {
         JSON.parse(localStorage.getItem("codex_user") || "{}")?.token ||
         localStorage.getItem("adminToken");
 
-      const res = await api.post("/api/upload/aktu/pdf", data, {
+      const res = await api.post("/upload/aktu/pdf", data, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
