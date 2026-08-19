@@ -6,24 +6,43 @@ const AdminLogin = () => {
   const [password, setPassword] = useState("");
 
   const submit = async () => {
-    const res = await axios.post("/api/admin/auth/login", {
-      email,
-      password,
-    });
-    localStorage.setItem("adminToken", res.data.token);
-    window.location.href = "/admin/dashboard";
+    try {
+      const res = await axios.post("/admin/auth/login", {
+        email,
+        password,
+      });
+
+      localStorage.setItem("adminToken", res.data.token);
+
+      window.location.href = "/admin/dashboard";
+    } catch (error) {
+      console.error(
+        "Admin login failed:",
+        error.response?.data || error.message
+      );
+    }
   };
 
   return (
     <div>
       <h2>Admin Login</h2>
-      <input placeholder="Email" onChange={e => setEmail(e.target.value)} />
+
+      <input
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
       <input
         placeholder="Password"
         type="password"
-        onChange={e => setPassword(e.target.value)}
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
       />
-      <button onClick={submit}>Login</button>
+
+      <button onClick={submit}>
+        Login
+      </button>
     </div>
   );
 };
