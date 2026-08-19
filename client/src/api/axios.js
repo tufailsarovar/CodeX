@@ -2,42 +2,41 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "https://codex-server-eight.vercel.app/api",
+  withCredentials: true,
 });
 
 api.interceptors.request.use(
   (config) => {
-    let token = localStorage.getItem("adminToken");
+    let token = null;
 
-    // Fallback for existing login systems
-    if (!token) {
-      token = localStorage.getItem("token");
+    // Existing CodeX login stores token inside codex_user
+    try {
+      const user = JSON.parse(
+        localStorage.getItem("codex_user")
+      );
+
+      token = user?.token || null;
+    } catch (error) {
+      console.error(
+        "Failed to read codex_user:",
+        error
+      );
     }
 
-    // Fallback if token is stored inside codex_user
+    // Fallback for adminToken if it exists
     if (!token) {
-      try {
-        const user = JSON.parse(
-          localStorage.getItem("codex_user")
-        );
-
-        token =
-          user?.token ||
-          user?.accessToken ||
-          user?.jwt ||
-          null;
-      } catch {
-        token = null;
-      }
+      token = localStorage.getItem("adminToken");
     }
 
     if (token) {
-      config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
     }
 
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
 export default api;
