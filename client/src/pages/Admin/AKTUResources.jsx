@@ -12,6 +12,7 @@ import {
   FormControlLabel,
   Divider,
   Alert,
+  Chip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
@@ -19,10 +20,16 @@ import api from "../../api/axios";
 const resourceTypes = [
   { value: "syllabus", label: "Syllabus" },
   { value: "notes", label: "Notes" },
-  { value: "important-questions", label: "Important Questions" },
+  {
+    value: "important-questions",
+    label: "Important Questions",
+  },
   { value: "pyq", label: "PYQ" },
   { value: "quantum", label: "Quantum" },
-  { value: "question-answers", label: "Question & Answers" },
+  {
+    value: "question-answers",
+    label: "Question & Answers",
+  },
 ];
 
 const branches = [
@@ -40,7 +47,10 @@ const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
 const priorities = [
   { value: "normal", label: "Normal" },
   { value: "important", label: "Important" },
-  { value: "very-important", label: "Very Important" },
+  {
+    value: "very-important",
+    label: "Very Important",
+  },
 ];
 
 const initialForm = {
@@ -65,14 +75,19 @@ const AKTUResources = () => {
 
   const [resources, setResources] = useState([]);
   const [form, setForm] = useState(initialForm);
+
+  const [editingId, setEditingId] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
   const fetchResources = async () => {
     try {
       setLoading(true);
+      setError("");
 
       const res = await api.get("/admin/aktu");
 
@@ -81,7 +96,8 @@ const AKTUResources = () => {
       console.error("AKTU resources load failed", err);
 
       setError(
-        err.response?.data?.message || "Failed to load AKTU resources."
+        err.response?.data?.message ||
+          "Failed to load AKTU resources."
       );
     } finally {
       setLoading(false);
@@ -97,8 +113,18 @@ const AKTUResources = () => {
 
     setForm((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : value,
     }));
+  };
+
+  const clearForm = () => {
+    setForm(initialForm);
+    setEditingId(null);
+    setMessage("");
+    setError("");
   };
 
   const handleSubmit = async (event) => {
@@ -107,9 +133,15 @@ const AKTUResources = () => {
     setMessage("");
     setError("");
 
-    if (!form.branch || !form.semester || !form.subjectName || !form.title) {
+    if (
+      !form.branch ||
+      !form.semester ||
+      !form.subjectName ||
+      !form.resourceType ||
+      !form.title
+    ) {
       setError(
-        "Branch, semester, subject name and title are required."
+        "Branch, semester, subject name, resource type and title are required."
       );
       return;
     }
@@ -120,27 +152,90 @@ const AKTUResources = () => {
       const payload = {
         ...form,
         semester: Number(form.semester),
-        year: form.year ? Number(form.year) : null,
-        questionFrequency: Number(form.questionFrequency || 0),
+        year:
+          form.year !== "" &&
+          form.year !== null
+            ? Number(form.year)
+            : null,
+        questionFrequency: Number(
+          form.questionFrequency || 0
+        ),
       };
 
-      await api.post("/admin/aktu", payload);
+      if (editingId) {
+        await api.put(
+          `/admin/aktu/${editingId}`,
+          payload
+        );
 
-      setMessage("AKTU resource added successfully.");
+        setMessage(
+          "AKTU resource updated successfully."
+        );
+      } else {
+        await api.post(
+          "/admin/aktu",
+          payload
+        );
+
+        setMessage(
+          "AKTU resource added successfully."
+        );
+      }
 
       setForm(initialForm);
+      setEditingId(null);
 
       await fetchResources();
     } catch (err) {
-      console.error("AKTU resource creation failed", err);
+      console.error(
+        "AKTU resource save failed",
+        err
+      );
 
       setError(
         err.response?.data?.message ||
-          "Failed to create AKTU resource."
+          "Failed to save AKTU resource."
       );
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleEdit = (resource) => {
+    setEditingId(resource._id);
+
+    setForm({
+      branch: resource.branch || "CSE",
+      semester: resource.semester || 1,
+      subjectCode:
+        resource.subjectCode || "",
+      subjectName:
+        resource.subjectName || "",
+      resourceType:
+        resource.resourceType || "notes",
+      unit: resource.unit || "",
+      title: resource.title || "",
+      description:
+        resource.description || "",
+      content: resource.content || "",
+      fileUrl: resource.fileUrl || "",
+      year:
+        resource.year ?? "",
+      questionFrequency:
+        resource.questionFrequency ?? 0,
+      priority:
+        resource.priority || "normal",
+      isPublished:
+        resource.isPublished !== false,
+    });
+
+    setMessage("");
+    setError("");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   const handleDelete = async (id) => {
@@ -154,13 +249,24 @@ const AKTUResources = () => {
       setError("");
       setMessage("");
 
-      await api.delete(`/admin/aktu/${id}`);
+      await api.delete(
+        `/admin/aktu/${id}`
+      );
 
-      setMessage("AKTU resource deleted successfully.");
+      if (editingId === id) {
+        clearForm();
+      }
+
+      setMessage(
+        "AKTU resource deleted successfully."
+      );
 
       await fetchResources();
     } catch (err) {
-      console.error("AKTU resource deletion failed", err);
+      console.error(
+        "AKTU resource deletion failed",
+        err
+      );
 
       setError(
         err.response?.data?.message ||
@@ -170,68 +276,130 @@ const AKTUResources = () => {
   };
 
   const getResourceTypeLabel = (type) => {
-    const item = resourceTypes.find((resource) => resource.value === type);
+    const item = resourceTypes.find(
+      (resource) =>
+        resource.value === type
+    );
 
     return item?.label || type;
   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 } }}>
+    <Box
+      sx={{
+        p: {
+          xs: 2,
+          md: 4,
+        },
+      }}
+    >
       {/* HEADER */}
       <Box
         mb={4}
         display="flex"
         justifyContent="space-between"
-        alignItems={{ xs: "flex-start", md: "center" }}
-        flexDirection={{ xs: "column", md: "row" }}
+        alignItems={{
+          xs: "flex-start",
+          md: "center",
+        }}
+        flexDirection={{
+          xs: "column",
+          md: "row",
+        }}
         gap={2}
       >
         <Box>
-          <Typography variant="h4" fontWeight={800}>
+          <Typography
+            variant="h4"
+            fontWeight={800}
+          >
             AKTU Resources
           </Typography>
 
           <Typography color="text.secondary">
-            Manage syllabus, notes, PYQs, Quantum and other AKTU
-            study resources.
+            Manage syllabus, notes, PYQs,
+            Quantum and other AKTU study
+            resources.
           </Typography>
         </Box>
 
         <Button
           variant="outlined"
-          onClick={() => navigate("/admin/dashboard")}
+          onClick={() =>
+            navigate("/admin/dashboard")
+          }
         >
           Back to Dashboard
         </Button>
       </Box>
 
+      {/* ALERTS */}
       {message && (
-        <Alert severity="success" sx={{ mb: 3 }}>
+        <Alert
+          severity="success"
+          sx={{ mb: 3 }}
+        >
           {message}
         </Alert>
       )}
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert
+          severity="error"
+          sx={{ mb: 3 }}
+        >
           {error}
         </Alert>
       )}
 
-      {/* ADD RESOURCE */}
+      {/* ADD / EDIT RESOURCE */}
       <Paper
         sx={{
-          p: { xs: 2, md: 4 },
+          p: {
+            xs: 2,
+            md: 4,
+          },
           borderRadius: 3,
           mb: 5,
         }}
       >
-        <Typography variant="h6" fontWeight={700} mb={3}>
-          Add AKTU Resource
-        </Typography>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={3}
+          gap={2}
+        >
+          <Typography
+            variant="h6"
+            fontWeight={700}
+          >
+            {editingId
+              ? "Edit AKTU Resource"
+              : "Add AKTU Resource"}
+          </Typography>
 
-        <Box component="form" onSubmit={handleSubmit}>
+          {editingId && (
+            <Chip
+              label="Editing"
+              color="primary"
+              variant="outlined"
+            />
+          )}
+        </Box>
+
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+        >
           <Grid container spacing={2.5}>
-            <Grid item xs={12} sm={6} md={4}>
+            {/* BRANCH */}
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+            >
               <TextField
                 select
                 fullWidth
@@ -241,14 +409,23 @@ const AKTUResources = () => {
                 onChange={handleChange}
               >
                 {branches.map((branch) => (
-                  <MenuItem key={branch} value={branch}>
+                  <MenuItem
+                    key={branch}
+                    value={branch}
+                  >
                     {branch}
                   </MenuItem>
                 ))}
               </TextField>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={4}>
+            {/* SEMESTER */}
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+            >
               <TextField
                 select
                 fullWidth
@@ -257,15 +434,26 @@ const AKTUResources = () => {
                 value={form.semester}
                 onChange={handleChange}
               >
-                {semesters.map((semester) => (
-                  <MenuItem key={semester} value={semester}>
-                    {semester} Semester
-                  </MenuItem>
-                ))}
+                {semesters.map(
+                  (semester) => (
+                    <MenuItem
+                      key={semester}
+                      value={semester}
+                    >
+                      {semester} Semester
+                    </MenuItem>
+                  )
+                )}
               </TextField>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={4}>
+            {/* RESOURCE TYPE */}
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+            >
               <TextField
                 select
                 fullWidth
@@ -274,18 +462,26 @@ const AKTUResources = () => {
                 value={form.resourceType}
                 onChange={handleChange}
               >
-                {resourceTypes.map((resource) => (
-                  <MenuItem
-                    key={resource.value}
-                    value={resource.value}
-                  >
-                    {resource.label}
-                  </MenuItem>
-                ))}
+                {resourceTypes.map(
+                  (resource) => (
+                    <MenuItem
+                      key={resource.value}
+                      value={resource.value}
+                    >
+                      {resource.label}
+                    </MenuItem>
+                  )
+                )}
               </TextField>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={4}>
+            {/* SUBJECT CODE */}
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+            >
               <TextField
                 fullWidth
                 label="Subject Code"
@@ -296,7 +492,13 @@ const AKTUResources = () => {
               />
             </Grid>
 
-            <Grid item xs={12} sm={6} md={4}>
+            {/* SUBJECT NAME */}
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+            >
               <TextField
                 fullWidth
                 label="Subject Name"
@@ -308,7 +510,13 @@ const AKTUResources = () => {
               />
             </Grid>
 
-            <Grid item xs={12} sm={6} md={4}>
+            {/* UNIT */}
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+            >
               <TextField
                 fullWidth
                 label="Unit"
@@ -319,6 +527,7 @@ const AKTUResources = () => {
               />
             </Grid>
 
+            {/* TITLE */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -331,6 +540,7 @@ const AKTUResources = () => {
               />
             </Grid>
 
+            {/* DESCRIPTION */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -343,6 +553,7 @@ const AKTUResources = () => {
               />
             </Grid>
 
+            {/* CONTENT */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -356,7 +567,12 @@ const AKTUResources = () => {
               />
             </Grid>
 
-            <Grid item xs={12} md={8}>
+            {/* FILE URL */}
+            <Grid
+              item
+              xs={12}
+              md={8}
+            >
               <TextField
                 fullWidth
                 label="File URL"
@@ -367,7 +583,13 @@ const AKTUResources = () => {
               />
             </Grid>
 
-            <Grid item xs={12} sm={6} md={2}>
+            {/* YEAR */}
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={2}
+            >
               <TextField
                 fullWidth
                 type="number"
@@ -379,19 +601,34 @@ const AKTUResources = () => {
               />
             </Grid>
 
-            <Grid item xs={12} sm={6} md={2}>
+            {/* FREQUENCY */}
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={2}
+            >
               <TextField
                 fullWidth
                 type="number"
                 label="PYQ Frequency"
                 name="questionFrequency"
-                value={form.questionFrequency}
+                value={
+                  form.questionFrequency
+                }
                 onChange={handleChange}
-                inputProps={{ min: 0 }}
+                inputProps={{
+                  min: 0,
+                }}
               />
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            {/* PRIORITY */}
+            <Grid
+              item
+              xs={12}
+              md={6}
+            >
               <TextField
                 select
                 fullWidth
@@ -400,22 +637,31 @@ const AKTUResources = () => {
                 value={form.priority}
                 onChange={handleChange}
               >
-                {priorities.map((priority) => (
-                  <MenuItem
-                    key={priority.value}
-                    value={priority.value}
-                  >
-                    {priority.label}
-                  </MenuItem>
-                ))}
+                {priorities.map(
+                  (priority) => (
+                    <MenuItem
+                      key={priority.value}
+                      value={priority.value}
+                    >
+                      {priority.label}
+                    </MenuItem>
+                  )
+                )}
               </TextField>
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            {/* PUBLISH */}
+            <Grid
+              item
+              xs={12}
+              md={6}
+            >
               <FormControlLabel
                 control={
                   <Switch
-                    checked={form.isPublished}
+                    checked={
+                      form.isPublished
+                    }
                     onChange={handleChange}
                     name="isPublished"
                   />
@@ -424,26 +670,36 @@ const AKTUResources = () => {
               />
             </Grid>
 
+            {/* ACTIONS */}
             <Grid item xs={12}>
-              <Stack direction="row" spacing={2}>
+              <Stack
+                direction={{
+                  xs: "column",
+                  sm: "row",
+                }}
+                spacing={2}
+              >
                 <Button
                   type="submit"
                   variant="contained"
                   disabled={saving}
                 >
-                  {saving ? "Adding..." : "Add Resource"}
+                  {saving
+                    ? "Saving..."
+                    : editingId
+                    ? "Save Changes"
+                    : "Add Resource"}
                 </Button>
 
                 <Button
                   type="button"
                   variant="outlined"
-                  onClick={() => {
-                    setForm(initialForm);
-                    setMessage("");
-                    setError("");
-                  }}
+                  onClick={clearForm}
+                  disabled={saving}
                 >
-                  Clear
+                  {editingId
+                    ? "Cancel Edit"
+                    : "Clear"}
                 </Button>
               </Stack>
             </Grid>
@@ -451,10 +707,13 @@ const AKTUResources = () => {
         </Box>
       </Paper>
 
-      {/* RESOURCE LIST */}
+      {/* EXISTING RESOURCES */}
       <Paper
         sx={{
-          p: { xs: 2, md: 4 },
+          p: {
+            xs: 2,
+            md: 4,
+          },
           borderRadius: 3,
         }}
       >
@@ -463,14 +722,22 @@ const AKTUResources = () => {
           justifyContent="space-between"
           alignItems="center"
           mb={3}
+          gap={2}
         >
           <Box>
-            <Typography variant="h6" fontWeight={700}>
+            <Typography
+              variant="h6"
+              fontWeight={700}
+            >
               Existing AKTU Resources
             </Typography>
 
-            <Typography variant="body2" color="text.secondary">
-              Total resources: {resources.length}
+            <Typography
+              variant="body2"
+              color="text.secondary"
+            >
+              Total resources:{" "}
+              {resources.length}
             </Typography>
           </Box>
 
@@ -496,7 +763,12 @@ const AKTUResources = () => {
         ) : (
           <Grid container spacing={2}>
             {resources.map((resource) => (
-              <Grid item xs={12} md={6} key={resource._id}>
+              <Grid
+                item
+                xs={12}
+                md={6}
+                key={resource._id}
+              >
                 <Paper
                   variant="outlined"
                   sx={{
@@ -505,7 +777,10 @@ const AKTUResources = () => {
                     height: "100%",
                   }}
                 >
-                  <Typography fontWeight={700} mb={1}>
+                  <Typography
+                    fontWeight={700}
+                    mb={1}
+                  >
                     {resource.title}
                   </Typography>
 
@@ -514,7 +789,9 @@ const AKTUResources = () => {
                     color="text.secondary"
                     mb={1}
                   >
-                    {resource.branch} • Semester {resource.semester}
+                    {resource.branch} •
+                    Semester{" "}
+                    {resource.semester}
                   </Typography>
 
                   <Typography
@@ -533,8 +810,12 @@ const AKTUResources = () => {
                     color="text.secondary"
                     mb={2}
                   >
-                    {getResourceTypeLabel(resource.resourceType)}
-                    {resource.unit ? ` • ${resource.unit}` : ""}
+                    {getResourceTypeLabel(
+                      resource.resourceType
+                    )}
+                    {resource.unit
+                      ? ` • ${resource.unit}`
+                      : ""}
                   </Typography>
 
                   <Stack
@@ -543,45 +824,86 @@ const AKTUResources = () => {
                     flexWrap="wrap"
                     mb={2}
                   >
-                    <Box
-                      component="span"
-                      sx={{
-                        px: 1.2,
-                        py: 0.4,
-                        borderRadius: 999,
-                        fontSize: 12,
-                        backgroundColor: "rgba(99,102,241,0.1)",
-                      }}
-                    >
-                      {resource.priority}
-                    </Box>
+                    <Chip
+                      size="small"
+                      label={
+                        resource.priority ||
+                        "normal"
+                      }
+                    />
 
-                    <Box
-                      component="span"
-                      sx={{
-                        px: 1.2,
-                        py: 0.4,
-                        borderRadius: 999,
-                        fontSize: 12,
-                        backgroundColor: resource.isPublished
-                          ? "rgba(34,197,94,0.1)"
-                          : "rgba(239,68,68,0.1)",
-                      }}
-                    >
-                      {resource.isPublished
-                        ? "Published"
-                        : "Hidden"}
-                    </Box>
+                    <Chip
+                      size="small"
+                      label={
+                        resource.isPublished
+                          ? "Published"
+                          : "Hidden"
+                      }
+                      color={
+                        resource.isPublished
+                          ? "success"
+                          : "default"
+                      }
+                    />
+
+                    {resource.fileUrl && (
+                      <Chip
+                        size="small"
+                        label="File Available"
+                        color="primary"
+                        variant="outlined"
+                      />
+                    )}
                   </Stack>
 
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    size="small"
-                    onClick={() => handleDelete(resource._id)}
+                  {resource.fileUrl && (
+                    <Button
+                      size="small"
+                      variant="text"
+                      href={
+                        resource.fileUrl
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      sx={{
+                        mr: 1,
+                        mb: 1,
+                      }}
+                    >
+                      View File
+                    </Button>
+                  )}
+
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    flexWrap="wrap"
                   >
-                    Delete
-                  </Button>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() =>
+                        handleEdit(
+                          resource
+                        )
+                      }
+                    >
+                      Edit
+                    </Button>
+
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      onClick={() =>
+                        handleDelete(
+                          resource._id
+                        )
+                      }
+                    >
+                      Delete
+                    </Button>
+                  </Stack>
                 </Paper>
               </Grid>
             ))}
