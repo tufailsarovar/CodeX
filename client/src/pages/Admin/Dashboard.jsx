@@ -42,6 +42,7 @@ const AdminDashboard = () => {
   }, []);
 
   const totalProjects = projects.length;
+
   const paidProjects = projects.filter(
     (p) => Number(p.price) > 0
   ).length;
@@ -53,21 +54,24 @@ const AdminDashboard = () => {
         <Typography variant="h4" fontWeight={800}>
           Welcome back, Admin 👋
         </Typography>
+
         <Typography color="text.secondary">
           Here’s a quick snapshot of CodeX today.
         </Typography>
       </Box>
 
-      {/* MAIN STATS (UNCHANGED) */}
+      {/* MAIN STATS */}
       <Grid container spacing={3} mb={6}>
         <Grid item xs={12} md={4}>
           <Paper sx={{ p: 3, borderRadius: 3 }}>
             <Typography variant="body2" color="text.secondary">
               Total Projects
             </Typography>
+
             <Typography variant="h3" fontWeight={800} mt={1}>
               {totalProjects}
             </Typography>
+
             <Typography variant="caption" color="text.secondary">
               All projects available
             </Typography>
@@ -79,9 +83,11 @@ const AdminDashboard = () => {
             <Typography variant="body2" color="text.secondary">
               Free Projects
             </Typography>
+
             <Typography variant="h3" fontWeight={800} mt={1}>
               {freeProjects.length}
             </Typography>
+
             <Typography variant="caption" color="text.secondary">
               Zero-cost learning resources
             </Typography>
@@ -93,9 +99,11 @@ const AdminDashboard = () => {
             <Typography variant="body2" color="text.secondary">
               Paid Projects
             </Typography>
+
             <Typography variant="h3" fontWeight={800} mt={1}>
               {paidProjects}
             </Typography>
+
             <Typography variant="caption" color="text.secondary">
               Revenue-generating projects
             </Typography>
@@ -103,7 +111,7 @@ const AdminDashboard = () => {
         </Grid>
       </Grid>
 
-      {/* 🔥 FREE PROJECTS DASHBOARD (NEW) */}
+      {/* FREE PROJECTS DASHBOARD */}
       <Box mb={6}>
         <Typography variant="h6" fontWeight={700} mb={2}>
           Free Projects Overview
@@ -115,9 +123,11 @@ const AdminDashboard = () => {
               <Typography variant="body2" color="text.secondary">
                 Total Free Projects
               </Typography>
+
               <Typography variant="h3" fontWeight={800} mt={1}>
                 {freeProjects.length}
               </Typography>
+
               <Typography variant="caption" color="text.secondary">
                 All free resources
               </Typography>
@@ -129,13 +139,17 @@ const AdminDashboard = () => {
               <Typography variant="body2" color="text.secondary">
                 GitHub Linked
               </Typography>
+
               <Typography variant="h3" fontWeight={800} mt={1}>
                 {
                   freeProjects.filter(
-                    (p) => p.githubLink && p.githubLink.trim() !== ""
+                    (p) =>
+                      p.githubLink &&
+                      p.githubLink.trim() !== ""
                   ).length
                 }
               </Typography>
+
               <Typography variant="caption" color="text.secondary">
                 Open-source repositories
               </Typography>
@@ -147,13 +161,17 @@ const AdminDashboard = () => {
               <Typography variant="body2" color="text.secondary">
                 With Video Preview
               </Typography>
+
               <Typography variant="h3" fontWeight={800} mt={1}>
                 {
                   freeProjects.filter(
-                    (p) => p.videoUrl && p.videoUrl.trim() !== ""
+                    (p) =>
+                      p.videoUrl &&
+                      p.videoUrl.trim() !== ""
                   ).length
                 }
               </Typography>
+
               <Typography variant="caption" color="text.secondary">
                 Demo-enabled projects
               </Typography>
@@ -162,18 +180,20 @@ const AdminDashboard = () => {
         </Grid>
       </Box>
 
-      {/* QUICK ACTIONS (UNCHANGED) */}
+      {/* QUICK ACTIONS */}
       <Box mb={6}>
         <Typography variant="h6" fontWeight={700} mb={2}>
           Quick Actions
         </Typography>
 
         <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
+          {/* ADD PROJECT */}
+          <Grid item xs={12} md={3}>
             <Paper sx={{ p: 3, borderRadius: 3 }}>
               <Typography fontWeight={700} mb={1}>
                 ➕ Add New Project
               </Typography>
+
               <Typography
                 variant="body2"
                 color="text.secondary"
@@ -181,20 +201,25 @@ const AdminDashboard = () => {
               >
                 Publish a new paid project.
               </Typography>
+
               <Button
                 variant="contained"
-                onClick={() => navigate("/admin/projects/add")}
+                onClick={() =>
+                  navigate("/admin/projects/add")
+                }
               >
                 Add Project
               </Button>
             </Paper>
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          {/* MANAGE PROJECTS */}
+          <Grid item xs={12} md={3}>
             <Paper sx={{ p: 3, borderRadius: 3 }}>
               <Typography fontWeight={700} mb={1}>
                 🛠 Manage Projects
               </Typography>
+
               <Typography
                 variant="body2"
                 color="text.secondary"
@@ -202,20 +227,25 @@ const AdminDashboard = () => {
               >
                 Edit or remove paid projects.
               </Typography>
+
               <Button
                 variant="outlined"
-                onClick={() => navigate("/admin/projects")}
+                onClick={() =>
+                  navigate("/admin/projects")
+                }
               >
                 Manage Projects
               </Button>
             </Paper>
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          {/* FREE PROJECTS */}
+          <Grid item xs={12} md={3}>
             <Paper sx={{ p: 3, borderRadius: 3 }}>
               <Typography fontWeight={700} mb={1}>
                 🎁 Manage Free Projects
               </Typography>
+
               <Typography
                 variant="body2"
                 color="text.secondary"
@@ -223,6 +253,7 @@ const AdminDashboard = () => {
               >
                 Control free open-source projects.
               </Typography>
+
               <Stack direction="row" spacing={1}>
                 <Button
                   variant="contained"
@@ -233,6 +264,7 @@ const AdminDashboard = () => {
                 >
                   Add Free
                 </Button>
+
                 <Button
                   variant="outlined"
                   size="small"
@@ -245,16 +277,46 @@ const AdminDashboard = () => {
               </Stack>
             </Paper>
           </Grid>
+
+          {/* AKTU */}
+          <Grid item xs={12} md={3}>
+            <Paper sx={{ p: 3, borderRadius: 3 }}>
+              <Typography fontWeight={700} mb={1}>
+                🎓 AKTU Study
+              </Typography>
+
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                mb={3}
+              >
+                Manage syllabus, notes, PYQs, Quantum and
+                question answers.
+              </Typography>
+
+              <Button
+                variant="contained"
+                onClick={() =>
+                  navigate("/admin/aktu")
+                }
+              >
+                Manage AKTU
+              </Button>
+            </Paper>
+          </Grid>
         </Grid>
       </Box>
 
-      {/* ABOUT ADMIN (UNCHANGED) */}
+      {/* ABOUT ADMIN */}
       <Paper sx={{ p: 4, borderRadius: 3 }}>
         <Typography variant="h6" fontWeight={700} mb={3}>
           About Admin
         </Typography>
 
-        <Stack direction={{ xs: "column", md: "row" }} spacing={4}>
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={4}
+        >
           <Avatar
             sx={{
               width: 120,
@@ -288,7 +350,11 @@ const AdminDashboard = () => {
 
             <Divider sx={{ mb: 2 }} />
 
-            <Stack direction="row" spacing={1} flexWrap="wrap">
+            <Stack
+              direction="row"
+              spacing={1}
+              flexWrap="wrap"
+            >
               <Chip label="MERN Stack" />
               <Chip label="Admin Systems" />
               <Chip label="Secure Payments" />

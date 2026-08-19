@@ -9,6 +9,11 @@ import {
   Paper,
 } from "@mui/material";
 import ShieldIcon from "@mui/icons-material/Shield";
+import SchoolIcon from "@mui/icons-material/School";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import DescriptionIcon from "@mui/icons-material/Description";
+import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import { Link } from "react-router-dom";
 import ProjectCard from "../components/Project/ProjectCard";
 import api from "../api/axios";
@@ -47,6 +52,7 @@ const Home = () => {
     };
 
     fetchFreeProjects();
+
     return () => clearTimeout(timeoutId);
   }, []);
 
@@ -63,11 +69,13 @@ const Home = () => {
 
         const sortedProjects = res.data.sort((a, b) => {
           const aAvailable = Object.values(a.files || {}).some(
-            (url) => typeof url === "string" && url.trim() !== "",
+            (url) => typeof url === "string" && url.trim() !== ""
           );
+
           const bAvailable = Object.values(b.files || {}).some(
-            (url) => typeof url === "string" && url.trim() !== "",
+            (url) => typeof url === "string" && url.trim() !== ""
           );
+
           return Number(bAvailable) - Number(aAvailable);
         });
 
@@ -81,6 +89,7 @@ const Home = () => {
     };
 
     fetchProjects();
+
     return () => clearTimeout(timeoutId);
   }, []);
 
@@ -91,7 +100,9 @@ const Home = () => {
     const visible = projects.slice(0, 5);
 
     const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev === visible.length - 1 ? 0 : prev + 1));
+      setActiveIndex((prev) =>
+        prev === visible.length - 1 ? 0 : prev + 1
+      );
     }, 2500);
 
     return () => clearInterval(interval);
@@ -99,7 +110,7 @@ const Home = () => {
 
   const isAnyFileAvailable = (files = {}) =>
     Object.values(files).some(
-      (url) => typeof url === "string" && url.trim() !== "",
+      (url) => typeof url === "string" && url.trim() !== ""
     );
 
   const visibleProjects = projects.slice(0, 5);
@@ -111,48 +122,80 @@ const Home = () => {
       <Box
         sx={{
           py: 8,
-          background: "radial-gradient(circle at top, #1D4ED8 0, #020617 55%)",
+          background:
+            "radial-gradient(circle at top, #1D4ED8 0, #020617 55%)",
         }}
       >
         <Container maxWidth="lg">
           <Grid container spacing={6} alignItems="center">
             {/* LEFT CONTENT */}
             <Grid item xs={12} md={6}>
-              <Typography variant="body2">CodeX | Tufail Sarovar</Typography>
+              <Typography variant="body2">
+                CodeX | Tufail Sarovar
+              </Typography>
 
-              <Typography variant="overline" color="secondary.main">
+              <Typography
+                variant="overline"
+                color="secondary.main"
+              >
                 Code | Learn | Submit | Succeed
               </Typography>
 
-              <Typography fontWeight={800} sx={{ mt: 2, mb: 2 }} variant="h4">
+              <Typography
+                fontWeight={800}
+                sx={{ mt: 2, mb: 2 }}
+                variant="h4"
+              >
                 Structured and Scalable{" "}
-                <Box component="span" sx={{ color: "primary.main" }}>
+                <Box
+                  component="span"
+                  sx={{ color: "primary.main" }}
+                >
                   Projects
                 </Box>{" "}
                 designed to achieve Academic excellence
               </Typography>
 
               <Typography sx={{ mb: 3 }}>
-                CodeX offers secure instant delivery, verified payments, and
-                high-quality project resources.
+                CodeX offers secure instant delivery, verified
+                payments, and high-quality project resources.
               </Typography>
 
               <Stack direction="row" spacing={2}>
-                <Button component={Link} to="/explore" variant="contained">
+                <Button
+                  component={Link}
+                  to="/explore"
+                  variant="contained"
+                >
                   Explore Projects
                 </Button>
 
                 {!token && (
-                  <Button component={Link} to="/login" variant="outlined">
+                  <Button
+                    component={Link}
+                    to="/login"
+                    variant="outlined"
+                  >
                     Login to Buy
                   </Button>
                 )}
               </Stack>
 
               <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1, mt: 2 }}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  mt: 2,
+                }}
               >
-                <ShieldIcon sx={{ color: "lightgreen", fontSize: 20 }} />
+                <ShieldIcon
+                  sx={{
+                    color: "lightgreen",
+                    fontSize: 20,
+                  }}
+                />
+
                 <Typography variant="body2">
                   Secure Payments • Instant Access
                 </Typography>
@@ -184,9 +227,11 @@ const Home = () => {
                     const position =
                       index === activeIndex
                         ? 0
-                        : index === (activeIndex - 1 + total) % total
+                        : index ===
+                            (activeIndex - 1 + total) % total
                           ? -1
-                          : index === (activeIndex + 1) % total
+                          : index ===
+                              (activeIndex + 1) % total
                             ? 1
                             : 2;
 
@@ -194,9 +239,16 @@ const Home = () => {
                       <MotionBox
                         key={project._id}
                         animate={{
-                          y: position === 0 ? 0 : position === -1 ? -120 : 120,
-                          scale: position === 0 ? 1 : 0.85,
-                          opacity: position === 0 ? 1 : 0.5,
+                          y:
+                            position === 0
+                              ? 0
+                              : position === -1
+                                ? -120
+                                : 120,
+                          scale:
+                            position === 0 ? 1 : 0.85,
+                          opacity:
+                            position === 0 ? 1 : 0.5,
                         }}
                         transition={{ duration: 0.6 }}
                         sx={{
@@ -204,10 +256,13 @@ const Home = () => {
                           width: "92%",
                           p: 3,
                           borderRadius: 4,
-                          background: "linear-gradient(180deg,#0f172a,#020617)",
-                          border: "1px solid rgba(148,163,184,0.3)",
+                          background:
+                            "linear-gradient(180deg,#0f172a,#020617)",
+                          border:
+                            "1px solid rgba(148,163,184,0.3)",
                           color: "#fff",
-                          zIndex: position === 0 ? 3 : 1,
+                          zIndex:
+                            position === 0 ? 3 : 1,
                         }}
                       >
                         <Stack spacing={2}>
@@ -216,7 +271,11 @@ const Home = () => {
                           </Typography>
 
                           <Typography variant="body2">
-                            {project.description?.slice(0, 120)}...
+                            {project.description?.slice(
+                              0,
+                              120
+                            )}
+                            ...
                           </Typography>
 
                           <Typography fontWeight={700}>
@@ -226,17 +285,24 @@ const Home = () => {
                           <Typography
                             sx={{
                               fontSize: "13px",
-                              color: isAnyFileAvailable(project.files)
+                              color: isAnyFileAvailable(
+                                project.files
+                              )
                                 ? "#22c55e"
                                 : "#facc15",
                             }}
                           >
-                            {isAnyFileAvailable(project.files)
+                            {isAnyFileAvailable(
+                              project.files
+                            )
                               ? "Available"
                               : "Coming soon"}
                           </Typography>
 
-                          <Stack direction="row" spacing={2}>
+                          <Stack
+                            direction="row"
+                            spacing={2}
+                          >
                             <Button
                               component={Link}
                               to={`/projects/${project._id}`}
@@ -278,10 +344,17 @@ const Home = () => {
             }}
           >
             <Box>
-              <Typography variant="h5" fontWeight={700}>
+              <Typography
+                variant="h5"
+                fontWeight={700}
+              >
                 All Projects
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
                 Browse all available projects.
               </Typography>
             </Box>
@@ -290,7 +363,10 @@ const Home = () => {
               component={Link}
               to="/projects"
               variant="outlined"
-              sx={{ textTransform: "none", borderRadius: 999 }}
+              sx={{
+                textTransform: "none",
+                borderRadius: 999,
+              }}
             >
               View full list
             </Button>
@@ -298,8 +374,15 @@ const Home = () => {
 
           <Grid container spacing={3}>
             {projectsLoading ? (
-              <Box sx={{ width: "100%", textAlign: "center", py: 4 }}>
+              <Box
+                sx={{
+                  width: "100%",
+                  textAlign: "center",
+                  py: 4,
+                }}
+              >
                 <CircularProgress />
+
                 <Typography
                   variant="body2"
                   color="text.secondary"
@@ -310,22 +393,396 @@ const Home = () => {
               </Box>
             ) : (
               projects.slice(0, 6).map((p) => (
-                <Grid item xs={12} sm={6} md={4} key={p._id}>
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  key={p._id}
+                >
                   <ProjectCard project={p} />
                 </Grid>
               ))
             )}
 
             {projects.length === 0 && (
-              <Typography variant="body2" color="text.secondary">
-                {projectsTimedOut ? "No project uploaded yet from admin" : ""}
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
+                {projectsTimedOut
+                  ? "No project uploaded yet from admin"
+                  : ""}
               </Typography>
             )}
           </Grid>
         </Container>
       </Box>
+
+      {/* =========================
+          AKTU STUDY HUB SECTION
+      ========================= */}
+      <Box
+        sx={{
+          py: 7,
+          background:
+            "linear-gradient(180deg, #020617, #0f172a)",
+        }}
+      >
+        <Container maxWidth="lg">
+          <Box
+            sx={{
+              mb: 4,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: {
+                xs: "flex-start",
+                md: "center",
+              },
+              flexDirection: {
+                xs: "column",
+                md: "row",
+              },
+              gap: 2,
+            }}
+          >
+            <Box>
+              <Stack
+                direction="row"
+                spacing={1}
+                alignItems="center"
+                sx={{ mb: 1 }}
+              >
+                <SchoolIcon
+                  sx={{
+                    color: "primary.main",
+                  }}
+                />
+
+                <Typography
+                  variant="h5"
+                  fontWeight={800}
+                >
+                  AKTU Study Hub
+                </Typography>
+              </Stack>
+
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
+                Semester-wise syllabus, notes, important
+                questions, PYQs, Quantum and answers.
+              </Typography>
+            </Box>
+
+            <Button
+              component={Link}
+              to="/aktu"
+              variant="contained"
+              sx={{
+                borderRadius: 999,
+                textTransform: "none",
+              }}
+            >
+              Explore AKTU
+            </Button>
+          </Box>
+
+          <Grid container spacing={3}>
+            {/* SYLLABUS */}
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper
+                sx={{
+                  p: 3,
+                  height: "100%",
+                  borderRadius: 4,
+                  background:
+                    "linear-gradient(180deg, rgba(15,23,42,.95), rgba(2,6,23,.98))",
+                  border:
+                    "1px solid rgba(148,163,184,.2)",
+                  transition: "all .3s ease",
+                  "&:hover": {
+                    transform: "translateY(-5px)",
+                    borderColor:
+                      "rgba(99,102,241,.6)",
+                  },
+                }}
+              >
+                <MenuBookIcon
+                  sx={{
+                    fontSize: 38,
+                    color: "primary.main",
+                    mb: 1.5,
+                  }}
+                />
+
+                <Typography
+                  fontWeight={800}
+                  sx={{ mb: 1 }}
+                >
+                  AKTU Syllabus
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{
+                    mb: 2.5,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Find branch and semester-wise syllabus.
+                </Typography>
+
+                <Button
+                  component={Link}
+                  to="/aktu/syllabus"
+                  variant="outlined"
+                  size="small"
+                  sx={{
+                    borderRadius: 999,
+                    textTransform: "none",
+                  }}
+                >
+                  View Syllabus
+                </Button>
+              </Paper>
+            </Grid>
+
+            {/* NOTES */}
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper
+                sx={{
+                  p: 3,
+                  height: "100%",
+                  borderRadius: 4,
+                  background:
+                    "linear-gradient(180deg, rgba(15,23,42,.95), rgba(2,6,23,.98))",
+                  border:
+                    "1px solid rgba(148,163,184,.2)",
+                  transition: "all .3s ease",
+                  "&:hover": {
+                    transform: "translateY(-5px)",
+                    borderColor:
+                      "rgba(99,102,241,.6)",
+                  },
+                }}
+              >
+                <DescriptionIcon
+                  sx={{
+                    fontSize: 38,
+                    color: "primary.main",
+                    mb: 1.5,
+                  }}
+                />
+
+                <Typography
+                  fontWeight={800}
+                  sx={{ mb: 1 }}
+                >
+                  AKTU Notes
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{
+                    mb: 2.5,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Easy notes organized according to subjects.
+                </Typography>
+
+                <Button
+                  component={Link}
+                  to="/aktu/notes"
+                  variant="outlined"
+                  size="small"
+                  sx={{
+                    borderRadius: 999,
+                    textTransform: "none",
+                  }}
+                >
+                  View Notes
+                </Button>
+              </Paper>
+            </Grid>
+
+            {/* PYQS */}
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper
+                sx={{
+                  p: 3,
+                  height: "100%",
+                  borderRadius: 4,
+                  background:
+                    "linear-gradient(180deg, rgba(15,23,42,.95), rgba(2,6,23,.98))",
+                  border:
+                    "1px solid rgba(148,163,184,.2)",
+                  transition: "all .3s ease",
+                  "&:hover": {
+                    transform: "translateY(-5px)",
+                    borderColor:
+                      "rgba(99,102,241,.6)",
+                  },
+                }}
+              >
+                <PictureAsPdfIcon
+                  sx={{
+                    fontSize: 38,
+                    color: "primary.main",
+                    mb: 1.5,
+                  }}
+                />
+
+                <Typography
+                  fontWeight={800}
+                  sx={{ mb: 1 }}
+                >
+                  Previous Year Papers
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{
+                    mb: 2.5,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Practice previous year AKTU question papers.
+                </Typography>
+
+                <Button
+                  component={Link}
+                  to="/aktu/pyqs"
+                  variant="outlined"
+                  size="small"
+                  sx={{
+                    borderRadius: 999,
+                    textTransform: "none",
+                  }}
+                >
+                  View PYQs
+                </Button>
+              </Paper>
+            </Grid>
+
+            {/* QUESTIONS */}
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper
+                sx={{
+                  p: 3,
+                  height: "100%",
+                  borderRadius: 4,
+                  background:
+                    "linear-gradient(180deg, rgba(15,23,42,.95), rgba(2,6,23,.98))",
+                  border:
+                    "1px solid rgba(148,163,184,.2)",
+                  transition: "all .3s ease",
+                  "&:hover": {
+                    transform: "translateY(-5px)",
+                    borderColor:
+                      "rgba(99,102,241,.6)",
+                  },
+                }}
+              >
+                <QuestionAnswerIcon
+                  sx={{
+                    fontSize: 38,
+                    color: "primary.main",
+                    mb: 1.5,
+                  }}
+                />
+
+                <Typography
+                  fontWeight={800}
+                  sx={{ mb: 1 }}
+                >
+                  Important Q&A
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{
+                    mb: 2.5,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Exam-focused important questions with answers.
+                </Typography>
+
+                <Button
+                  component={Link}
+                  to="/aktu/question-answers"
+                  variant="outlined"
+                  size="small"
+                  sx={{
+                    borderRadius: 999,
+                    textTransform: "none",
+                  }}
+                >
+                  View Q&A
+                </Button>
+              </Paper>
+            </Grid>
+          </Grid>
+
+          {/* BOTTOM LINKS */}
+          <Stack
+            direction="row"
+            spacing={2}
+            justifyContent="center"
+            flexWrap="wrap"
+            sx={{ mt: 4 }}
+          >
+            <Button
+              component={Link}
+              to="/aktu/important-questions"
+              sx={{
+                textTransform: "none",
+                borderRadius: 999,
+              }}
+            >
+              Important Questions
+            </Button>
+
+            <Button
+              component={Link}
+              to="/aktu/quantum"
+              sx={{
+                textTransform: "none",
+                borderRadius: 999,
+              }}
+            >
+              Quantum
+            </Button>
+
+            <Button
+              component={Link}
+              to="/aktu/subjects"
+              sx={{
+                textTransform: "none",
+                borderRadius: 999,
+              }}
+            >
+              Browse Subjects
+            </Button>
+          </Stack>
+        </Container>
+      </Box>
+
       {/* FREE PROJECTS SECTION */}
-      <Box sx={{ py: 6, my: 6, backgroundColor: "#020617" }}>
+      <Box
+        sx={{
+          py: 6,
+          my: 6,
+          backgroundColor: "#020617",
+        }}
+      >
         <Container maxWidth="lg">
           {/* HEADER */}
           <Box
@@ -337,10 +794,17 @@ const Home = () => {
             }}
           >
             <Box>
-              <Typography variant="h5" fontWeight={700}>
+              <Typography
+                variant="h5"
+                fontWeight={700}
+              >
                 Free Projects
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
                 Open-source projects you can download from GitHub.
               </Typography>
             </Box>
@@ -355,10 +819,12 @@ const Home = () => {
                 borderRadius: 999,
                 px: 2.5,
                 color: "#e0f2fe",
-                border: "1px solid rgba(148,163,184,0.35)",
+                border:
+                  "1px solid rgba(148,163,184,0.35)",
                 "&:hover": {
                   borderColor: "primary.main",
-                  background: "rgba(99,102,241,0.08)",
+                  background:
+                    "rgba(99,102,241,0.08)",
                 },
               }}
             >
@@ -375,9 +841,12 @@ const Home = () => {
               pb: 3,
               px: 1,
               my: 5,
-              "&::-webkit-scrollbar": { height: 8 },
+              "&::-webkit-scrollbar": {
+                height: 8,
+              },
               "&::-webkit-scrollbar-track": {
-                background: "rgba(148,163,184,0.12)",
+                background:
+                  "rgba(148,163,184,0.12)",
                 borderRadius: 10,
               },
               "&::-webkit-scrollbar-thumb": {
@@ -388,8 +857,15 @@ const Home = () => {
             }}
           >
             {freeProjectsLoading ? (
-              <Box sx={{ minWidth: 200, textAlign: "center", py: 4 }}>
+              <Box
+                sx={{
+                  minWidth: 200,
+                  textAlign: "center",
+                  py: 4,
+                }}
+              >
                 <CircularProgress size={28} />
+
                 <Typography
                   variant="body2"
                   color="text.secondary"
@@ -403,19 +879,24 @@ const Home = () => {
                 <Paper
                   key={p._id}
                   sx={{
-                    minWidth: 288, // ↓ 20% smaller
+                    minWidth: 288,
                     maxWidth: 288,
                     position: "relative",
                     borderRadius: 4,
                     overflow: "hidden",
                     background:
                       "linear-gradient(180deg, rgba(15,23,42,0.88), rgba(2,6,23,0.95))",
-                    border: "1px solid rgba(148,163,184,0.25)",
-                    boxShadow: "0 8px 20px rgba(0,0,0,.25)",
-                    transition: "box-shadow .35s ease, border-color .35s ease",
+                    border:
+                      "1px solid rgba(148,163,184,0.25)",
+                    boxShadow:
+                      "0 8px 20px rgba(0,0,0,.25)",
+                    transition:
+                      "box-shadow .35s ease, border-color .35s ease",
                     "&:hover": {
-                      borderColor: "rgba(99,102,241,.6)",
-                      boxShadow: "0 16px 40px rgba(79,70,229,.35)",
+                      borderColor:
+                        "rgba(99,102,241,.6)",
+                      boxShadow:
+                        "0 16px 40px rgba(79,70,229,.35)",
                     },
                   }}
                 >
@@ -426,7 +907,8 @@ const Home = () => {
                       top: 10,
                       left: -36,
                       transform: "rotate(-45deg)",
-                      background: "linear-gradient(90deg, #22c55e, #4ade80)",
+                      background:
+                        "linear-gradient(90deg, #22c55e, #4ade80)",
                       color: "#022c22",
                       px: 5,
                       py: 0.35,
@@ -449,7 +931,7 @@ const Home = () => {
                       playsInline
                       style={{
                         width: "100%",
-                        height: 152, // ↓ 20% smaller
+                        height: 152,
                         objectFit: "cover",
                       }}
                     />
@@ -457,14 +939,20 @@ const Home = () => {
 
                   {/* CONTENT */}
                   <Box sx={{ p: 2 }}>
-                    <Typography fontWeight={800} sx={{ mb: 0.4 }}>
+                    <Typography
+                      fontWeight={800}
+                      sx={{ mb: 0.4 }}
+                    >
                       {p.title}
                     </Typography>
 
                     <Typography
                       variant="body2"
                       color="text.secondary"
-                      sx={{ mb: 1.2, lineHeight: 1.5 }}
+                      sx={{
+                        mb: 1.2,
+                        lineHeight: 1.5,
+                      }}
                     >
                       {p.description?.slice(0, 90)}...
                     </Typography>
@@ -478,22 +966,26 @@ const Home = () => {
                         mb: 1.5,
                       }}
                     >
-                      {p.techStack?.slice(0, 4).map((tech, i) => (
-                        <Box
-                          key={i}
-                          sx={{
-                            px: 1,
-                            py: 0.25,
-                            fontSize: "10px",
-                            borderRadius: 999,
-                            color: "#c7d2fe",
-                            background: "rgba(99,102,241,0.15)",
-                            border: "1px solid rgba(99,102,241,0.35)",
-                          }}
-                        >
-                          {tech}
-                        </Box>
-                      ))}
+                      {p.techStack
+                        ?.slice(0, 4)
+                        .map((tech, i) => (
+                          <Box
+                            key={i}
+                            sx={{
+                              px: 1,
+                              py: 0.25,
+                              fontSize: "10px",
+                              borderRadius: 999,
+                              color: "#c7d2fe",
+                              background:
+                                "rgba(99,102,241,0.15)",
+                              border:
+                                "1px solid rgba(99,102,241,0.35)",
+                            }}
+                          >
+                            {tech}
+                          </Box>
+                        ))}
                     </Box>
 
                     <Button
@@ -522,7 +1014,10 @@ const Home = () => {
             )}
 
             {freeProjects.length === 0 && (
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
                 {freeProjectsTimedOut
                   ? "No project uploaded yet from admin"
                   : ""}
