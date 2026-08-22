@@ -1,12 +1,22 @@
 import React, { useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+
 import { Box } from "@mui/material";
 
 import Navbar from "./components/Layout/Navbar";
 import Footer from "./components/Layout/Footer";
 
+/* =========================================================
+   PUBLIC
+========================================================= */
+
 import Home from "./pages/Home";
 import About from "./pages/About";
+
 import Login from "./pages/Auth/Login";
 import Signup from "./pages/Auth/Signup";
 
@@ -17,41 +27,78 @@ import ProjectDetails from "./pages/Projects/ProjectDetails";
 import Contact from "./pages/Contact";
 import AllFreeProjects from "./pages/AllFreeProjects";
 
+/* =========================================================
+   AKTU PUBLIC
+========================================================= */
+
+import AKTUStudy from "./pages/AKTU/AKTUStudy";
+
+/* =========================================================
+   ADMIN
+========================================================= */
+
 import AdminProjects from "./pages/Admin/Projects";
 import AdminDashboard from "./pages/Admin/Dashboard";
 import EditProject from "./pages/Admin/EditProject";
 import AddProject from "./pages/Admin/AddProject";
+
 import AdminFreeProjects from "./pages/Admin/AdminFreeProjects";
 import AdminFreeProjectForm from "./pages/Admin/AdminFreeProjectForm";
 
-/* AKTU PUBLIC */
-import AKTUStudy from "./pages/AKTU/AKTUStudy";
-import Syllabus from "./pages/AKTU/Syllabus";
-import Notes from "./pages/AKTU/Notes";
-import ImportantQuestions from "./pages/AKTU/ImportantQuestions";
-import PYQs from "./pages/AKTU/PYQs";
-import Quantum from "./pages/AKTU/Quantum";
-import QuestionAnswers from "./pages/AKTU/QuestionAnswers";
-import SubjectResources from "./pages/AKTU/SubjectResources";
-import SubjectDetails from "./pages/AKTU/SubjectDetails";
-
-/* AKTU ADMIN */
 import AKTUResources from "./pages/Admin/AKTUResources";
 
+/* =========================================================
+   APP
+========================================================= */
+
 const App = () => {
-  const user = JSON.parse(localStorage.getItem("codex_user"));
+  let user = null;
+
+  try {
+    user = JSON.parse(
+      localStorage.getItem(
+        "codex_user"
+      )
+    );
+  } catch {
+    user = null;
+  }
+
+  /* =======================================================
+     KEEP BACKEND AWAKE / HEALTH CHECK
+  ======================================================= */
 
   useEffect(() => {
-    fetch("https://codex-server-eight.vercel.app/health").catch(() => {});
+    fetch(
+      "https://codex-server-eight.vercel.app/health"
+    ).catch(() => {});
   }, []);
 
-  const AdminRoute = ({ children }) => {
-    if (!user || !user.isAdmin) {
-      return <Navigate to="/" replace />;
+  /* =======================================================
+     ADMIN ROUTE
+  ======================================================= */
+
+  const AdminRoute = ({
+    children,
+  }) => {
+    if (
+      !user ||
+      user.isAdmin !== true
+    ) {
+      return (
+        <Navigate
+          to="/"
+          replace
+        />
+      );
     }
 
     return children;
   };
+
+  /* =======================================================
+     RENDER
+  ======================================================= */
 
   return (
     <Box
@@ -61,31 +108,65 @@ const App = () => {
         flexDirection: "column",
       }}
     >
+      {/* =================================================
+          NAVBAR
+      ================================================= */}
+
       <Navbar />
 
-      <Box sx={{ flex: 1 }}>
+      {/* =================================================
+          PAGE CONTENT
+      ================================================= */}
+
+      <Box
+        sx={{
+          flex: 1,
+        }}
+      >
         <Routes>
+          {/* =================================================
+              PUBLIC
+          ================================================= */}
 
-          {/* PUBLIC */}
+          <Route
+            path="/"
+            element={<Home />}
+          />
 
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/about"
+            element={<About />}
+          />
+
+          <Route
+            path="/login"
+            element={<Login />}
+          />
+
+          <Route
+            path="/signup"
+            element={<Signup />}
+          />
 
           <Route
             path="/projects"
-            element={<AllProjects />}
+            element={
+              <AllProjects />
+            }
           />
 
           <Route
             path="/explore"
-            element={<ExploreProjects />}
+            element={
+              <ExploreProjects />
+            }
           />
 
           <Route
             path="/projects/:id"
-            element={<ProjectDetails />}
+            element={
+              <ProjectDetails />
+            }
           />
 
           <Route
@@ -95,57 +176,25 @@ const App = () => {
 
           <Route
             path="/free-projects"
-            element={<AllFreeProjects />}
+            element={
+              <AllFreeProjects />
+            }
           />
 
-          {/* AKTU */}
+          {/* =================================================
+              AKTU — SINGLE STUDENT PAGE
+          ================================================= */}
 
           <Route
             path="/aktu"
-            element={<AKTUStudy />}
+            element={
+              <AKTUStudy />
+            }
           />
 
-          <Route
-            path="/aktu/syllabus"
-            element={<Syllabus />}
-          />
-
-          <Route
-            path="/aktu/notes"
-            element={<Notes />}
-          />
-
-          <Route
-            path="/aktu/important-questions"
-            element={<ImportantQuestions />}
-          />
-
-          <Route
-            path="/aktu/pyqs"
-            element={<PYQs />}
-          />
-
-          <Route
-            path="/aktu/quantum"
-            element={<Quantum />}
-          />
-
-          <Route
-            path="/aktu/question-answers"
-            element={<QuestionAnswers />}
-          />
-
-          <Route
-            path="/aktu/subjects"
-            element={<SubjectResources />}
-          />
-
-          <Route
-            path="/aktu/subject"
-            element={<SubjectDetails />}
-          />
-
-          {/* ADMIN DASHBOARD */}
+          {/* =================================================
+              ADMIN DASHBOARD
+          ================================================= */}
 
           <Route
             path="/admin/dashboard"
@@ -156,7 +205,9 @@ const App = () => {
             }
           />
 
-          {/* ADMIN PROJECTS */}
+          {/* =================================================
+              ADMIN PROJECTS
+          ================================================= */}
 
           <Route
             path="/admin/projects"
@@ -185,7 +236,9 @@ const App = () => {
             }
           />
 
-          {/* ADMIN FREE PROJECTS */}
+          {/* =================================================
+              ADMIN FREE PROJECTS
+          ================================================= */}
 
           <Route
             path="/admin/free-projects"
@@ -205,7 +258,9 @@ const App = () => {
             }
           />
 
-          {/* ADMIN AKTU */}
+          {/* =================================================
+              ADMIN AKTU
+          ================================================= */}
 
           <Route
             path="/admin/aktu"
@@ -216,15 +271,25 @@ const App = () => {
             }
           />
 
-          {/* FALLBACK */}
+          {/* =================================================
+              FALLBACK
+          ================================================= */}
 
           <Route
             path="*"
-            element={<Navigate to="/" replace />}
+            element={
+              <Navigate
+                to="/"
+                replace
+              />
+            }
           />
-
         </Routes>
       </Box>
+
+      {/* =================================================
+          FOOTER
+      ================================================= */}
 
       <Footer />
     </Box>

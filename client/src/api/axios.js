@@ -1,7 +1,14 @@
 import axios from "axios";
 
+const isLocal =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
+
 const api = axios.create({
-  baseURL: "https://codex-server-eight.vercel.app/api",
+  baseURL: isLocal
+    ? "http://localhost:5000/api"
+    : "https://codex-server-eight.vercel.app/api",
+
   withCredentials: true,
 });
 
@@ -9,7 +16,6 @@ api.interceptors.request.use(
   (config) => {
     let token = null;
 
-    // Existing CodeX login stores token inside codex_user
     try {
       const user = JSON.parse(
         localStorage.getItem("codex_user")
@@ -23,13 +29,14 @@ api.interceptors.request.use(
       );
     }
 
-    // Fallback for adminToken if it exists
     if (!token) {
-      token = localStorage.getItem("adminToken");
+      token =
+        localStorage.getItem("adminToken");
     }
 
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization =
+        `Bearer ${token}`;
     }
 
     return config;
