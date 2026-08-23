@@ -454,289 +454,205 @@ const AKTUStudy = () => {
      BUY PAID RESOURCE
   ======================================================= */
 
-  const buyResource = async (resource) => {
-    if (!resource?._id) {
-      setPurchaseError(
-        "Resource information is missing."
+ const buyResource = async (resource) => {
+  if (!resource?._id) {
+    setPurchaseError("Resource information is missing.");
+    return;
+  }
+
+  if (purchaseLoading) return;
+
+  let user = null;
+
+  try {
+    user = JSON.parse(
+      localStorage.getItem("codex_user")
+    );
+  } catch {
+    user = null;
+  }
+
+  if (!user?.token) {
+    navigate("/login", {
+      state: {
+        from: "/aktu",
+      },
+    });
+    return;
+  }
+
+  const amount = Number(resource.price);
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    setPurchaseError("Invalid resource price.");
+    return;
+  }
+
+  try {
+    setPurchaseLoading(true);
+    setPurchaseError("");
+
+    const razorpayLoaded = await loadRazorpayScript();
+
+    if (!razorpayLoaded || !window.Razorpay) {
+      throw new Error(
+        "Razorpay checkout could not be loaded. Please try again."
       );
-
-      return;
     }
 
-    if (purchaseLoading) {
-      return;
-    }
-
-    /*
-     * Check login.
-     */
-
-    let user = null;
-
-    try {
-      user = JSON.parse(
-        localStorage.getItem(
-          "codex_user"
-        )
-      );
-    } catch {
-      user = null;
-    }
-
-    if (!user?.token) {
-      navigate("/login", {
-        state: {
-          from: "/aktu",
-        },
-      });
-
-      return;
-    }
-
-    const amount = Number(
-      resource.price
+    const response = await api.post(
+      "/aktu-payment/create-order",
+      {
+        resourceId: resource._id,
+      }
     );
 
-    if (
-      !Number.isFinite(amount) ||
-      amount <= 0
-    ) {
-      setPurchaseError(
-        "Invalid resource price."
-      );
+    const data = response?.data;
 
-      return;
+    if (!data?.success || !data?.order?.id) {
+      throw new Error(
+        data?.message ||
+          "Failed to create payment order."
+      );
     }
 
-    try {
-      setPurchaseLoading(true);
-      setPurchaseError("");
+    if (!data?.key) {
+      throw new Error(
+        "Razorpay key is missing from server response."
+      );
+    }
 
-      /* -----------------------------------------
-         LOAD RAZORPAY
-      ----------------------------------------- */
+    const options = {
+      key: data.key,
+      amount: data.order.amount,
+      currency: data.order.currency || "INR",
+      name: "CodeX",
+      description:
+        resource.description ||
+        getResourceTitle(resource.resourceType),
+      order_id: data.order.id,
 
-      const razorpayLoaded =
-        await loadRazorpayScript();
+      prefill: {
+        name: user?.name || "",
+        email: user?.email || "",
+        contact:
+          user?.phone ||
+          user?.mobile ||
+          "",
+      },
 
-      if (!razorpayLoaded) {
-        throw new Error(
-          "Razorpay checkout could not be loaded. Please check your internet connection."
-        );
-      }
+      notes: {
+        resourceId: resource._id,
+      },
 
-      /* -----------------------------------------
-         CREATE SERVER ORDER
-      ----------------------------------------- */
+      theme: {
+        color: "#6366f1",
+      },
 
-      const response =
-        await api.post(
-          "/aktu-payment/create-order",
-          {
-            resourceId:
-              resource._id,
-          }
-        );
-
-      const data =
-        response?.data;
-
-      if (
-        !data?.success ||
-        !data?.order?.id
-      ) {
-        throw new Error(
-          data?.message ||
-            "Failed to create payment order."
-        );
-      }
-
-      if (!data?.key) {
-        throw new Error(
-          "Razorpay key is missing from server response."
-        );
-      }
-
-      /* -----------------------------------------
-         OPEN RAZORPAY
-      ----------------------------------------- */
-
-      const options = {
-        key: data.key,
-
-        amount:
-          data.order.amount,
-
-        currency:
-          data.order.currency ||
-          "INR",
-
-        name: "CodeX",
-
-        description:
-          resource.description ||
-          getResourceTitle(
-            resource.resourceType
-          ),
-
-        order_id:
-          data.order.id,
-
-        prefill: {
-          name:
-            user?.name ||
-            "",
-          email:
-            user?.email ||
-            "",
-          contact:
-            user?.phone ||
-            user?.mobile ||
-            "",
+      modal: {
+        confirm_close: true,
+        ondismiss: () => {
+          setPurchaseLoading(false);
         },
+      },
 
-        notes: {
-          resourceId:
-            resource._id,
-        },
+      handler: async (paymentResponse) => {
+        try {
+          setPurchaseError("");
 
-        theme: {
-          color: "#6366f1",
-        },
-
-        modal: {
-          confirm_close: true,
-
-          ondismiss: () => {
-            setPurchaseLoading(
-              false
-            );
-          },
-        },
-
-        handler:
-          async function (
-            paymentResponse
-          ) {
-            try {
-              setPurchaseError("");
-
-              const verifyResponse =
-                await api.post(
-                  "/aktu-payment/verify",
-                  {
-                    razorpay_order_id:
-                      paymentResponse.razorpay_order_id,
-
-                    razorpay_payment_id:
-                      paymentResponse.razorpay_payment_id,
-
-                    razorpay_signature:
-                      paymentResponse.razorpay_signature,
-
-                    resourceId:
-                      resource._id,
-                  }
-                );
-
-              const verifyData =
-                verifyResponse?.data;
-
-              if (
-                !verifyData?.success ||
-                !verifyData?.paymentSuccess
-              ) {
-                throw new Error(
-                  verifyData?.message ||
-                    "Payment verification failed."
-                );
-              }
-
-              setSuccessMessage(
-                verifyData?.emailSent
-                  ? "Payment successful! The PDF link has been sent to your registered email."
-                  : "Payment successful! Please check your email or contact support if you do not receive the PDF."
-              );
-
-              /*
-               * Payment is verified.
-               *
-               * We can now safely open the PDF.
-               */
-
-              if (
-                resource.fileUrl
-              ) {
-                setTimeout(() => {
-                  window.open(
-                    resource.fileUrl,
-                    "_blank",
-                    "noopener,noreferrer"
-                  );
-                }, 700);
-              }
-            } catch (verifyError) {
-              console.error(
-                "AKTU payment verification error:",
-                verifyError
-              );
-
-              setPurchaseError(
-                verifyError?.response
-                  ?.data?.message ||
-                  verifyError?.message ||
-                  "Payment was completed but verification failed. Please contact support."
-              );
-            } finally {
-              setPurchaseLoading(
-                false
-              );
+          const verifyResponse = await api.post(
+            "/aktu-payment/verify",
+            {
+              razorpay_order_id:
+                paymentResponse.razorpay_order_id,
+              razorpay_payment_id:
+                paymentResponse.razorpay_payment_id,
+              razorpay_signature:
+                paymentResponse.razorpay_signature,
+              resourceId: resource._id,
             }
-          },
-      };
+          );
 
-      const razorpay =
-        new window.Razorpay(
-          options
-        );
+          const verifyData =
+            verifyResponse?.data;
 
-      razorpay.on(
-        "payment.failed",
-        (response) => {
+          if (
+            !verifyData?.success ||
+            !verifyData?.paymentSuccess
+          ) {
+            throw new Error(
+              verifyData?.message ||
+                "Payment verification failed."
+            );
+          }
+
+          setSuccessMessage(
+            verifyData?.emailSent
+              ? "Payment successful! The PDF link has been sent to your registered email."
+              : "Payment successful! Please check your email or contact support if you do not receive the PDF."
+          );
+
+          if (resource.fileUrl) {
+            setTimeout(() => {
+              window.open(
+                resource.fileUrl,
+                "_blank",
+                "noopener,noreferrer"
+              );
+            }, 700);
+          }
+        } catch (verifyError) {
           console.error(
-            "Razorpay payment failed:",
-            response
+            "AKTU payment verification error:",
+            verifyError
           );
 
           setPurchaseError(
-            response?.error
-              ?.description ||
-              "Payment failed. Please try again."
+            verifyError?.response?.data?.message ||
+              verifyError?.message ||
+              "Payment was completed but verification failed. Please contact support."
           );
-
-          setPurchaseLoading(
-            false
-          );
+        } finally {
+          setPurchaseLoading(false);
         }
-      );
+      },
+    };
 
-      razorpay.open();
-    } catch (err) {
-      console.error(
-        "AKTU purchase error:",
-        err
-      );
+    const razorpay = new window.Razorpay(options);
 
-      setPurchaseError(
-        err?.response?.data
-          ?.message ||
-          err?.message ||
-          "Unable to start payment."
-      );
+    razorpay.on(
+      "payment.failed",
+      (response) => {
+        console.error(
+          "AKTU Razorpay payment failed:",
+          response
+        );
 
-      setPurchaseLoading(false);
-    }
-  };
+        setPurchaseError(
+          response?.error?.description ||
+            "Payment failed. Please try again."
+        );
+
+        setPurchaseLoading(false);
+      }
+    );
+
+    razorpay.open();
+  } catch (error) {
+    console.error(
+      "AKTU payment error:",
+      error
+    );
+
+    setPurchaseError(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Unable to start payment. Please try again."
+    );
+
+    setPurchaseLoading(false);
+  }
+};
 
   /* =======================================================
      CLEAR SEARCH
