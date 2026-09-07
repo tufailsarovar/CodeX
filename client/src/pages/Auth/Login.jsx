@@ -7,92 +7,747 @@ import {
   Button,
   Paper,
   Stack,
+  InputAdornment,
+  IconButton,
+  Alert,
+  Divider,
+  Chip,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
+import LoginRoundedIcon from "@mui/icons-material/LoginRounded";
+import PersonAddAltRoundedIcon from "@mui/icons-material/PersonAddAltRounded";
+import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
+import CodeRoundedIcon from "@mui/icons-material/CodeRounded";
+import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
+import SvgIcon from "@mui/material/SvgIcon";
+
+const XLogoIcon = (props) => (
+  <SvgIcon viewBox="0 0 24 24" {...props}>
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.657l-5.214-6.817-5.963 6.817H1.684l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.451-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z" />
+  </SvgIcon>
+);
+
+const CodeXLogo = () => (
+  <Box
+    sx={{
+      width: { xs: 52, sm: 58 },
+      height: { xs: 52, sm: 58 },
+      borderRadius: { xs: 2.5, sm: 3 },
+      p: "1px",
+      flexShrink: 0,
+      background:
+        "linear-gradient(135deg,#6366f1,#8b5cf6,#f97316)",
+      boxShadow:
+        "0 12px 35px rgba(99,102,241,.25)",
+    }}
+  >
+    <Box
+      sx={{
+        width: "100%",
+        height: "100%",
+        borderRadius: "inherit",
+        overflow: "hidden",
+        bgcolor: "#020617",
+      }}
+    >
+      <Box
+        component="img"
+        src="/images/logo.png"
+        alt="CodeX"
+        sx={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          display: "block",
+        }}
+      />
+    </Box>
+  </Box>
+);
+
 const Login = () => {
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((previous) => ({
+      ...previous,
+      [e.target.name]: e.target.value,
+    }));
+
+    if (error) {
+      setError("");
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+
+    if (loading) return;
+
+    const email = form.email.trim();
+    const password = form.password;
+
+    if (!email || !password) {
+      setError("Please enter your email and password.");
+      return;
+    }
+
     setLoading(true);
+    setError("");
+
     try {
-      const res = await api.post("/auth/login", form);
+      const res = await api.post("/auth/login", {
+        email,
+        password,
+      });
+
       localStorage.setItem("codex_token", res.data.token);
-      localStorage.setItem("codex_user", JSON.stringify(res.data));
+      localStorage.setItem(
+        "codex_user",
+        JSON.stringify(res.data),
+      );
+
       if (res.data.isAdmin) {
-        navigate("/admin/dashboard"); // ADMIN LOGIN
+        navigate("/admin/dashboard");
       } else {
-        navigate("/"); // NORMAL USER
+        navigate("/");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
+      console.error("Login error:", err);
+
+      setError(
+        err.response?.data?.message ||
+          "Unable to login. Please check your credentials and try again.",
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  const fieldSx = {
+    "& .MuiOutlinedInput-root": {
+      minHeight: 54,
+      borderRadius: 2.5,
+      color: "#fff",
+      bgcolor: "rgba(2,6,23,.58)",
+      transition: "all .2s ease",
+
+      "& fieldset": {
+        borderColor: "rgba(148,163,184,.16)",
+      },
+
+      "&:hover fieldset": {
+        borderColor: "rgba(129,140,248,.45)",
+      },
+
+      "&.Mui-focused fieldset": {
+        borderColor: "#6366f1",
+        borderWidth: 1,
+      },
+
+      "&.Mui-focused": {
+        boxShadow:
+          "0 0 0 3px rgba(99,102,241,.08)",
+      },
+    },
+
+    "& .MuiInputLabel-root": {
+      color: "#64748b",
+    },
+
+    "& .MuiInputLabel-root.Mui-focused": {
+      color: "#a5b4fc",
+    },
+
+    "& .MuiInputBase-input::placeholder": {
+      color: "#475569",
+      opacity: 1,
+    },
+  };
+
   return (
-    <Box sx={{ py: 6 }}>
-      <Container maxWidth="sm">
-        <Paper sx={{ p: 4, bgcolor: "rgba(15,23,42,0.9)" }}>
-          <Typography variant="h5" fontWeight={700} mb={2}>
-            Login to CodeX
-          </Typography>
-          <Typography variant="body2" color="text.secondary" mb={3}>
-            Access your purchased projects and continue learning.
-          </Typography>
-          <Box component="form" onSubmit={handleSubmit}>
-            <Stack spacing={2}>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "#020617",
+        color: "#fff",
+        position: "relative",
+        overflow: "hidden",
+        py: {
+          xs: 3,
+          sm: 5,
+          md: 7,
+        },
+      }}
+    >
+      {/* Background */}
+      <Box
+        sx={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          background:
+            "radial-gradient(circle at 10% 5%, rgba(99,102,241,.18), transparent 30%), radial-gradient(circle at 90% 20%, rgba(249,115,22,.08), transparent 28%), linear-gradient(180deg,#020617,#070b20 55%,#020617)",
+        }}
+      />
+
+      <Box
+        sx={{
+          position: "absolute",
+          top: "12%",
+          left: "50%",
+          width: 420,
+          height: 420,
+          transform: "translateX(-50%)",
+          borderRadius: "50%",
+          bgcolor: "rgba(79,70,229,.045)",
+          filter: "blur(90px)",
+          pointerEvents: "none",
+        }}
+      />
+
+      <Container
+        maxWidth="sm"
+        sx={{
+          position: "relative",
+          zIndex: 1,
+          px: {
+            xs: 1.5,
+            sm: 3,
+          },
+        }}
+      >
+        {/* Back button */}
+        <Button
+          component={Link}
+          to="/"
+          startIcon={<ArrowBackRoundedIcon />}
+          sx={{
+            mb: {
+              xs: 2,
+              sm: 3,
+            },
+            color: "#64748b",
+            textTransform: "none",
+            fontWeight: 800,
+            fontSize: {
+              xs: ".68rem",
+              sm: ".75rem",
+            },
+            px: 0.5,
+
+            "&:hover": {
+              bgcolor: "transparent",
+              color: "#a5b4fc",
+            },
+          }}
+        >
+          Back to CodeX
+        </Button>
+
+        {/* Login Card */}
+        <Paper
+          elevation={0}
+          sx={{
+            position: "relative",
+            overflow: "hidden",
+            borderRadius: {
+              xs: 3,
+              sm: 4,
+            },
+            bgcolor: "rgba(15,23,42,.86)",
+            border:
+              "1px solid rgba(148,163,184,.14)",
+            boxShadow:
+              "0 30px 90px rgba(0,0,0,.35)",
+            color: "#fff",
+            p: {
+              xs: 2.2,
+              sm: 4,
+              md: 4.5,
+            },
+          }}
+        >
+          {/* Top gradient */}
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 2,
+              background:
+                "linear-gradient(90deg,#6366f1,#8b5cf6,#f97316)",
+            }}
+          />
+
+          {/* Brand */}
+          <Stack
+            alignItems="center"
+            textAlign="center"
+            sx={{
+              mb: {
+                xs: 2.5,
+                sm: 3,
+              },
+            }}
+          >
+            <CodeXLogo />
+
+            <Typography
+              sx={{
+                mt: 1.5,
+                fontSize: {
+                  xs: "1.45rem",
+                  sm: "1.7rem",
+                },
+                fontWeight: 950,
+                lineHeight: 1,
+                letterSpacing: "-.7px",
+                background:
+                  "linear-gradient(90deg,#fff,#a5b4fc)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              CodeX
+            </Typography>
+
+            <Typography
+              sx={{
+                mt: 0.55,
+                color: "#64748b",
+                fontSize: {
+                  xs: ".52rem",
+                  sm: ".58rem",
+                },
+                fontWeight: 900,
+                letterSpacing: "1px",
+              }}
+            >
+              PROJECT MARKETPLACE
+            </Typography>
+
+            <Chip
+              icon={
+                <LoginRoundedIcon
+                  sx={{
+                    fontSize:
+                      "14px !important",
+                  }}
+                />
+              }
+              label="WELCOME BACK"
+              size="small"
+              sx={{
+                mt: 1.7,
+                height: 27,
+                bgcolor:
+                  "rgba(99,102,241,.09)",
+                color: "#a5b4fc",
+                border:
+                  "1px solid rgba(129,140,248,.18)",
+                fontSize: {
+                  xs: 7.5,
+                  sm: 9,
+                },
+                fontWeight: 900,
+                letterSpacing: ".7px",
+              }}
+            />
+          </Stack>
+
+          {/* Heading */}
+          <Box
+            sx={{
+              textAlign: "center",
+              mb: 2.7,
+            }}
+          >
+            <Typography
+              component="h1"
+              fontWeight={950}
+              sx={{
+                fontSize: {
+                  xs: "1.35rem",
+                  sm: "1.6rem",
+                },
+                letterSpacing: "-.5px",
+              }}
+            >
+              Login to your account
+            </Typography>
+
+            <Typography
+              sx={{
+                mt: 0.7,
+                color: "#64748b",
+                fontSize: {
+                  xs: ".68rem",
+                  sm: ".75rem",
+                },
+                lineHeight: 1.6,
+              }}
+            >
+              Access your purchased projects and
+              continue learning with CodeX.
+            </Typography>
+          </Box>
+
+          {/* Form */}
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+          >
+            <Stack spacing={1.8}>
               <TextField
-                label="Email"
+                label="Email Address"
                 variant="outlined"
                 fullWidth
+                required
                 name="email"
                 type="email"
                 value={form.email}
                 onChange={handleChange}
+                autoComplete="email"
+                placeholder="you@example.com"
+                sx={fieldSx}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <EmailOutlinedIcon
+                        sx={{
+                          color: "#64748b",
+                          fontSize: 20,
+                        }}
+                      />
+                    </InputAdornment>
+                  ),
+                }}
               />
+
               <TextField
                 label="Password"
                 variant="outlined"
                 fullWidth
+                required
                 name="password"
-                type="password"
+                type={
+                  showPassword
+                    ? "text"
+                    : "password"
+                }
                 value={form.password}
                 onChange={handleChange}
+                autoComplete="current-password"
+                placeholder="Enter your password"
+                sx={fieldSx}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockOutlinedIcon
+                        sx={{
+                          color: "#64748b",
+                          fontSize: 20,
+                        }}
+                      />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        type="button"
+                        onClick={() =>
+                          setShowPassword(
+                            (previous) =>
+                              !previous,
+                          )
+                        }
+                        edge="end"
+                        aria-label={
+                          showPassword
+                            ? "Hide password"
+                            : "Show password"
+                        }
+                        sx={{
+                          color: "#64748b",
+                          "&:hover": {
+                            color: "#a5b4fc",
+                          },
+                        }}
+                      >
+                        {showPassword ? (
+                          <VisibilityOffOutlinedIcon
+                            sx={{ fontSize: 19 }}
+                          />
+                        ) : (
+                          <VisibilityOutlinedIcon
+                            sx={{ fontSize: 19 }}
+                          />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
+
               {error && (
-                <Typography variant="body2" color="error">
+                <Alert
+                  severity="error"
+                  sx={{
+                    borderRadius: 2.5,
+                    bgcolor:
+                      "rgba(239,68,68,.08)",
+                    color: "#fca5a5",
+                    border:
+                      "1px solid rgba(239,68,68,.18)",
+                    fontSize: ".72rem",
+                    "& .MuiAlert-icon": {
+                      color: "#f87171",
+                    },
+                  }}
+                >
                   {error}
-                </Typography>
+                </Alert>
               )}
+
               <Button
                 type="submit"
                 variant="contained"
                 disabled={loading}
                 fullWidth
+                startIcon={
+                  !loading && (
+                    <LoginRoundedIcon
+                      sx={{
+                        fontSize:
+                          "18px !important",
+                      }}
+                    />
+                  )
+                }
+                sx={{
+                  mt: 0.3,
+                  minHeight: {
+                    xs: 48,
+                    sm: 52,
+                  },
+                  borderRadius: 2.5,
+                  textTransform: "none",
+                  fontWeight: 900,
+                  fontSize: {
+                    xs: ".76rem",
+                    sm: ".82rem",
+                  },
+                  background:
+                    "linear-gradient(135deg,#6366f1,#4f46e5)",
+                  boxShadow:
+                    "0 12px 30px rgba(79,70,229,.22)",
+                  transition:
+                    "all .2s ease",
+
+                  "&:hover": {
+                    background:
+                      "linear-gradient(135deg,#818cf8,#6366f1)",
+                    transform:
+                      "translateY(-1px)",
+                    boxShadow:
+                      "0 16px 35px rgba(79,70,229,.3)",
+                  },
+
+                  "&.Mui-disabled": {
+                    color: "#94a3b8",
+                    background:
+                      "rgba(71,85,105,.35)",
+                  },
+                }}
               >
-                {loading ? "Logging in..." : "Login"}
+                {loading
+                  ? "Logging in..."
+                  : "Login to CodeX"}
               </Button>
-              <Typography variant="body2" color="text.secondary">
-                Don't have an account?{" "}
-                <Button component={Link} to="/signup" size="small">
-                  Sign up
-                </Button>
+            </Stack>
+          </Box>
+
+          {/* Divider */}
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1.5}
+            sx={{
+              my: 2.5,
+            }}
+          >
+            <Divider
+              sx={{
+                flex: 1,
+                borderColor:
+                  "rgba(148,163,184,.1)",
+              }}
+            />
+
+            <Typography
+              sx={{
+                color: "#475569",
+                fontSize: ".58rem",
+                fontWeight: 800,
+              }}
+            >
+              OR
+            </Typography>
+
+            <Divider
+              sx={{
+                flex: 1,
+                borderColor:
+                  "rgba(148,163,184,.1)",
+              }}
+            />
+          </Stack>
+
+          {/* Signup */}
+          <Button
+            component={Link}
+            to="/signup"
+            variant="outlined"
+            fullWidth
+            startIcon={<PersonAddAltRoundedIcon />}
+            sx={{
+              minHeight: 46,
+              borderRadius: 2.5,
+              textTransform: "none",
+              fontWeight: 800,
+              color: "#cbd5e1",
+              borderColor:
+                "rgba(148,163,184,.18)",
+              fontSize: {
+                xs: ".7rem",
+                sm: ".75rem",
+              },
+
+              "&:hover": {
+                borderColor:
+                  "rgba(129,140,248,.5)",
+                bgcolor:
+                  "rgba(99,102,241,.06)",
+                color: "#a5b4fc",
+              },
+            }}
+          >
+            Create a new account
+          </Button>
+
+          {/* Security info */}
+          <Box
+            sx={{
+              mt: 2.5,
+              p: 1.5,
+              borderRadius: 2.5,
+              bgcolor:
+                "rgba(99,102,241,.045)",
+              border:
+                "1px solid rgba(129,140,248,.1)",
+            }}
+          >
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              justifyContent="center"
+            >
+              <VerifiedUserOutlinedIcon
+                sx={{
+                  color: "#818cf8",
+                  fontSize: 17,
+                }}
+              />
+
+              <Typography
+                sx={{
+                  color: "#64748b",
+                  fontSize: {
+                    xs: ".57rem",
+                    sm: ".62rem",
+                  },
+                  textAlign: "center",
+                }}
+              >
+                Your account information is
+                securely protected.
               </Typography>
             </Stack>
           </Box>
         </Paper>
+
+        {/* Bottom branding */}
+        <Stack
+          direction="row"
+          justifyContent="center"
+          alignItems="center"
+          spacing={1.5}
+          sx={{
+            mt: 2.2,
+            color: "#475569",
+          }}
+        >
+          <Stack
+            direction="row"
+            spacing={0.6}
+            alignItems="center"
+          >
+            <CodeRoundedIcon
+              sx={{ fontSize: 15 }}
+            />
+            <Typography
+              sx={{
+                fontSize: ".58rem",
+                fontWeight: 700,
+              }}
+            >
+              CodeX Marketplace
+            </Typography>
+          </Stack>
+
+          <Box
+            sx={{
+              width: 3,
+              height: 3,
+              borderRadius: "50%",
+              bgcolor: "#475569",
+            }}
+          />
+
+          <Stack
+            direction="row"
+            spacing={0.6}
+            alignItems="center"
+          >
+            <XLogoIcon sx={{ fontSize: 14 }} />
+            <Typography
+              sx={{
+                fontSize: ".58rem",
+                fontWeight: 700,
+              }}
+            >
+              CodeX
+            </Typography>
+          </Stack>
+        </Stack>
       </Container>
     </Box>
   );

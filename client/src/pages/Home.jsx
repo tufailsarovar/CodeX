@@ -199,8 +199,7 @@ const Home = () => {
 
   /* =====================================================
      EXPLORE PROJECTS AUTO SCROLL
-     AUTO SCROLL + MOUSE DRAG + TOUCH SWIPE
-     HOVER PAUSE + SMOOTH RESUME
+     FRAME-RATE INDEPENDENT + DRAG + TOUCH + PAUSE
   ===================================================== */
 
   useEffect(() => {
@@ -209,15 +208,18 @@ const Home = () => {
     if (!track) return;
 
     let frameId;
+    let lastTime = performance.now();
 
     explorePositionRef.current = 0;
-    track.style.transform = "translate3d(0, 0, 0)";
+    track.style.transform = "translate3d(0,0,0)";
 
-    const speed = 0.55;
+    const animate = (now) => {
+      const delta = Math.min(now - lastTime, 32);
+      lastTime = now;
 
-    const animate = () => {
       if (!exploreDraggingRef.current && !explorePausedRef.current) {
-        explorePositionRef.current -= speed;
+        const speed = window.innerWidth < 600 ? 0.035 : 0.055;
+        explorePositionRef.current -= speed * delta;
 
         const halfWidth = track.scrollWidth / 2;
 
@@ -226,7 +228,7 @@ const Home = () => {
         }
 
         track.style.transform =
-          `translate3d(${explorePositionRef.current}px, 0, 0)`;
+          `translate3d(${explorePositionRef.current}px,0,0)`;
       }
 
       frameId = requestAnimationFrame(animate);
@@ -335,17 +337,23 @@ const Home = () => {
       <Box
         sx={{
           py: {
-            xs: 6,
-            sm: 8,
-            md: 11,
+            xs: 4.5,
+            sm: 6.5,
+            md: 10,
           },
 
-          background: "radial-gradient(circle at top, #1D4ED8 0, #020617 55%)",
+          background:
+            "radial-gradient(circle at 70% 10%, rgba(37,99,235,.55) 0%, rgba(30,64,175,.22) 28%, transparent 55%), linear-gradient(135deg,#020617 0%,#06143d 48%,#020617 100%)",
 
           color: "#fff",
         }}
       >
-        <Container maxWidth="lg">
+        <Container
+          maxWidth="lg"
+          sx={{
+            px: { xs: 2, sm: 3, md: 0 },
+          }}
+        >
           <Grid
             container
             spacing={{
@@ -387,13 +395,24 @@ const Home = () => {
                   mb: 2,
 
                   fontSize: {
-                    xs: "2.2rem",
-                    sm: "3rem",
+                    xs: "1.85rem",
+                    sm: "2.65rem",
                     md: "3.7rem",
                   },
 
-                  lineHeight: 1.08,
-                  letterSpacing: "-1.5px",
+                  lineHeight: {
+                    xs: 1.12,
+                    sm: 1.08,
+                  },
+                  letterSpacing: {
+                    xs: "-0.7px",
+                    sm: "-1.2px",
+                    md: "-1.5px",
+                  },
+                  maxWidth: {
+                    xs: 520,
+                    md: 650,
+                  },
                 }}
               >
                 Structured and Scalable{" "}
@@ -415,11 +434,15 @@ const Home = () => {
                   maxWidth: 570,
 
                   fontSize: {
-                    xs: ".95rem",
+                    xs: ".82rem",
+                    sm: ".95rem",
                     md: "1.08rem",
                   },
 
-                  lineHeight: 1.75,
+                  lineHeight: {
+                    xs: 1.6,
+                    md: 1.75,
+                  },
                 }}
               >
                 CodeX offers secure payments, instant delivery and high-quality
@@ -450,7 +473,10 @@ const Home = () => {
                     textTransform: "none",
                     fontWeight: 900,
                     px: 3,
-                    minHeight: 52,
+                    minHeight: {
+                      xs: 46,
+                      sm: 52,
+                    },
                   }}
                 >
                   Explore Projects
@@ -493,7 +519,16 @@ const Home = () => {
                   }}
                 />
 
-                <Typography variant="body2" fontWeight={600}>
+                <Typography
+                  variant="body2"
+                  fontWeight={600}
+                  sx={{
+                    fontSize: {
+                      xs: ".72rem",
+                      sm: ".875rem",
+                    },
+                  }}
+                >
                   Secure Payments • Instant Access
                 </Typography>
               </Stack>
@@ -507,8 +542,8 @@ const Home = () => {
                   position: "relative",
 
                   height: {
-                    xs: 350,
-                    sm: 390,
+                    xs: 270,
+                    sm: 340,
                     md: 430,
                   },
 
@@ -551,14 +586,22 @@ const Home = () => {
                       <MotionBox
                         key={project._id}
                         animate={{
-                          y: position === 0 ? 0 : position === -1 ? -120 : 120,
+                          y:
+                            position === 0
+                              ? 0
+                              : position === -1
+                                ? -95
+                                : 95,
 
-                          scale: position === 0 ? 1 : 0.85,
+                          scale: position === 0 ? 1 : 0.9,
 
-                          opacity: position === 0 ? 1 : 0.5,
+                          opacity: position === 0 ? 1 : 0.38,
+
+                          rotateX: position === 0 ? 0 : position === -1 ? 2 : -2,
                         }}
                         transition={{
-                          duration: 0.6,
+                          duration: 0.55,
+                          ease: [0.22, 1, 0.36, 1],
                         }}
                         sx={{
                           position: "absolute",
@@ -586,11 +629,16 @@ const Home = () => {
                               : "none",
                         }}
                       >
-                        <Stack spacing={2}>
+                        <Stack spacing={{ xs: 1.1, sm: 1.7, md: 2 }}>
                           <Typography
                             fontWeight={800}
                             sx={{
-                              fontSize: "1.15rem",
+                              fontSize: {
+                                xs: ".95rem",
+                                sm: "1.05rem",
+                                md: "1.15rem",
+                              },
+                              lineHeight: 1.3,
                             }}
                           >
                             {project.title}
@@ -600,7 +648,14 @@ const Home = () => {
                             variant="body2"
                             sx={{
                               color: "#cbd5e1",
-                              lineHeight: 1.65,
+                              lineHeight: {
+                                xs: 1.45,
+                                md: 1.65,
+                              },
+                              display: "-webkit-box",
+                              WebkitBoxOrient: "vertical",
+                              WebkitLineClamp: 3,
+                              overflow: "hidden",
                             }}
                           >
                             {project.description?.slice(0, 120)}
@@ -610,7 +665,11 @@ const Home = () => {
                           <Typography
                             fontWeight={900}
                             sx={{
-                              fontSize: "1.2rem",
+                              fontSize: {
+                                xs: "1.05rem",
+                                sm: "1.15rem",
+                                md: "1.2rem",
+                              },
                             }}
                           >
                             ₹{project.price}
@@ -618,7 +677,11 @@ const Home = () => {
 
                           <Typography
                             sx={{
-                              fontSize: 13,
+                              fontSize: {
+                                xs: 11,
+                                sm: 12,
+                                md: 13,
+                              },
                               fontWeight: 700,
                               color: isAnyFileAvailable(project.files)
                                 ? "#4ade80"
@@ -630,7 +693,10 @@ const Home = () => {
                               : "● Coming soon"}
                           </Typography>
 
-                          <Stack direction="row" spacing={1.5}>
+                          <Stack
+                            direction="row"
+                            spacing={{ xs: 1, sm: 1.3 }}
+                          >
                             <Button
                               component={Link}
                               to={`/projects/${project._id}`}
@@ -679,9 +745,9 @@ const Home = () => {
       <Box
         sx={{
           py: {
-            xs: 4,
-            sm: 5,
-            md: 6,
+            xs: 4.5,
+            sm: 5.5,
+            md: 7,
           },
           background: "#020617",
           color: "#fff",
@@ -1128,17 +1194,17 @@ const Home = () => {
                       }}
                       sx={{
                         width: {
-                          xs: "calc((100vw - 24px) / 2)",
+                          xs: "calc((100vw - 36px) / 2)",
                           sm: 295,
                           md: 335,
                         },
                         maxWidth: {
-                          xs: "calc((100vw - 24px) / 2)",
+                          xs: "calc((100vw - 36px) / 2)",
                           sm: 295,
                           md: 335,
                         },
                         minWidth: {
-                          xs: "calc((100vw - 24px) / 2)",
+                          xs: "calc((100vw - 36px) / 2)",
                           sm: 295,
                           md: 335,
                         },
@@ -1164,17 +1230,17 @@ const Home = () => {
                       }}
                       sx={{
                         width: {
-                          xs: "calc((100vw - 24px) / 2)",
+                          xs: "calc((100vw - 36px) / 2)",
                           sm: 295,
                           md: 335,
                         },
                         maxWidth: {
-                          xs: "calc((100vw - 24px) / 2)",
+                          xs: "calc((100vw - 36px) / 2)",
                           sm: 295,
                           md: 335,
                         },
                         minWidth: {
-                          xs: "calc((100vw - 24px) / 2)",
+                          xs: "calc((100vw - 36px) / 2)",
                           sm: 295,
                           md: 335,
                         },
