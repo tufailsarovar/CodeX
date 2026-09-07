@@ -1,7 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-} from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   Box,
@@ -34,33 +31,25 @@ import api from "../api/axios";
 const MotionBox = motion(Box);
 
 const Home = () => {
-  const token =
-    localStorage.getItem("codex_token");
+  const token = localStorage.getItem("codex_token");
 
   /* =====================================================
      PROJECT STATES
   ===================================================== */
 
-  const [projects, setProjects] =
-    useState([]);
+  const [projects, setProjects] = useState([]);
 
-  const [freeProjects, setFreeProjects] =
-    useState([]);
+  const [freeProjects, setFreeProjects] = useState([]);
 
-  const [projectsLoading, setProjectsLoading] =
-    useState(true);
+  const [projectsLoading, setProjectsLoading] = useState(true);
 
-  const [freeProjectsLoading, setFreeProjectsLoading] =
-    useState(true);
+  const [freeProjectsLoading, setFreeProjectsLoading] = useState(true);
 
-  const [projectsTimedOut, setProjectsTimedOut] =
-    useState(false);
+  const [projectsTimedOut, setProjectsTimedOut] = useState(false);
 
-  const [freeProjectsTimedOut, setFreeProjectsTimedOut] =
-    useState(false);
+  const [freeProjectsTimedOut, setFreeProjectsTimedOut] = useState(false);
 
-  const [activeIndex, setActiveIndex] =
-    useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   /* =====================================================
      FETCH FREE PROJECTS
@@ -74,20 +63,11 @@ const Home = () => {
 
     const fetchFreeProjects = async () => {
       try {
-        const res = await api.get(
-          "/free-projects"
-        );
+        const res = await api.get("/free-projects");
 
-        setFreeProjects(
-          Array.isArray(res.data)
-            ? res.data
-            : []
-        );
+        setFreeProjects(Array.isArray(res.data) ? res.data : []);
       } catch (error) {
-        console.error(
-          "Free projects error:",
-          error
-        );
+        console.error("Free projects error:", error);
       } finally {
         clearTimeout(timeoutId);
         setFreeProjectsLoading(false);
@@ -96,8 +76,7 @@ const Home = () => {
 
     fetchFreeProjects();
 
-    return () =>
-      clearTimeout(timeoutId);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   /* =====================================================
@@ -112,53 +91,25 @@ const Home = () => {
 
     const fetchProjects = async () => {
       try {
-        const res = await api.get(
-          "/projects"
-        );
+        const res = await api.get("/projects");
 
-        const projectData =
-          Array.isArray(res.data)
-            ? res.data
-            : [];
+        const projectData = Array.isArray(res.data) ? res.data : [];
 
-        const sortedProjects =
-          [...projectData].sort(
-            (a, b) => {
-              const aAvailable =
-                Object.values(
-                  a.files || {}
-                ).some(
-                  (url) =>
-                    typeof url ===
-                      "string" &&
-                    url.trim() !== ""
-                );
-
-              const bAvailable =
-                Object.values(
-                  b.files || {}
-                ).some(
-                  (url) =>
-                    typeof url ===
-                      "string" &&
-                    url.trim() !== ""
-                );
-
-              return (
-                Number(bAvailable) -
-                Number(aAvailable)
-              );
-            }
+        const sortedProjects = [...projectData].sort((a, b) => {
+          const aAvailable = Object.values(a.files || {}).some(
+            (url) => typeof url === "string" && url.trim() !== "",
           );
 
-        setProjects(
-          sortedProjects
-        );
+          const bAvailable = Object.values(b.files || {}).some(
+            (url) => typeof url === "string" && url.trim() !== "",
+          );
+
+          return Number(bAvailable) - Number(aAvailable);
+        });
+
+        setProjects(sortedProjects);
       } catch (error) {
-        console.error(
-          "Projects error:",
-          error
-        );
+        console.error("Projects error:", error);
       } finally {
         clearTimeout(timeoutId);
         setProjectsLoading(false);
@@ -167,8 +118,7 @@ const Home = () => {
 
     fetchProjects();
 
-    return () =>
-      clearTimeout(timeoutId);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   /* =====================================================
@@ -180,42 +130,29 @@ const Home = () => {
       return;
     }
 
-    const visible =
-      projects.slice(0, 5);
+    const visible = projects.slice(0, 5);
 
-    const interval =
-      setInterval(() => {
-        setActiveIndex(
-          (previous) =>
-            previous ===
-            visible.length - 1
-              ? 0
-              : previous + 1
-        );
-      }, 2500);
+    const interval = setInterval(() => {
+      setActiveIndex((previous) =>
+        previous === visible.length - 1 ? 0 : previous + 1,
+      );
+    }, 2500);
 
-    return () =>
-      clearInterval(interval);
+    return () => clearInterval(interval);
   }, [projects]);
 
   /* =====================================================
      HELPERS
   ===================================================== */
 
-  const isAnyFileAvailable = (
-    files = {}
-  ) =>
+  const isAnyFileAvailable = (files = {}) =>
     Object.values(files).some(
-      (url) =>
-        typeof url === "string" &&
-        url.trim() !== ""
+      (url) => typeof url === "string" && url.trim() !== "",
     );
 
-  const visibleProjects =
-    projects.slice(0, 5);
+  const visibleProjects = projects.slice(0, 5);
 
-  const total =
-    visibleProjects.length;
+  const total = visibleProjects.length;
 
   /* =====================================================
      AKTU RESOURCE CARDS
@@ -225,12 +162,10 @@ const Home = () => {
     {
       icon: <MenuBookIcon />,
       title: "AKTU Syllabus",
-      description:
-        "Find branch-wise and year-wise AKTU syllabus in one place.",
+      description: "Find branch-wise and year-wise AKTU syllabus in one place.",
       tag: "Free",
       tagColor: "success",
-      iconBackground:
-        "rgba(34,197,94,.12)",
+      iconBackground: "rgba(34,197,94,.12)",
     },
 
     {
@@ -240,8 +175,7 @@ const Home = () => {
         "Access organized study notes for your branch and academic year.",
       tag: "Paid",
       tagColor: "warning",
-      iconBackground:
-        "rgba(245,158,11,.12)",
+      iconBackground: "rgba(245,158,11,.12)",
     },
 
     {
@@ -251,8 +185,7 @@ const Home = () => {
         "Prepare with AKTU previous year question papers and exam material.",
       tag: "Paid",
       tagColor: "warning",
-      iconBackground:
-        "rgba(245,158,11,.12)",
+      iconBackground: "rgba(245,158,11,.12)",
     },
 
     {
@@ -262,8 +195,7 @@ const Home = () => {
         "Focus on important exam questions and question-answer resources.",
       tag: "Paid",
       tagColor: "warning",
-      iconBackground:
-        "rgba(245,158,11,.12)",
+      iconBackground: "rgba(245,158,11,.12)",
     },
 
     {
@@ -273,8 +205,7 @@ const Home = () => {
         "Explore useful AKTU Quantum study material organized by year.",
       tag: "Paid",
       tagColor: "warning",
-      iconBackground:
-        "rgba(245,158,11,.12)",
+      iconBackground: "rgba(245,158,11,.12)",
     },
 
     {
@@ -284,8 +215,7 @@ const Home = () => {
         "Get exam-focused questions and answers for your AKTU preparation.",
       tag: "Paid",
       tagColor: "warning",
-      iconBackground:
-        "rgba(245,158,11,.12)",
+      iconBackground: "rgba(245,158,11,.12)",
     },
   ];
 
@@ -308,8 +238,7 @@ const Home = () => {
             md: 11,
           },
 
-          background:
-            "radial-gradient(circle at top, #1D4ED8 0, #020617 55%)",
+          background: "radial-gradient(circle at top, #1D4ED8 0, #020617 55%)",
 
           color: "#fff",
         }}
@@ -325,11 +254,7 @@ const Home = () => {
           >
             {/* HERO LEFT */}
 
-            <Grid
-              item
-              xs={12}
-              md={6}
-            >
+            <Grid item xs={12} md={6}>
               <Typography
                 variant="body2"
                 sx={{
@@ -349,8 +274,7 @@ const Home = () => {
                   letterSpacing: "1.5px",
                 }}
               >
-                Code • Learn • Submit •
-                Succeed
+                Code • Learn • Submit • Succeed
               </Typography>
 
               <Typography
@@ -370,8 +294,7 @@ const Home = () => {
                   letterSpacing: "-1.5px",
                 }}
               >
-                Structured and
-                Scalable{" "}
+                Structured and Scalable{" "}
                 <Box
                   component="span"
                   sx={{
@@ -380,8 +303,7 @@ const Home = () => {
                 >
                   Projects
                 </Box>{" "}
-                designed for academic
-                excellence.
+                designed for academic excellence.
               </Typography>
 
               <Typography
@@ -398,10 +320,8 @@ const Home = () => {
                   lineHeight: 1.75,
                 }}
               >
-                CodeX offers secure
-                payments, instant delivery
-                and high-quality project
-                resources for students.
+                CodeX offers secure payments, instant delivery and high-quality
+                project resources for students.
               </Typography>
 
               <Stack
@@ -422,9 +342,7 @@ const Home = () => {
                   to="/explore"
                   variant="contained"
                   size="large"
-                  endIcon={
-                    <ArrowForwardIcon />
-                  }
+                  endIcon={<ArrowForwardIcon />}
                   sx={{
                     borderRadius: 3,
                     textTransform: "none",
@@ -449,8 +367,7 @@ const Home = () => {
                       px: 3,
                       minHeight: 52,
                       color: "#fff",
-                      borderColor:
-                        "rgba(255,255,255,.4)",
+                      borderColor: "rgba(255,255,255,.4)",
                     }}
                   >
                     Login to Buy
@@ -474,23 +391,15 @@ const Home = () => {
                   }}
                 />
 
-                <Typography
-                  variant="body2"
-                  fontWeight={600}
-                >
-                  Secure Payments •
-                  Instant Access
+                <Typography variant="body2" fontWeight={600}>
+                  Secure Payments • Instant Access
                 </Typography>
               </Stack>
             </Grid>
 
             {/* HERO RIGHT */}
 
-            <Grid
-              item
-              xs={12}
-              md={6}
-            >
+            <Grid item xs={12} md={6}>
               <Box
                 sx={{
                   position: "relative",
@@ -526,198 +435,133 @@ const Home = () => {
                       : "No projects available."}
                   </Typography>
                 ) : (
-                  visibleProjects.map(
-                    (
-                      project,
-                      index
-                    ) => {
-                      const position =
-                        index ===
-                        activeIndex
-                          ? 0
-                          : index ===
-                              (activeIndex -
-                                1 +
-                                total) %
-                                total
-                            ? -1
-                            : index ===
-                                (activeIndex +
-                                  1) %
-                                  total
-                              ? 1
-                              : 2;
+                  visibleProjects.map((project, index) => {
+                    const position =
+                      index === activeIndex
+                        ? 0
+                        : index === (activeIndex - 1 + total) % total
+                          ? -1
+                          : index === (activeIndex + 1) % total
+                            ? 1
+                            : 2;
 
-                      return (
-                        <MotionBox
-                          key={
-                            project._id
-                          }
-                          animate={{
-                            y:
-                              position === 0
-                                ? 0
-                                : position === -1
-                                  ? -120
-                                  : 120,
+                    return (
+                      <MotionBox
+                        key={project._id}
+                        animate={{
+                          y: position === 0 ? 0 : position === -1 ? -120 : 120,
 
-                            scale:
-                              position === 0
-                                ? 1
-                                : 0.85,
+                          scale: position === 0 ? 1 : 0.85,
 
-                            opacity:
-                              position === 0
-                                ? 1
-                                : 0.5,
-                          }}
-                          transition={{
-                            duration: 0.6,
-                          }}
-                          sx={{
-                            position:
-                              "absolute",
+                          opacity: position === 0 ? 1 : 0.5,
+                        }}
+                        transition={{
+                          duration: 0.6,
+                        }}
+                        sx={{
+                          position: "absolute",
 
-                            width: "92%",
+                          width: "92%",
 
-                            p: {
-                              xs: 2.5,
-                              sm: 3,
-                            },
+                          p: {
+                            xs: 2.5,
+                            sm: 3,
+                          },
 
-                            borderRadius: 4,
+                          borderRadius: 4,
 
-                            background:
-                              "linear-gradient(180deg,#0f172a,#020617)",
+                          background: "linear-gradient(180deg,#0f172a,#020617)",
 
-                            border:
-                              "1px solid rgba(148,163,184,.3)",
+                          border: "1px solid rgba(148,163,184,.3)",
 
-                            color: "#fff",
+                          color: "#fff",
 
-                            zIndex:
-                              position ===
-                              0
-                                ? 3
-                                : 1,
+                          zIndex: position === 0 ? 3 : 1,
 
-                            boxShadow:
-                              position ===
-                              0
-                                ? "0 25px 70px rgba(0,0,0,.4)"
-                                : "none",
-                          }}
-                        >
-                          <Stack spacing={2}>
-                            <Typography
-                              fontWeight={800}
+                          boxShadow:
+                            position === 0
+                              ? "0 25px 70px rgba(0,0,0,.4)"
+                              : "none",
+                        }}
+                      >
+                        <Stack spacing={2}>
+                          <Typography
+                            fontWeight={800}
+                            sx={{
+                              fontSize: "1.15rem",
+                            }}
+                          >
+                            {project.title}
+                          </Typography>
+
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: "#cbd5e1",
+                              lineHeight: 1.65,
+                            }}
+                          >
+                            {project.description?.slice(0, 120)}
+                            ...
+                          </Typography>
+
+                          <Typography
+                            fontWeight={900}
+                            sx={{
+                              fontSize: "1.2rem",
+                            }}
+                          >
+                            ₹{project.price}
+                          </Typography>
+
+                          <Typography
+                            sx={{
+                              fontSize: 13,
+                              fontWeight: 700,
+                              color: isAnyFileAvailable(project.files)
+                                ? "#4ade80"
+                                : "#facc15",
+                            }}
+                          >
+                            {isAnyFileAvailable(project.files)
+                              ? "● Available"
+                              : "● Coming soon"}
+                          </Typography>
+
+                          <Stack direction="row" spacing={1.5}>
+                            <Button
+                              component={Link}
+                              to={`/projects/${project._id}`}
+                              variant="outlined"
+                              size="small"
                               sx={{
-                                fontSize:
-                                  "1.15rem",
+                                borderRadius: 2.5,
+                                textTransform: "none",
+                                color: "#fff",
+                                borderColor: "rgba(255,255,255,.35)",
                               }}
                             >
-                              {
-                                project.title
-                              }
-                            </Typography>
+                              View
+                            </Button>
 
-                            <Typography
-                              variant="body2"
+                            <Button
+                              component={Link}
+                              to={`/projects/${project._id}`}
+                              variant="contained"
+                              size="small"
                               sx={{
-                                color:
-                                  "#cbd5e1",
-                                lineHeight:
-                                  1.65,
+                                borderRadius: 2.5,
+                                textTransform: "none",
+                                fontWeight: 800,
                               }}
                             >
-                              {project.description?.slice(
-                                0,
-                                120
-                              )}
-                              ...
-                            </Typography>
-
-                            <Typography
-                              fontWeight={900}
-                              sx={{
-                                fontSize:
-                                  "1.2rem",
-                              }}
-                            >
-                              ₹
-                              {
-                                project.price
-                              }
-                            </Typography>
-
-                            <Typography
-                              sx={{
-                                fontSize: 13,
-                                fontWeight: 700,
-                                color:
-                                  isAnyFileAvailable(
-                                    project.files
-                                  )
-                                    ? "#4ade80"
-                                    : "#facc15",
-                              }}
-                            >
-                              {isAnyFileAvailable(
-                                project.files
-                              )
-                                ? "● Available"
-                                : "● Coming soon"}
-                            </Typography>
-
-                            <Stack
-                              direction="row"
-                              spacing={1.5}
-                            >
-                              <Button
-                                component={
-                                  Link
-                                }
-                                to={`/projects/${project._id}`}
-                                variant="outlined"
-                                size="small"
-                                sx={{
-                                  borderRadius:
-                                    2.5,
-                                  textTransform:
-                                    "none",
-                                  color:
-                                    "#fff",
-                                  borderColor:
-                                    "rgba(255,255,255,.35)",
-                                }}
-                              >
-                                View
-                              </Button>
-
-                              <Button
-                                component={
-                                  Link
-                                }
-                                to={`/projects/${project._id}`}
-                                variant="contained"
-                                size="small"
-                                sx={{
-                                  borderRadius:
-                                    2.5,
-                                  textTransform:
-                                    "none",
-                                  fontWeight:
-                                    800,
-                                }}
-                              >
-                                Buy
-                              </Button>
-                            </Stack>
+                              Buy
+                            </Button>
                           </Stack>
-                        </MotionBox>
-                      );
-                    }
-                  )
+                        </Stack>
+                      </MotionBox>
+                    );
+                  })
                 )}
               </Box>
             </Grid>
@@ -747,8 +591,7 @@ const Home = () => {
 
               display: "flex",
 
-              justifyContent:
-                "space-between",
+              justifyContent: "space-between",
 
               alignItems: {
                 xs: "flex-start",
@@ -764,10 +607,7 @@ const Home = () => {
             }}
           >
             <Box>
-              <Typography
-                variant="h5"
-                fontWeight={900}
-              >
+              <Typography variant="h5" fontWeight={900}>
                 All Projects
               </Typography>
 
@@ -778,8 +618,7 @@ const Home = () => {
                   mt: 0.5,
                 }}
               >
-                Browse all available
-                academic projects.
+                Browse all available academic projects.
               </Typography>
             </Box>
 
@@ -824,53 +663,57 @@ const Home = () => {
                     mt: 1,
                   }}
                 >
-                  Loading projects
-                  from server…
+                  Loading projects from server…
                 </Typography>
               </Box>
             ) : (
-              projects
-                .slice(0, 6)
-                .map(
-                  (project) => (
-                    <Grid
-                      item
-                      xs={12}
-                      sm={6}
-                      md={4}
-                      key={
-                        project._id
-                      }
-                    >
-                      <ProjectCard
-                        project={
-                          project
-                        }
-                      />
-                    </Grid>
-                  )
-                )
+              projects.slice(0, 6).map((project) => (
+                <Grid item xs={12} sm={6} md={4} key={project._id}>
+                  <ProjectCard project={project} />
+                </Grid>
+              ))
             )}
 
-            {!projectsLoading &&
-              projects.length === 0 && (
-                <Box
-                  sx={{
-                    width: "100%",
-                    textAlign: "center",
-                    py: 5,
-                  }}
-                >
-                  <Typography
-                    color="text.secondary"
-                  >
-                    {projectsTimedOut
-                      ? "No project uploaded yet from admin"
-                      : "No projects available."}
-                  </Typography>
-                </Box>
-              )}
+            {!projectsLoading && projects.length === 0 && (
+              <Box
+                sx={{
+                  width: "100%",
+                  textAlign: "center",
+                  py: 5,
+                }}
+              >
+                <Typography color="text.secondary">
+                  {projectsTimedOut
+                    ? "No project uploaded yet from admin"
+                    : "No projects available."}
+                </Typography>
+              </Box>
+            )}
           </Grid>
+
+          {/* VIEW FULL PROJECT LIST - BELOW PROJECT CARDS */}
+          {!projectsLoading && projects.length > 0 && (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                mt: { xs: 3, md: 4 },
+              }}
+            >
+              <Button
+                component={Link}
+                to="/projects"
+                variant="outlined"
+                sx={{
+                  textTransform: "none",
+                  borderRadius: 999,
+                  fontWeight: 700,
+                }}
+              >
+                View Full List
+              </Button>
+            </Box>
+          )}
         </Container>
       </Box>
 
@@ -906,8 +749,7 @@ const Home = () => {
 
             borderRadius: "50%",
 
-            background:
-              "rgba(79,70,229,.18)",
+            background: "rgba(79,70,229,.18)",
 
             filter: "blur(100px)",
 
@@ -925,8 +767,7 @@ const Home = () => {
 
             borderRadius: "50%",
 
-            background:
-              "rgba(14,165,233,.12)",
+            background: "rgba(14,165,233,.12)",
 
             filter: "blur(100px)",
 
@@ -969,16 +810,13 @@ const Home = () => {
                 display: "flex",
 
                 alignItems: "center",
-                justifyContent:
-                  "center",
+                justifyContent: "center",
 
                 borderRadius: 4,
 
-                background:
-                  "linear-gradient(135deg,#6366f1,#2563eb)",
+                background: "linear-gradient(135deg,#6366f1,#2563eb)",
 
-                boxShadow:
-                  "0 15px 45px rgba(79,70,229,.3)",
+                boxShadow: "0 15px 45px rgba(79,70,229,.3)",
               }}
             >
               <SchoolIcon
@@ -996,11 +834,9 @@ const Home = () => {
 
                 color: "#c7d2fe",
 
-                background:
-                  "rgba(99,102,241,.12)",
+                background: "rgba(99,102,241,.12)",
 
-                border:
-                  "1px solid rgba(129,140,248,.3)",
+                border: "1px solid rgba(129,140,248,.3)",
 
                 fontWeight: 800,
               }}
@@ -1018,8 +854,7 @@ const Home = () => {
 
                 lineHeight: 1.1,
 
-                letterSpacing:
-                  "-1px",
+                letterSpacing: "-1px",
               }}
             >
               AKTU Study Hub
@@ -1039,10 +874,8 @@ const Home = () => {
                 lineHeight: 1.8,
               }}
             >
-              Everything you need for
-              AKTU preparation in one
-              place — organized by
-              branch and academic year.
+              Everything you need for AKTU preparation in one place — organized
+              by branch and academic year.
             </Typography>
           </Box>
 
@@ -1060,191 +893,158 @@ const Home = () => {
               md: 2.5,
             }}
           >
-            {aktuResources.map(
-              (resource) => (
-                <Grid
-                  item
-                  xs={6}
-                  sm={6}
-                  md={4}
-                  key={
-                    resource.title
-                  }
+            {aktuResources.map((resource) => (
+              <Grid item xs={6} sm={6} md={4} key={resource.title}>
+                <Paper
+                  sx={{
+                    height: "100%",
+
+                    p: {
+                      xs: 1.5,
+                      sm: 2.5,
+                      md: 3,
+                    },
+
+                    borderRadius: {
+                      xs: 2.5,
+                      md: 4,
+                    },
+
+                    background: "rgba(15,23,42,.75)",
+
+                    border: "1px solid rgba(148,163,184,.16)",
+
+                    color: "#fff",
+
+                    backdropFilter: "blur(12px)",
+
+                    transition: "all .3s ease",
+
+                    "&:hover": {
+                      transform: "translateY(-6px)",
+
+                      borderColor: "rgba(99,102,241,.55)",
+
+                      boxShadow: "0 20px 45px rgba(0,0,0,.25)",
+                    },
+                  }}
                 >
-                  <Paper
+                  <Stack
+                    direction="row"
+                    alignItems="flex-start"
+                    justifyContent="space-between"
+                    spacing={0.5}
+                  >
+                    <Box
+                      sx={{
+                        width: {
+                          xs: 38,
+                          sm: 52,
+                        },
+
+                        height: {
+                          xs: 38,
+                          sm: 52,
+                        },
+
+                        flexShrink: 0,
+
+                        display: "flex",
+
+                        alignItems: "center",
+
+                        justifyContent: "center",
+
+                        borderRadius: {
+                          xs: 2,
+                          sm: 3,
+                        },
+
+                        background: resource.iconBackground,
+
+                        color: "#818cf8",
+
+                        "& svg": {
+                          fontSize: {
+                            xs: 21,
+                            sm: 29,
+                          },
+                        },
+                      }}
+                    >
+                      {resource.icon}
+                    </Box>
+
+                    <Chip
+                      size="small"
+                      label={resource.tag}
+                      color={resource.tagColor}
+                      sx={{
+                        fontWeight: 800,
+
+                        fontSize: {
+                          xs: 9,
+                          sm: 11,
+                        },
+
+                        height: {
+                          xs: 22,
+                          sm: 28,
+                        },
+                      }}
+                    />
+                  </Stack>
+
+                  <Typography
+                    fontWeight={900}
                     sx={{
-                      height: "100%",
-
-                      p: {
-                        xs: 1.5,
-                        sm: 2.5,
-                        md: 3,
+                      mt: {
+                        xs: 1.4,
+                        sm: 2.2,
                       },
 
-                      borderRadius: {
-                        xs: 2.5,
-                        md: 4,
+                      mb: 0.8,
+
+                      fontSize: {
+                        xs: ".88rem",
+                        sm: "1.1rem",
                       },
 
-                      background:
-                        "rgba(15,23,42,.75)",
-
-                      border:
-                        "1px solid rgba(148,163,184,.16)",
-
-                      color: "#fff",
-
-                      backdropFilter:
-                        "blur(12px)",
-
-                      transition:
-                        "all .3s ease",
-
-                      "&:hover": {
-                        transform:
-                          "translateY(-6px)",
-
-                        borderColor:
-                          "rgba(99,102,241,.55)",
-
-                        boxShadow:
-                          "0 20px 45px rgba(0,0,0,.25)",
-                      },
+                      lineHeight: 1.25,
                     }}
                   >
-                    <Stack
-                      direction="row"
-                      alignItems="flex-start"
-                      justifyContent="space-between"
-                      spacing={0.5}
-                    >
-                      <Box
-                        sx={{
-                          width: {
-                            xs: 38,
-                            sm: 52,
-                          },
+                    {resource.title}
+                  </Typography>
 
-                          height: {
-                            xs: 38,
-                            sm: 52,
-                          },
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "#94a3b8",
 
-                          flexShrink: 0,
+                      lineHeight: 1.55,
 
-                          display: "flex",
+                      fontSize: {
+                        xs: ".72rem",
+                        sm: ".875rem",
+                      },
 
-                          alignItems:
-                            "center",
+                      display: "-webkit-box",
 
-                          justifyContent:
-                            "center",
+                      WebkitBoxOrient: "vertical",
 
-                          borderRadius: {
-                            xs: 2,
-                            sm: 3,
-                          },
+                      WebkitLineClamp: {
+                        xs: 3,
+                        sm: 4,
+                      },
 
-                          background:
-                            resource.iconBackground,
-
-                          color:
-                            "#818cf8",
-
-                          "& svg": {
-                            fontSize: {
-                              xs: 21,
-                              sm: 29,
-                            },
-                          },
-                        }}
-                      >
-                        {resource.icon}
-                      </Box>
-
-                      <Chip
-                        size="small"
-                        label={
-                          resource.tag
-                        }
-                        color={
-                          resource.tagColor
-                        }
-                        sx={{
-                          fontWeight: 800,
-
-                          fontSize: {
-                            xs: 9,
-                            sm: 11,
-                          },
-
-                          height: {
-                            xs: 22,
-                            sm: 28,
-                          },
-                        }}
-                      />
-                    </Stack>
-
-                    <Typography
-                      fontWeight={900}
-                      sx={{
-                        mt: {
-                          xs: 1.4,
-                          sm: 2.2,
-                        },
-
-                        mb: 0.8,
-
-                        fontSize: {
-                          xs: ".88rem",
-                          sm: "1.1rem",
-                        },
-
-                        lineHeight: 1.25,
-                      }}
-                    >
-                      {
-                        resource.title
-                      }
-                    </Typography>
-
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color:
-                          "#94a3b8",
-
-                        lineHeight: 1.55,
-
-                        fontSize: {
-                          xs: ".72rem",
-                          sm: ".875rem",
-                        },
-
-                        display:
-                          "-webkit-box",
-
-                        WebkitBoxOrient:
-                          "vertical",
-
-                        WebkitLineClamp: {
-                          xs: 3,
-                          sm: 4,
-                        },
-
-                        overflow:
-                          "hidden",
-                      }}
-                    >
-                      {
-                        resource.description
-                      }
-                    </Typography>
-                  </Paper>
-                </Grid>
-              )
-            )}
+                      overflow: "hidden",
+                    }}
+                  >
+                    {resource.description}
+                  </Typography>
+                </Paper>
+              </Grid>
+            ))}
           </Grid>
 
           {/* AKTU CTA */}
@@ -1263,8 +1063,7 @@ const Home = () => {
               background:
                 "linear-gradient(135deg,rgba(79,70,229,.2),rgba(14,165,233,.1))",
 
-              border:
-                "1px solid rgba(129,140,248,.25)",
+              border: "1px solid rgba(129,140,248,.25)",
             }}
           >
             <Stack
@@ -1289,15 +1088,13 @@ const Home = () => {
                     },
                   }}
                 >
-                  Looking for AKTU
-                  study material?
+                  Looking for AKTU study material?
                 </Typography>
 
                 <Typography
                   variant="body2"
                   sx={{
-                    color:
-                      "#94a3b8",
+                    color: "#94a3b8",
 
                     mt: 0.5,
 
@@ -1307,9 +1104,7 @@ const Home = () => {
                     },
                   }}
                 >
-                  Select your branch,
-                  year and resource type
-                  from the AKTU Study
+                  Select your branch, year and resource type from the AKTU Study
                   page.
                 </Typography>
               </Box>
@@ -1319,16 +1114,13 @@ const Home = () => {
                 to="/aktu"
                 variant="contained"
                 size="large"
-                endIcon={
-                  <ArrowForwardIcon />
-                }
+                endIcon={<ArrowForwardIcon />}
                 sx={{
                   flexShrink: 0,
 
                   borderRadius: 3,
 
-                  textTransform:
-                    "none",
+                  textTransform: "none",
 
                   fontWeight: 900,
 
@@ -1351,11 +1143,7 @@ const Home = () => {
               mt: 3,
             }}
           >
-            <Grid
-              item
-              xs={12}
-              sm={4}
-            >
+            <Grid item xs={12} sm={4}>
               <Stack
                 direction="row"
                 spacing={1.2}
@@ -1367,8 +1155,7 @@ const Home = () => {
               >
                 <SchoolIcon
                   sx={{
-                    color:
-                      "#818cf8",
+                    color: "#818cf8",
                   }}
                 />
 
@@ -1382,11 +1169,7 @@ const Home = () => {
               </Stack>
             </Grid>
 
-            <Grid
-              item
-              xs={12}
-              sm={4}
-            >
+            <Grid item xs={12} sm={4}>
               <Stack
                 direction="row"
                 spacing={1.2}
@@ -1395,8 +1178,7 @@ const Home = () => {
               >
                 <MenuBookIcon
                   sx={{
-                    color:
-                      "#818cf8",
+                    color: "#818cf8",
                   }}
                 />
 
@@ -1410,11 +1192,7 @@ const Home = () => {
               </Stack>
             </Grid>
 
-            <Grid
-              item
-              xs={12}
-              sm={4}
-            >
+            <Grid item xs={12} sm={4}>
               <Stack
                 direction="row"
                 spacing={1.2}
@@ -1426,8 +1204,7 @@ const Home = () => {
               >
                 <PictureAsPdfIcon
                   sx={{
-                    color:
-                      "#818cf8",
+                    color: "#818cf8",
                   }}
                 />
 
@@ -1456,8 +1233,7 @@ const Home = () => {
             md: 7,
           },
 
-          backgroundColor:
-            "#020617",
+          backgroundColor: "#020617",
 
           color: "#fff",
         }}
@@ -1469,8 +1245,7 @@ const Home = () => {
 
               display: "flex",
 
-              justifyContent:
-                "space-between",
+              justifyContent: "space-between",
 
               alignItems: {
                 xs: "flex-start",
@@ -1486,10 +1261,7 @@ const Home = () => {
             }}
           >
             <Box>
-              <Typography
-                variant="h5"
-                fontWeight={900}
-              >
+              <Typography variant="h5" fontWeight={900}>
                 Free Projects
               </Typography>
 
@@ -1500,9 +1272,7 @@ const Home = () => {
                   mt: 0.5,
                 }}
               >
-                Open-source projects
-                you can download from
-                GitHub.
+                Open-source projects you can download from GitHub.
               </Typography>
             </Box>
 
@@ -1510,8 +1280,7 @@ const Home = () => {
               component={Link}
               to="/free-projects"
               sx={{
-                textTransform:
-                  "none",
+                textTransform: "none",
 
                 fontWeight: 700,
 
@@ -1519,8 +1288,7 @@ const Home = () => {
 
                 color: "#e0f2fe",
 
-                border:
-                  "1px solid rgba(148,163,184,.35)",
+                border: "1px solid rgba(148,163,184,.35)",
 
                 px: 2.5,
               }}
@@ -1547,21 +1315,17 @@ const Home = () => {
                 height: 7,
               },
 
-              "&::-webkit-scrollbar-track":
-                {
-                  background:
-                    "rgba(148,163,184,.12)",
+              "&::-webkit-scrollbar-track": {
+                background: "rgba(148,163,184,.12)",
 
-                  borderRadius: 10,
-                },
+                borderRadius: 10,
+              },
 
-              "&::-webkit-scrollbar-thumb":
-                {
-                  background:
-                    "rgba(99,102,241,.7)",
+              "&::-webkit-scrollbar-thumb": {
+                background: "rgba(99,102,241,.7)",
 
-                  borderRadius: 10,
-                },
+                borderRadius: 10,
+              },
             }}
           >
             {freeProjectsLoading ? (
@@ -1574,9 +1338,7 @@ const Home = () => {
                   py: 4,
                 }}
               >
-                <CircularProgress
-                  size={28}
-                />
+                <CircularProgress size={28} />
 
                 <Typography
                   variant="body2"
@@ -1585,241 +1347,183 @@ const Home = () => {
                     mt: 1,
                   }}
                 >
-                  Loading free
-                  projects…
+                  Loading free projects…
                 </Typography>
               </Box>
             ) : (
-              freeProjects
-                .slice(0, 6)
-                .map(
-                  (project) => (
-                    <Paper
-                      key={
-                        project._id
-                      }
+              freeProjects.slice(0, 6).map((project) => (
+                <Paper
+                  key={project._id}
+                  sx={{
+                    minWidth: 288,
+                    maxWidth: 288,
+
+                    position: "relative",
+
+                    borderRadius: 4,
+
+                    overflow: "hidden",
+
+                    background:
+                      "linear-gradient(180deg,rgba(15,23,42,.88),rgba(2,6,23,.95))",
+
+                    border: "1px solid rgba(148,163,184,.25)",
+
+                    color: "#fff",
+
+                    transition: "all .3s ease",
+
+                    "&:hover": {
+                      transform: "translateY(-5px)",
+
+                      borderColor: "rgba(99,102,241,.6)",
+
+                      boxShadow: "0 16px 40px rgba(79,70,229,.3)",
+                    },
+                  }}
+                >
+                  {/* FREE BADGE */}
+
+                  <Box
+                    sx={{
+                      position: "absolute",
+
+                      top: 10,
+                      left: -35,
+
+                      transform: "rotate(-45deg)",
+
+                      background: "linear-gradient(90deg,#22c55e,#4ade80)",
+
+                      color: "#022c22",
+
+                      px: 5,
+
+                      py: 0.35,
+
+                      fontSize: 10,
+
+                      fontWeight: 900,
+
+                      letterSpacing: ".8px",
+
+                      zIndex: 2,
+                    }}
+                  >
+                    FREE
+                  </Box>
+
+                  {project.videoUrl && (
+                    <video
+                      src={project.videoUrl}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      style={{
+                        width: "100%",
+
+                        height: 152,
+
+                        objectFit: "cover",
+                      }}
+                    />
+                  )}
+
+                  <Box
+                    sx={{
+                      p: 2,
+                    }}
+                  >
+                    <Typography
+                      fontWeight={900}
                       sx={{
-                        minWidth: 288,
-                        maxWidth: 288,
+                        mb: 0.5,
+                      }}
+                    >
+                      {project.title}
+                    </Typography>
 
-                        position:
-                          "relative",
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{
+                        mb: 1.5,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {project.description?.slice(0, 90)}
+                      ...
+                    </Typography>
 
-                        borderRadius: 4,
+                    <Box
+                      sx={{
+                        display: "flex",
 
-                        overflow:
-                          "hidden",
+                        flexWrap: "wrap",
 
-                        background:
-                          "linear-gradient(180deg,rgba(15,23,42,.88),rgba(2,6,23,.95))",
+                        gap: 0.6,
 
-                        border:
-                          "1px solid rgba(148,163,184,.25)",
+                        mb: 1.5,
+                      }}
+                    >
+                      {project.techStack?.slice(0, 4).map((tech, index) => (
+                        <Box
+                          key={index}
+                          sx={{
+                            px: 1,
+
+                            py: 0.25,
+
+                            fontSize: 10,
+
+                            borderRadius: 999,
+
+                            color: "#c7d2fe",
+
+                            background: "rgba(99,102,241,.15)",
+
+                            border: "1px solid rgba(99,102,241,.35)",
+                          }}
+                        >
+                          {tech}
+                        </Box>
+                      ))}
+                    </Box>
+
+                    <Button
+                      href={project.githubLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      fullWidth
+                      size="small"
+                      sx={{
+                        borderRadius: 999,
+
+                        fontWeight: 800,
+
+                        textTransform: "none",
 
                         color: "#fff",
 
-                        transition:
-                          "all .3s ease",
-
-                        "&:hover": {
-                          transform:
-                            "translateY(-5px)",
-
-                          borderColor:
-                            "rgba(99,102,241,.6)",
-
-                          boxShadow:
-                            "0 16px 40px rgba(79,70,229,.3)",
-                        },
+                        background:
+                          "linear-gradient(90deg,rgba(99,102,241,.85),rgba(34,211,238,.85))",
                       }}
                     >
-                      {/* FREE BADGE */}
-
-                      <Box
-                        sx={{
-                          position:
-                            "absolute",
-
-                          top: 10,
-                          left: -35,
-
-                          transform:
-                            "rotate(-45deg)",
-
-                          background:
-                            "linear-gradient(90deg,#22c55e,#4ade80)",
-
-                          color:
-                            "#022c22",
-
-                          px: 5,
-
-                          py: 0.35,
-
-                          fontSize: 10,
-
-                          fontWeight: 900,
-
-                          letterSpacing:
-                            ".8px",
-
-                          zIndex: 2,
-                        }}
-                      >
-                        FREE
-                      </Box>
-
-                      {project.videoUrl && (
-                        <video
-                          src={
-                            project.videoUrl
-                          }
-                          autoPlay
-                          muted
-                          loop
-                          playsInline
-                          style={{
-                            width:
-                              "100%",
-
-                            height: 152,
-
-                            objectFit:
-                              "cover",
-                          }}
-                        />
-                      )}
-
-                      <Box
-                        sx={{
-                          p: 2,
-                        }}
-                      >
-                        <Typography
-                          fontWeight={900}
-                          sx={{
-                            mb: 0.5,
-                          }}
-                        >
-                          {
-                            project.title
-                          }
-                        </Typography>
-
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{
-                            mb: 1.5,
-                            lineHeight: 1.5,
-                          }}
-                        >
-                          {project.description?.slice(
-                            0,
-                            90
-                          )}
-                          ...
-                        </Typography>
-
-                        <Box
-                          sx={{
-                            display:
-                              "flex",
-
-                            flexWrap:
-                              "wrap",
-
-                            gap: 0.6,
-
-                            mb: 1.5,
-                          }}
-                        >
-                          {project.techStack
-                            ?.slice(
-                              0,
-                              4
-                            )
-                            .map(
-                              (
-                                tech,
-                                index
-                              ) => (
-                                <Box
-                                  key={
-                                    index
-                                  }
-                                  sx={{
-                                    px: 1,
-
-                                    py: 0.25,
-
-                                    fontSize:
-                                      10,
-
-                                    borderRadius:
-                                      999,
-
-                                    color:
-                                      "#c7d2fe",
-
-                                    background:
-                                      "rgba(99,102,241,.15)",
-
-                                    border:
-                                      "1px solid rgba(99,102,241,.35)",
-                                  }}
-                                >
-                                  {
-                                    tech
-                                  }
-                                </Box>
-                              )
-                            )}
-                        </Box>
-
-                        <Button
-                          href={
-                            project.githubLink
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          fullWidth
-                          size="small"
-                          sx={{
-                            borderRadius:
-                              999,
-
-                            fontWeight: 800,
-
-                            textTransform:
-                              "none",
-
-                            color: "#fff",
-
-                            background:
-                              "linear-gradient(90deg,rgba(99,102,241,.85),rgba(34,211,238,.85))",
-                          }}
-                        >
-                          Download Code
-                        </Button>
-                      </Box>
-                    </Paper>
-                  )
-                )
+                      Download Code
+                    </Button>
+                  </Box>
+                </Paper>
+              ))
             )}
 
-            {!freeProjectsLoading &&
-              freeProjects.length ===
-                0 && (
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                >
-                  {freeProjectsTimedOut
-                    ? "No project uploaded yet from admin"
-                    : "No free projects available."}
-                </Typography>
-              )}
+            {!freeProjectsLoading && freeProjects.length === 0 && (
+              <Typography variant="body2" color="text.secondary">
+                {freeProjectsTimedOut
+                  ? "No project uploaded yet from admin"
+                  : "No free projects available."}
+              </Typography>
+            )}
           </Box>
         </Container>
       </Box>
