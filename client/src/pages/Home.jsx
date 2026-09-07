@@ -38,6 +38,7 @@ const Home = () => {
   ===================================================== */
 
   const [projects, setProjects] = useState([]);
+  const [featuredCategory, setFeaturedCategory] = useState("all");
 
   const [freeProjects, setFreeProjects] = useState([]);
 
@@ -569,6 +570,665 @@ const Home = () => {
         </Container>
       </Box>
 
+      {/* =================================================
+    EXPLORE PROJECTS
+    FILTER + AUTO SMOOTH SCROLL
+================================================= */}
+
+      <Box
+        sx={{
+          py: {
+            xs: 3.5,
+            sm: 5,
+            md: 6,
+          },
+          background: "#020617",
+          color: "#fff",
+          overflow: "hidden",
+        }}
+      >
+        <Container
+          maxWidth="lg"
+          sx={{
+            px: {
+              xs: 2,
+              sm: 3,
+              md: 0,
+            },
+          }}
+        >
+          {/* =================================================
+        HEADER
+    ================================================= */}
+
+          <MotionBox
+            initial={{
+              opacity: 0,
+              y: 18,
+            }}
+            whileInView={{
+              opacity: 1,
+              y: 0,
+            }}
+            viewport={{
+              once: true,
+              amount: 0.2,
+            }}
+            transition={{
+              duration: 0.5,
+            }}
+          >
+            <Typography
+              component="h2"
+              fontWeight={900}
+              sx={{
+                fontSize: {
+                  xs: "1.45rem",
+                  sm: "1.8rem",
+                  md: "2.15rem",
+                },
+
+                lineHeight: 1.2,
+
+                letterSpacing: "-.5px",
+              }}
+            >
+              Explore Projects
+            </Typography>
+
+            <Typography
+              sx={{
+                mt: 0.5,
+
+                color: "#94a3b8",
+
+                fontSize: {
+                  xs: ".72rem",
+                  sm: ".84rem",
+                  md: ".9rem",
+                },
+
+                lineHeight: 1.5,
+              }}
+            >
+              Filter by category to find perfect projects for your submission.
+            </Typography>
+          </MotionBox>
+
+          {/* =================================================
+        CATEGORY TABS
+    ================================================= */}
+
+          <Box
+            sx={{
+              mt: {
+                xs: 1.8,
+                sm: 2.5,
+              },
+
+              mb: {
+                xs: 2.5,
+                sm: 3.5,
+              },
+
+              overflowX: "auto",
+
+              "&::-webkit-scrollbar": {
+                display: "none",
+              },
+
+              scrollbarWidth: "none",
+            }}
+          >
+            <Stack
+              direction="row"
+              sx={{
+                width: "fit-content",
+
+                borderBottom: "1px solid rgba(148,163,184,.12)",
+              }}
+            >
+              {[
+                {
+                  label: "ALL",
+                  value: "all",
+                },
+                {
+                  label: "FRONTEND",
+                  value: "frontend",
+                },
+                {
+                  label: "MERN FULL STACK",
+                  value: "mern",
+                },
+              ].map((tab) => {
+                const active = featuredCategory === tab.value;
+
+                return (
+                  <Box
+                    key={tab.value}
+                    onClick={() => setFeaturedCategory(tab.value)}
+                    sx={{
+                      position: "relative",
+
+                      px: {
+                        xs: 1.8,
+                        sm: 2.7,
+                        md: 3.2,
+                      },
+
+                      py: {
+                        xs: 1.05,
+                        sm: 1.3,
+                      },
+
+                      cursor: "pointer",
+
+                      color: active ? "#6366f1" : "#94a3b8",
+
+                      fontSize: {
+                        xs: ".68rem",
+                        sm: ".78rem",
+                        md: ".84rem",
+                      },
+
+                      fontWeight: 700,
+
+                      whiteSpace: "nowrap",
+
+                      transition: "color .25s ease",
+
+                      "&:hover": {
+                        color: "#fff",
+                      },
+
+                      "&::after": {
+                        content: '""',
+
+                        position: "absolute",
+
+                        left: 0,
+                        right: 0,
+                        bottom: -1,
+
+                        height: {
+                          xs: 2,
+                          sm: 3,
+                        },
+
+                        borderRadius: "3px 3px 0 0",
+
+                        background: "linear-gradient(90deg,#6366f1,#818cf8)",
+
+                        transform: active ? "scaleX(1)" : "scaleX(0)",
+
+                        transition: "transform .25s ease",
+                      },
+                    }}
+                  >
+                    {tab.label}
+                  </Box>
+                );
+              })}
+            </Stack>
+          </Box>
+        </Container>
+
+        {/* =================================================
+      PROJECTS
+  ================================================= */}
+
+        {(() => {
+          const filteredProjects =
+            featuredCategory === "all"
+              ? projects
+              : projects.filter((project) => {
+                  const projectCategory = String(project.category || "")
+                    .trim()
+                    .toLowerCase();
+
+                  return projectCategory === featuredCategory.toLowerCase();
+                });
+
+          /* LOADING */
+
+          if (projectsLoading) {
+            return (
+              <Box
+                sx={{
+                  py: 4,
+
+                  display: "flex",
+
+                  justifyContent: "center",
+                }}
+              >
+                <CircularProgress
+                  size={26}
+                  sx={{
+                    color: "#6366f1",
+                  }}
+                />
+              </Box>
+            );
+          }
+
+          /* EMPTY */
+
+          if (filteredProjects.length === 0) {
+            return (
+              <Box
+                sx={{
+                  mx: {
+                    xs: 2,
+                    sm: 3,
+                    md: 0,
+                  },
+
+                  py: 4,
+
+                  textAlign: "center",
+
+                  borderRadius: 3,
+
+                  border: "1px solid rgba(148,163,184,.15)",
+
+                  background: "rgba(15,23,42,.55)",
+                }}
+              >
+                <Typography
+                  fontWeight={800}
+                  sx={{
+                    fontSize: ".85rem",
+                    color: "#e2e8f0",
+                  }}
+                >
+                  No projects found
+                </Typography>
+
+                <Typography
+                  sx={{
+                    mt: 0.5,
+
+                    color: "#64748b",
+
+                    fontSize: ".7rem",
+                  }}
+                >
+                  No projects are available in this category yet.
+                </Typography>
+              </Box>
+            );
+          }
+
+          return (
+            <Box
+              sx={{
+                width: "100%",
+
+                overflow: "hidden",
+
+                position: "relative",
+
+                /* LEFT FADE */
+
+                "&::before": {
+                  content: '""',
+
+                  position: "absolute",
+
+                  zIndex: 5,
+
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+
+                  width: {
+                    xs: 15,
+                    sm: 40,
+                    md: 80,
+                  },
+
+                  background:
+                    "linear-gradient(90deg,#020617 0%,transparent 100%)",
+
+                  pointerEvents: "none",
+                },
+
+                /* RIGHT FADE */
+
+                "&::after": {
+                  content: '""',
+
+                  position: "absolute",
+
+                  zIndex: 5,
+
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+
+                  width: {
+                    xs: 15,
+                    sm: 40,
+                    md: 80,
+                  },
+
+                  background:
+                    "linear-gradient(270deg,#020617 0%,transparent 100%)",
+
+                  pointerEvents: "none",
+                },
+              }}
+            >
+              <MotionBox
+                key={featuredCategory}
+                initial={{
+                  opacity: 0,
+                }}
+                animate={{
+                  opacity: 1,
+                }}
+                transition={{
+                  duration: 0.3,
+                }}
+              >
+                <MotionBox
+                  animate={{
+                    x: ["0%", "-50%"],
+                  }}
+                  transition={{
+                    duration:
+                      filteredProjects.length <= 2
+                        ? 20
+                        : filteredProjects.length <= 4
+                          ? 28
+                          : 36,
+
+                    ease: "linear",
+
+                    repeat: Infinity,
+
+                    repeatType: "loop",
+                  }}
+                  sx={{
+                    display: "flex",
+
+                    width: "max-content",
+
+                    gap: {
+                      xs: 1.5,
+                      sm: 2,
+                      md: 2.5,
+                    },
+
+                    /* BOTH SIDE MARGINS */
+
+                    px: {
+                      xs: 2,
+                      sm: 4,
+                      md: 7,
+                    },
+
+                    willChange: "transform",
+                  }}
+                >
+                  {/* =================================================
+                FIRST PROJECT SET
+            ================================================= */}
+
+                  {filteredProjects.map((project, index) => (
+                    <MotionBox
+                      key={`home-project-${project._id}-${index}`}
+                      whileHover={{
+                        y: {
+                          xs: -2,
+                          sm: -5,
+                        },
+
+                        scale: {
+                          xs: 1,
+                          sm: 1.01,
+                        },
+                      }}
+                      transition={{
+                        duration: 0.25,
+                      }}
+                      sx={{
+                        width: {
+                          xs: 225,
+                          sm: 295,
+                          md: 335,
+                        },
+
+                        height: {
+                          xs: 315,
+                          sm: "auto",
+                          md: "auto",
+                        },
+
+                        flexShrink: 0,
+
+                        overflow: "hidden",
+
+                        borderRadius: {
+                          xs: 3,
+                          sm: 4,
+                        },
+
+                        /* COMPACT MOBILE CARD */
+
+                        "& > *": {
+                          height: {
+                            xs: 315,
+                            sm: "auto",
+                          },
+
+                          maxHeight: {
+                            xs: 315,
+                            sm: "none",
+                          },
+
+                          overflow: "hidden",
+                        },
+
+                        "& .MuiCard-root": {
+                          height: {
+                            xs: 315,
+                            sm: "auto",
+                          },
+
+                          maxHeight: {
+                            xs: 315,
+                            sm: "none",
+                          },
+
+                          overflow: "hidden",
+                        },
+
+                        "& img": {
+                          height: {
+                            xs: 105,
+                            sm: "auto",
+                          },
+
+                          maxHeight: {
+                            xs: 105,
+                            sm: "none",
+                          },
+
+                          objectFit: "cover",
+                        },
+                      }}
+                    >
+                      <ProjectCard project={project} />
+                    </MotionBox>
+                  ))}
+
+                  {/* =================================================
+                DUPLICATE PROJECT SET
+                SEAMLESS MARQUEE
+            ================================================= */}
+
+                  {filteredProjects.map((project, index) => (
+                    <MotionBox
+                      key={`home-project-copy-${project._id}-${index}`}
+                      whileHover={{
+                        y: {
+                          xs: -2,
+                          sm: -5,
+                        },
+
+                        scale: {
+                          xs: 1,
+                          sm: 1.01,
+                        },
+                      }}
+                      transition={{
+                        duration: 0.25,
+                      }}
+                      sx={{
+                        width: {
+                          xs: 225,
+                          sm: 295,
+                          md: 335,
+                        },
+
+                        height: {
+                          xs: 315,
+                          sm: "auto",
+                          md: "auto",
+                        },
+
+                        flexShrink: 0,
+
+                        overflow: "hidden",
+
+                        borderRadius: {
+                          xs: 3,
+                          sm: 4,
+                        },
+
+                        "& > *": {
+                          height: {
+                            xs: 315,
+                            sm: "auto",
+                          },
+
+                          maxHeight: {
+                            xs: 315,
+                            sm: "none",
+                          },
+
+                          overflow: "hidden",
+                        },
+
+                        "& .MuiCard-root": {
+                          height: {
+                            xs: 315,
+                            sm: "auto",
+                          },
+
+                          maxHeight: {
+                            xs: 315,
+                            sm: "none",
+                          },
+
+                          overflow: "hidden",
+                        },
+
+                        "& img": {
+                          height: {
+                            xs: 105,
+                            sm: "auto",
+                          },
+
+                          maxHeight: {
+                            xs: 105,
+                            sm: "none",
+                          },
+
+                          objectFit: "cover",
+                        },
+                      }}
+                    >
+                      <ProjectCard project={project} />
+                    </MotionBox>
+                  ))}
+                </MotionBox>
+              </MotionBox>
+            </Box>
+          );
+        })()}
+
+        {/* =================================================
+      VIEW ALL
+  ================================================= */}
+
+        <Container
+          maxWidth="lg"
+          sx={{
+            mt: {
+              xs: 2.2,
+              sm: 3,
+            },
+
+            textAlign: "center",
+
+            px: {
+              xs: 2,
+              sm: 3,
+              md: 0,
+            },
+          }}
+        >
+          <Button
+            component={Link}
+            to="/projects"
+            variant="outlined"
+            endIcon={<ArrowForwardIcon />}
+            sx={{
+              borderRadius: 999,
+
+              px: {
+                xs: 2,
+                sm: 2.8,
+              },
+
+              py: {
+                xs: 0.55,
+                sm: 0.85,
+              },
+
+              minHeight: {
+                xs: 32,
+                sm: 40,
+              },
+
+              fontSize: {
+                xs: ".68rem",
+                sm: ".8rem",
+              },
+
+              textTransform: "none",
+
+              fontWeight: 800,
+
+              color: "#a5b4fc",
+
+              borderColor: "rgba(129,140,248,.4)",
+
+              "&:hover": {
+                borderColor: "#6366f1",
+
+                background: "rgba(99,102,241,.08)",
+              },
+            }}
+          >
+            View All Projects
+          </Button>
+        </Container>
+      </Box>
       {/* =================================================
           ALL PROJECTS
           PHONE = 1 COLUMN
