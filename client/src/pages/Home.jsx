@@ -84,42 +84,79 @@ const Home = () => {
      FETCH PROJECTS
   ===================================================== */
 
+  /* =====================================================
+   FETCH PROJECTS
+===================================================== */
+
   useEffect(() => {
-    let timeoutId = setTimeout(() => {
-      setProjectsLoading(false);
-      setProjectsTimedOut(true);
-    }, 30000);
+    let cancelled = false;
+    let timeoutId;
 
     const fetchProjects = async () => {
-      try {
-        const res = await api.get("/projects");
+      setProjectsLoading(true);
+      setProjectsTimedOut(false);
 
-        const projectData = Array.isArray(res.data) ? res.data : [];
+      const maxRetries = 3;
 
-        const sortedProjects = [...projectData].sort((a, b) => {
-          const aAvailable = Object.values(a.files || {}).some(
-            (url) => typeof url === "string" && url.trim() !== "",
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          const res = await api.get("/projects", {
+            timeout: 15000,
+          });
+
+          if (cancelled) return;
+
+          const projectData = Array.isArray(res.data) ? res.data : [];
+
+          const sortedProjects = [...projectData].sort((a, b) => {
+            const aAvailable = Object.values(a.files || {}).some(
+              (url) => typeof url === "string" && url.trim() !== "",
+            );
+
+            const bAvailable = Object.values(b.files || {}).some(
+              (url) => typeof url === "string" && url.trim() !== "",
+            );
+
+            return Number(bAvailable) - Number(aAvailable);
+          });
+
+          setProjects(sortedProjects);
+          setProjectsLoading(false);
+          setProjectsTimedOut(false);
+
+          return;
+        } catch (error) {
+          console.error(
+            `Projects request failed (attempt ${attempt}/${maxRetries}):`,
+            error,
           );
 
-          const bAvailable = Object.values(b.files || {}).some(
-            (url) => typeof url === "string" && url.trim() !== "",
-          );
+          if (attempt < maxRetries) {
+            await new Promise((resolve) => setTimeout(resolve, attempt * 1500));
+          }
+        }
+      }
 
-          return Number(bAvailable) - Number(aAvailable);
-        });
-
-        setProjects(sortedProjects);
-      } catch (error) {
-        console.error("Projects error:", error);
-      } finally {
-        clearTimeout(timeoutId);
+      if (!cancelled) {
+        setProjects([]);
         setProjectsLoading(false);
+        setProjectsTimedOut(true);
       }
     };
 
+    timeoutId = setTimeout(() => {
+      if (!cancelled) {
+        setProjectsLoading(false);
+        setProjectsTimedOut(true);
+      }
+    }, 30000);
+
     fetchProjects();
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   /* =====================================================
@@ -570,525 +607,497 @@ const Home = () => {
         </Container>
       </Box>
 
-    {/* =================================================
+      {/* =================================================
     EXPLORE PROJECTS
     FILTER + AUTO SMOOTH SCROLL
 ================================================= */}
 
-<Box
-  sx={{
-    py: {
-      xs: 4,
-      sm: 5,
-      md: 6,
-    },
-    background: "#020617",
-    color: "#fff",
-    overflow: "hidden",
-    width: "100%",
-  }}
->
-  {/* ================= HEADER ================= */}
-
-  <Container
-    maxWidth="lg"
-    sx={{
-      px: {
-        xs: 2,
-        sm: 3,
-        md: 0,
-      },
-    }}
-  >
-    <MotionBox
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
-    >
-      <Typography
-        component="h2"
-        fontWeight={900}
+      <Box
         sx={{
-          fontSize: {
-            xs: "1.35rem",
-            sm: "1.8rem",
-            md: "2.15rem",
+          py: {
+            xs: 4,
+            sm: 5,
+            md: 6,
           },
-          lineHeight: 1.2,
-          letterSpacing: "-.5px",
+          background: "#020617",
+          color: "#fff",
+          overflow: "hidden",
+          width: "100%",
         }}
       >
-        Explore Projects
-      </Typography>
+        {/* ================= HEADER ================= */}
 
-      <Typography
-        sx={{
-          mt: 0.5,
-          color: "#94a3b8",
-          fontSize: {
-            xs: ".72rem",
-            sm: ".85rem",
-            md: ".9rem",
-          },
-        }}
-      >
-        Filter by category to find perfect projects for your submission.
-      </Typography>
-    </MotionBox>
+        <Container
+          maxWidth="lg"
+          sx={{
+            px: {
+              xs: 2,
+              sm: 3,
+              md: 0,
+            },
+          }}
+        >
+          <MotionBox
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <Typography
+              component="h2"
+              fontWeight={900}
+              sx={{
+                fontSize: {
+                  xs: "1.35rem",
+                  sm: "1.8rem",
+                  md: "2.15rem",
+                },
+                lineHeight: 1.2,
+                letterSpacing: "-.5px",
+              }}
+            >
+              Explore Projects
+            </Typography>
 
-    {/* ================= CATEGORY TABS ================= */}
+            <Typography
+              sx={{
+                mt: 0.5,
+                color: "#94a3b8",
+                fontSize: {
+                  xs: ".72rem",
+                  sm: ".85rem",
+                  md: ".9rem",
+                },
+              }}
+            >
+              Filter by category to find perfect projects for your submission.
+            </Typography>
+          </MotionBox>
 
-    <Box
-      sx={{
-        mt: 2.2,
-        mb: 3,
-        overflowX: "auto",
-        "&::-webkit-scrollbar": {
-          display: "none",
-        },
-        scrollbarWidth: "none",
-      }}
-    >
-      <Stack
-        direction="row"
-        sx={{
-          width: "fit-content",
-          borderBottom: "1px solid rgba(148,163,184,.12)",
-        }}
-      >
-        {[
-          {
-            label: "ALL",
-            value: "all",
-          },
-          {
-            label: "FRONTEND",
-            value: "frontend",
-          },
-          {
-            label: "MERN FULL STACK",
-            value: "mern",
-          },
-        ].map((tab) => {
-          const active =
-            featuredCategory === tab.value;
+          {/* ================= CATEGORY TABS ================= */}
+
+          <Box
+            sx={{
+              mt: 2.2,
+              mb: 3,
+              overflowX: "auto",
+              "&::-webkit-scrollbar": {
+                display: "none",
+              },
+              scrollbarWidth: "none",
+            }}
+          >
+            <Stack
+              direction="row"
+              sx={{
+                width: "fit-content",
+                borderBottom: "1px solid rgba(148,163,184,.12)",
+              }}
+            >
+              {[
+                {
+                  label: "ALL",
+                  value: "all",
+                },
+                {
+                  label: "FRONTEND",
+                  value: "frontend",
+                },
+                {
+                  label: "MERN FULL STACK",
+                  value: "mern",
+                },
+              ].map((tab) => {
+                const active = featuredCategory === tab.value;
+
+                return (
+                  <Box
+                    key={tab.value}
+                    onClick={() => setFeaturedCategory(tab.value)}
+                    sx={{
+                      position: "relative",
+
+                      px: {
+                        xs: 1.8,
+                        sm: 2.7,
+                        md: 3.2,
+                      },
+
+                      py: {
+                        xs: 1.1,
+                        sm: 1.4,
+                      },
+
+                      cursor: "pointer",
+
+                      color: active ? "#6366f1" : "#94a3b8",
+
+                      fontSize: {
+                        xs: ".68rem",
+                        sm: ".8rem",
+                        md: ".85rem",
+                      },
+
+                      fontWeight: 700,
+
+                      whiteSpace: "nowrap",
+
+                      transition: "color .25s ease",
+
+                      "&:hover": {
+                        color: "#fff",
+                      },
+
+                      "&::after": {
+                        content: '""',
+                        position: "absolute",
+
+                        left: 0,
+                        right: 0,
+                        bottom: -1,
+
+                        height: 2,
+
+                        borderRadius: "3px 3px 0 0",
+
+                        background: "linear-gradient(90deg,#6366f1,#818cf8)",
+
+                        transform: active ? "scaleX(1)" : "scaleX(0)",
+
+                        transition: "transform .25s ease",
+                      },
+                    }}
+                  >
+                    {tab.label}
+                  </Box>
+                );
+              })}
+            </Stack>
+          </Box>
+        </Container>
+
+        {/* ================= PROJECT MARQUEE ================= */}
+
+        {(() => {
+          const filteredProjects =
+            featuredCategory === "all"
+              ? projects
+              : projects.filter((project) => {
+                  const projectCategory = String(project.category || "")
+                    .trim()
+                    .toLowerCase();
+
+                  return projectCategory === featuredCategory.toLowerCase();
+                });
+
+          if (projectsLoading) {
+            return (
+              <Box
+                sx={{
+                  py: 5,
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <CircularProgress
+                  size={27}
+                  sx={{
+                    color: "#6366f1",
+                  }}
+                />
+              </Box>
+            );
+          }
+
+          if (filteredProjects.length === 0) {
+            return (
+              <Box
+                sx={{
+                  mx: {
+                    xs: 2,
+                    sm: 3,
+                    md: 0,
+                  },
+
+                  py: 4,
+
+                  textAlign: "center",
+
+                  borderRadius: 3,
+
+                  border: "1px solid rgba(148,163,184,.15)",
+
+                  background: "rgba(15,23,42,.55)",
+                }}
+              >
+                <Typography
+                  fontWeight={800}
+                  sx={{
+                    fontSize: ".9rem",
+                    color: "#e2e8f0",
+                  }}
+                >
+                  No projects found
+                </Typography>
+
+                <Typography
+                  sx={{
+                    mt: 0.5,
+                    color: "#64748b",
+                    fontSize: ".72rem",
+                  }}
+                >
+                  No projects are available in this category yet.
+                </Typography>
+              </Box>
+            );
+          }
 
           return (
             <Box
-              key={tab.value}
-              onClick={() =>
-                setFeaturedCategory(tab.value)
-              }
               sx={{
+                width: "100%",
+                overflow: "hidden",
                 position: "relative",
 
-                px: {
-                  xs: 1.8,
-                  sm: 2.7,
-                  md: 3.2,
-                },
+                /* Mobile fade */
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  zIndex: 5,
 
-                py: {
-                  xs: 1.1,
-                  sm: 1.4,
-                },
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
 
-                cursor: "pointer",
+                  width: {
+                    xs: 6,
+                    sm: 25,
+                    md: 60,
+                  },
 
-                color: active
-                  ? "#6366f1"
-                  : "#94a3b8",
+                  background: "linear-gradient(90deg,#020617,transparent)",
 
-                fontSize: {
-                  xs: ".68rem",
-                  sm: ".8rem",
-                  md: ".85rem",
-                },
-
-                fontWeight: 700,
-
-                whiteSpace: "nowrap",
-
-                transition: "color .25s ease",
-
-                "&:hover": {
-                  color: "#fff",
+                  pointerEvents: "none",
                 },
 
                 "&::after": {
                   content: '""',
                   position: "absolute",
+                  zIndex: 5,
 
-                  left: 0,
                   right: 0,
-                  bottom: -1,
+                  top: 0,
+                  bottom: 0,
 
-                  height: 2,
+                  width: {
+                    xs: 6,
+                    sm: 25,
+                    md: 60,
+                  },
 
-                  borderRadius: "3px 3px 0 0",
+                  background: "linear-gradient(270deg,#020617,transparent)",
 
-                  background:
-                    "linear-gradient(90deg,#6366f1,#818cf8)",
-
-                  transform: active
-                    ? "scaleX(1)"
-                    : "scaleX(0)",
-
-                  transition:
-                    "transform .25s ease",
+                  pointerEvents: "none",
                 },
               }}
             >
-              {tab.label}
+              <MotionBox
+                key={featuredCategory}
+                initial={{
+                  opacity: 0,
+                }}
+                animate={{
+                  opacity: 1,
+                }}
+                transition={{
+                  duration: 0.3,
+                }}
+              >
+                <MotionBox
+                  animate={{
+                    x: ["0%", "-50%"],
+                  }}
+                  transition={{
+                    duration:
+                      filteredProjects.length <= 2
+                        ? 20
+                        : filteredProjects.length <= 4
+                          ? 28
+                          : 36,
+
+                    ease: "linear",
+
+                    repeat: Infinity,
+
+                    repeatType: "loop",
+                  }}
+                  sx={{
+                    display: "flex",
+
+                    width: "max-content",
+
+                    gap: {
+                      xs: 1.5,
+                      sm: 2,
+                      md: 2.5,
+                    },
+
+                    /*
+                     * MOBILE:
+                     * One card fills almost the entire phone.
+                     */
+                    px: {
+                      xs: 2,
+                      sm: 4,
+                      md: 7,
+                    },
+
+                    willChange: "transform",
+                  }}
+                >
+                  {/* ================= FIRST SET ================= */}
+
+                  {filteredProjects.map((project, index) => (
+                    <MotionBox
+                      key={`home-project-${project._id}-${index}`}
+                      whileHover={{
+                        y: -5,
+                        scale: 1.01,
+                      }}
+                      sx={{
+                        width: {
+                          xs: "calc(100vw - 32px)",
+                          sm: 295,
+                          md: 335,
+                        },
+
+                        maxWidth: {
+                          xs: "calc(100vw - 32px)",
+                          sm: 295,
+                          md: 335,
+                        },
+
+                        flexShrink: 0,
+
+                        /*
+                         * Make ProjectCard fill wrapper
+                         */
+                        "& > *": {
+                          width: "100%",
+                          maxWidth: "100%",
+                        },
+                      }}
+                    >
+                      <ProjectCard project={project} />
+                    </MotionBox>
+                  ))}
+
+                  {/* ================= DUPLICATE SET ================= */}
+
+                  {filteredProjects.map((project, index) => (
+                    <MotionBox
+                      key={`home-project-copy-${project._id}-${index}`}
+                      whileHover={{
+                        y: -5,
+                        scale: 1.01,
+                      }}
+                      sx={{
+                        width: {
+                          xs: "calc(100vw - 32px)",
+                          sm: 295,
+                          md: 335,
+                        },
+
+                        maxWidth: {
+                          xs: "calc(100vw - 32px)",
+                          sm: 295,
+                          md: 335,
+                        },
+
+                        flexShrink: 0,
+
+                        "& > *": {
+                          width: "100%",
+                          maxWidth: "100%",
+                        },
+                      }}
+                    >
+                      <ProjectCard project={project} />
+                    </MotionBox>
+                  ))}
+                </MotionBox>
+              </MotionBox>
             </Box>
           );
-        })}
-      </Stack>
-    </Box>
-  </Container>
+        })()}
 
-  {/* ================= PROJECT MARQUEE ================= */}
+        {/* ================= VIEW ALL ================= */}
 
-  {(() => {
-    const filteredProjects =
-      featuredCategory === "all"
-        ? projects
-        : projects.filter((project) => {
-            const projectCategory = String(
-              project.category || ""
-            )
-              .trim()
-              .toLowerCase();
-
-            return (
-              projectCategory ===
-              featuredCategory.toLowerCase()
-            );
-          });
-
-    if (projectsLoading) {
-      return (
-        <Box
+        <Container
+          maxWidth="lg"
           sx={{
-            py: 5,
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          <CircularProgress
-            size={27}
-            sx={{
-              color: "#6366f1",
-            }}
-          />
-        </Box>
-      );
-    }
+            mt: {
+              xs: 2.5,
+              sm: 3,
+            },
 
-    if (filteredProjects.length === 0) {
-      return (
-        <Box
-          sx={{
-            mx: {
+            textAlign: "center",
+
+            px: {
               xs: 2,
               sm: 3,
               md: 0,
             },
-
-            py: 4,
-
-            textAlign: "center",
-
-            borderRadius: 3,
-
-            border:
-              "1px solid rgba(148,163,184,.15)",
-
-            background:
-              "rgba(15,23,42,.55)",
           }}
         >
-          <Typography
-            fontWeight={800}
+          <Button
+            component={Link}
+            to="/projects"
+            variant="outlined"
+            endIcon={<ArrowForwardIcon />}
             sx={{
-              fontSize: ".9rem",
-              color: "#e2e8f0",
-            }}
-          >
-            No projects found
-          </Typography>
+              borderRadius: 999,
 
-          <Typography
-            sx={{
-              mt: 0.5,
-              color: "#64748b",
-              fontSize: ".72rem",
-            }}
-          >
-            No projects are available in this category yet.
-          </Typography>
-        </Box>
-      );
-    }
-
-    return (
-      <Box
-        sx={{
-          width: "100%",
-          overflow: "hidden",
-          position: "relative",
-
-          /* Mobile fade */
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            zIndex: 5,
-
-            left: 0,
-            top: 0,
-            bottom: 0,
-
-            width: {
-              xs: 6,
-              sm: 25,
-              md: 60,
-            },
-
-            background:
-              "linear-gradient(90deg,#020617,transparent)",
-
-            pointerEvents: "none",
-          },
-
-          "&::after": {
-            content: '""',
-            position: "absolute",
-            zIndex: 5,
-
-            right: 0,
-            top: 0,
-            bottom: 0,
-
-            width: {
-              xs: 6,
-              sm: 25,
-              md: 60,
-            },
-
-            background:
-              "linear-gradient(270deg,#020617,transparent)",
-
-            pointerEvents: "none",
-          },
-        }}
-      >
-        <MotionBox
-          key={featuredCategory}
-          initial={{
-            opacity: 0,
-          }}
-          animate={{
-            opacity: 1,
-          }}
-          transition={{
-            duration: 0.3,
-          }}
-        >
-          <MotionBox
-            animate={{
-              x: ["0%", "-50%"],
-            }}
-            transition={{
-              duration:
-                filteredProjects.length <= 2
-                  ? 20
-                  : filteredProjects.length <= 4
-                  ? 28
-                  : 36,
-
-              ease: "linear",
-
-              repeat: Infinity,
-
-              repeatType: "loop",
-            }}
-            sx={{
-              display: "flex",
-
-              width: "max-content",
-
-              gap: {
-                xs: 1.5,
-                sm: 2,
-                md: 2.5,
-              },
-
-              /*
-               * MOBILE:
-               * One card fills almost the entire phone.
-               */
               px: {
-                xs: 2,
-                sm: 4,
-                md: 7,
+                xs: 2.2,
+                sm: 2.8,
               },
 
-              willChange: "transform",
+              py: {
+                xs: 0.7,
+                sm: 0.9,
+              },
+
+              minHeight: {
+                xs: 34,
+                sm: 40,
+              },
+
+              fontSize: {
+                xs: ".7rem",
+                sm: ".8rem",
+              },
+
+              textTransform: "none",
+
+              fontWeight: 800,
+
+              color: "#a5b4fc",
+
+              borderColor: "rgba(129,140,248,.4)",
+
+              "&:hover": {
+                borderColor: "#6366f1",
+
+                background: "rgba(99,102,241,.08)",
+              },
             }}
           >
-            {/* ================= FIRST SET ================= */}
-
-            {filteredProjects.map(
-              (project, index) => (
-                <MotionBox
-                  key={`home-project-${project._id}-${index}`}
-                  whileHover={{
-                    y: -5,
-                    scale: 1.01,
-                  }}
-                  sx={{
-                    width: {
-                      xs: "calc(100vw - 32px)",
-                      sm: 295,
-                      md: 335,
-                    },
-
-                    maxWidth: {
-                      xs: "calc(100vw - 32px)",
-                      sm: 295,
-                      md: 335,
-                    },
-
-                    flexShrink: 0,
-
-                    /*
-                     * Make ProjectCard fill wrapper
-                     */
-                    "& > *": {
-                      width: "100%",
-                      maxWidth: "100%",
-                    },
-                  }}
-                >
-                  <ProjectCard
-                    project={project}
-                  />
-                </MotionBox>
-              )
-            )}
-
-            {/* ================= DUPLICATE SET ================= */}
-
-            {filteredProjects.map(
-              (project, index) => (
-                <MotionBox
-                  key={`home-project-copy-${project._id}-${index}`}
-                  whileHover={{
-                    y: -5,
-                    scale: 1.01,
-                  }}
-                  sx={{
-                    width: {
-                      xs: "calc(100vw - 32px)",
-                      sm: 295,
-                      md: 335,
-                    },
-
-                    maxWidth: {
-                      xs: "calc(100vw - 32px)",
-                      sm: 295,
-                      md: 335,
-                    },
-
-                    flexShrink: 0,
-
-                    "& > *": {
-                      width: "100%",
-                      maxWidth: "100%",
-                    },
-                  }}
-                >
-                  <ProjectCard
-                    project={project}
-                  />
-                </MotionBox>
-              )
-            )}
-          </MotionBox>
-        </MotionBox>
+            View All Projects
+          </Button>
+        </Container>
       </Box>
-    );
-  })()}
-
-  {/* ================= VIEW ALL ================= */}
-
-  <Container
-    maxWidth="lg"
-    sx={{
-      mt: {
-        xs: 2.5,
-        sm: 3,
-      },
-
-      textAlign: "center",
-
-      px: {
-        xs: 2,
-        sm: 3,
-        md: 0,
-      },
-    }}
-  >
-    <Button
-      component={Link}
-      to="/projects"
-      variant="outlined"
-      endIcon={<ArrowForwardIcon />}
-      sx={{
-        borderRadius: 999,
-
-        px: {
-          xs: 2.2,
-          sm: 2.8,
-        },
-
-        py: {
-          xs: 0.7,
-          sm: 0.9,
-        },
-
-        minHeight: {
-          xs: 34,
-          sm: 40,
-        },
-
-        fontSize: {
-          xs: ".7rem",
-          sm: ".8rem",
-        },
-
-        textTransform: "none",
-
-        fontWeight: 800,
-
-        color: "#a5b4fc",
-
-        borderColor:
-          "rgba(129,140,248,.4)",
-
-        "&:hover": {
-          borderColor: "#6366f1",
-
-          background:
-            "rgba(99,102,241,.08)",
-        },
-      }}
-    >
-      View All Projects
-    </Button>
-  </Container>
-</Box>
       {/* =================================================
           ALL PROJECTS
           PHONE = 1 COLUMN
