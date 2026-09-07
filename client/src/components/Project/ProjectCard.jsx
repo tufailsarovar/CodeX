@@ -15,15 +15,14 @@ import { useNavigate } from "react-router-dom";
 const ProjectCard = ({ project }) => {
   const navigate = useNavigate();
 
-  // ✅ check if ANY file exists
   const isAnyFileAvailable = () => {
     const files = project.files || {};
+
     return Object.values(files).some(
       (url) => typeof url === "string" && url.trim() !== "",
     );
   };
 
-  // ✅ whole / bundle price (unchanged logic)
   const wholePrice =
     project.price ||
     (project.itemPrices
@@ -32,46 +31,116 @@ const ProjectCard = ({ project }) => {
         (project.itemPrices.documentation || 0)
       : 0);
 
+  const available = isAnyFileAvailable();
+
   return (
     <Card
       sx={{
-        bgcolor: "rgba(15,23,42,0.9)",
+        bgcolor: "rgba(15,23,42,0.95)",
+        width: "100%",
         height: "100%",
+        minWidth: 0,
+
         display: "flex",
         flexDirection: "column",
-        borderRadius: 3,
+
+        borderRadius: {
+          xs: 2,
+          sm: 3,
+        },
+
         overflow: "hidden",
+
         transition: "transform 0.2s ease, box-shadow 0.2s ease",
+
         "&:hover": {
           transform: "translateY(-4px)",
           boxShadow: "0 20px 40px rgba(15,23,42,0.7)",
         },
       }}
     >
-      {project.videoUrl && (
-        <Box sx={{ overflow: "hidden" }}>
-          <video
-            src={project.videoUrl}
-            autoPlay
-            muted
-            loop
-            playsInline
-            style={{
+      {/* ================= PROJECT IMAGE ================= */}
+
+      {project.screenshotUrl && (
+        <Box
+          sx={{
+            width: "100%",
+            overflow: "hidden",
+            flexShrink: 0,
+          }}
+        >
+          <Box
+            component="img"
+            src={project.screenshotUrl}
+            alt={project.title}
+            loading="lazy"
+            sx={{
               width: "100%",
-              height: "220px",
+
+              height: {
+                xs: 105,
+                sm: 160,
+                md: 220,
+              },
+
               objectFit: "cover",
+
               display: "block",
+
+              transition: "transform .3s ease",
+
+              "&:hover": {
+                transform: "scale(1.03)",
+              },
             }}
           />
         </Box>
       )}
+      {/* ================= CONTENT ================= */}
 
-      <CardContent sx={{ flexGrow: 1 }}>
+      <CardContent
+        sx={{
+          flexGrow: 1,
+          minWidth: 0,
+
+          p: {
+            xs: 1.1,
+            sm: 1.8,
+            md: 2,
+          },
+
+          "&:last-child": {
+            pb: {
+              xs: 1.1,
+              sm: 1.8,
+              md: 2,
+            },
+          },
+        }}
+      >
+        {/* CATEGORY */}
+
         <Typography
-          variant="subtitle2"
           color="secondary.main"
-          fontWeight={600}
-          gutterBottom
+          fontWeight={700}
+          sx={{
+            fontSize: {
+              xs: "9px",
+              sm: "11px",
+              md: "12px",
+            },
+
+            mb: {
+              xs: 0.35,
+              sm: 0.6,
+            },
+
+            textTransform: "uppercase",
+
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
         >
           {project.category === "mern"
             ? "MERN Full Stack"
@@ -80,59 +149,241 @@ const ProjectCard = ({ project }) => {
               : "Project"}
         </Typography>
 
-        <Typography variant="h6" gutterBottom>
+        {/* TITLE */}
+
+        <Typography
+          fontWeight={800}
+          sx={{
+            fontSize: {
+              xs: "12px",
+              sm: "15px",
+              md: "17px",
+            },
+
+            lineHeight: 1.25,
+
+            mb: {
+              xs: 0.6,
+              sm: 0.8,
+            },
+
+            display: "-webkit-box",
+            WebkitBoxOrient: "vertical",
+            WebkitLineClamp: {
+              xs: 2,
+              sm: 2,
+            },
+
+            overflow: "hidden",
+
+            wordBreak: "break-word",
+          }}
+        >
           {project.title}
         </Typography>
 
+        {/* DESCRIPTION */}
+
         <Typography
-          variant="body2"
           color="text.secondary"
-          sx={{ mb: 1.5 }}
-          noWrap
+          sx={{
+            fontSize: {
+              xs: "9px",
+              sm: "11px",
+              md: "13px",
+            },
+
+            lineHeight: 1.45,
+
+            mb: {
+              xs: 0.8,
+              sm: 1.2,
+            },
+
+            display: "-webkit-box",
+            WebkitBoxOrient: "vertical",
+            WebkitLineClamp: {
+              xs: 2,
+              sm: 2,
+            },
+
+            overflow: "hidden",
+
+            minHeight: {
+              xs: "26px",
+              sm: "32px",
+            },
+          }}
         >
           {project.description}
         </Typography>
 
-        <Stack direction="row" spacing={0.5} flexWrap="wrap" sx={{ mb: 1 }}>
-          {project.techStack?.slice(0, 4).map((tech) => (
-            <Chip key={tech} label={tech} size="small" variant="outlined" />
+        {/* TECH STACK */}
+
+        <Stack
+          direction="row"
+          spacing={0.4}
+          flexWrap="wrap"
+          sx={{
+            mb: {
+              xs: 0.8,
+              sm: 1.2,
+            },
+
+            maxHeight: {
+              xs: 25,
+              sm: 32,
+            },
+
+            overflow: "hidden",
+          }}
+        >
+          {project.techStack?.slice(0, 3).map((tech) => (
+            <Chip
+              key={tech}
+              label={tech}
+              size="small"
+              variant="outlined"
+              sx={{
+                height: {
+                  xs: 18,
+                  sm: 23,
+                },
+
+                fontSize: {
+                  xs: "8px",
+                  sm: "10px",
+                },
+
+                "& .MuiChip-label": {
+                  px: {
+                    xs: 0.7,
+                    sm: 1,
+                  },
+                },
+              }}
+            />
           ))}
         </Stack>
 
-        {/* ✅ PRICE + AVAILABILITY (ONLY THIS SHOWN) */}
-        <Typography variant="subtitle1" fontWeight={700}>
+        {/* ================= PRICE ================= */}
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: {
+              xs: 0.5,
+              sm: 0.8,
+            },
+          }}
+        >
           {project.originalPrice && (
-            <span
-              style={{
+            <Typography
+              component="span"
+              sx={{
                 textDecoration: "line-through",
-                marginRight: "8px",
-                opacity: 0.7,
-                fontSize: "14px",
+                opacity: 0.6,
+
+                fontSize: {
+                  xs: "8px",
+                  sm: "11px",
+                },
               }}
             >
               ₹{project.originalPrice}
-            </span>
+            </Typography>
           )}
-          ₹{wholePrice}
-          <span
-            style={{
-              marginLeft: "10px",
-              fontSize: "13px",
-              fontWeight: 600,
-              color: isAnyFileAvailable() ? "#22c55e" : "#facc15",
+
+          <Typography
+            fontWeight={900}
+            sx={{
+              fontSize: {
+                xs: "12px",
+                sm: "16px",
+              },
             }}
           >
-            {isAnyFileAvailable() ? "Available" : "Coming soon"}
-          </span>
-        </Typography>
+            ₹{wholePrice}
+          </Typography>
+
+          <Typography
+            component="span"
+            fontWeight={700}
+            sx={{
+              fontSize: {
+                xs: "8px",
+                sm: "10px",
+              },
+
+              color: available ? "#22c55e" : "#facc15",
+            }}
+          >
+            {available ? "Available" : "Coming soon"}
+          </Typography>
+        </Box>
       </CardContent>
 
-      <CardActions sx={{ px: 2, pb: 2, gap: 1 }}>
+      {/* ================= ACTIONS ================= */}
+
+      <CardActions
+        sx={{
+          px: {
+            xs: 1.1,
+            sm: 1.8,
+            md: 2,
+          },
+
+          pb: {
+            xs: 1.1,
+            sm: 1.8,
+            md: 2,
+          },
+
+          pt: 0,
+
+          gap: {
+            xs: 0.6,
+            sm: 1,
+          },
+
+          flexWrap: "nowrap",
+        }}
+      >
         {project.livePreviewUrl && (
           <Button
             size="small"
             variant="outlined"
             onClick={() => window.open(project.livePreviewUrl, "_blank")}
+            sx={{
+              minWidth: 0,
+              flex: 1,
+
+              px: {
+                xs: 0.5,
+                sm: 1.2,
+              },
+
+              minHeight: {
+                xs: 28,
+                sm: 34,
+              },
+
+              borderRadius: {
+                xs: 1.5,
+                sm: 2.5,
+              },
+
+              fontSize: {
+                xs: "8px",
+                sm: "11px",
+              },
+
+              textTransform: "none",
+
+              whiteSpace: "nowrap",
+            }}
           >
             Live Preview
           </Button>
@@ -142,6 +393,36 @@ const ProjectCard = ({ project }) => {
           size="small"
           variant="contained"
           onClick={() => navigate(`/projects/${project._id}`)}
+          sx={{
+            minWidth: 0,
+            flex: 1,
+
+            px: {
+              xs: 0.5,
+              sm: 1.2,
+            },
+
+            minHeight: {
+              xs: 28,
+              sm: 34,
+            },
+
+            borderRadius: {
+              xs: 1.5,
+              sm: 2.5,
+            },
+
+            fontSize: {
+              xs: "8px",
+              sm: "11px",
+            },
+
+            fontWeight: 800,
+
+            textTransform: "none",
+
+            whiteSpace: "nowrap",
+          }}
         >
           View Details
         </Button>

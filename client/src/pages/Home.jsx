@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import {
   Box,
@@ -39,6 +39,24 @@ const Home = () => {
 
   const [projects, setProjects] = useState([]);
   const [featuredCategory, setFeaturedCategory] = useState("all");
+
+  /* =====================================================
+     EXPLORE PROJECTS INTERACTION REFS
+  ===================================================== */
+
+  const exploreTrackRef = useRef(null);
+  const explorePositionRef = useRef(0);
+  const exploreDraggingRef = useRef(false);
+  const explorePausedRef = useRef(false);
+  const exploreDidDragRef = useRef(false);
+  const explorePointerIdRef = useRef(null);
+  const explorePointerRef = useRef({
+    startX: 0,
+    startPosition: 0,
+  });
+  const exploreResumeTimerRef = useRef(null);
+
+  const [exploreIsDragging, setExploreIsDragging] = useState(false);
 
   const [freeProjects, setFreeProjects] = useState([]);
 
@@ -178,6 +196,52 @@ const Home = () => {
 
     return () => clearInterval(interval);
   }, [projects]);
+
+  /* =====================================================
+     EXPLORE PROJECTS AUTO SCROLL
+     AUTO SCROLL + MOUSE DRAG + TOUCH SWIPE
+     HOVER PAUSE + SMOOTH RESUME
+  ===================================================== */
+
+  useEffect(() => {
+    const track = exploreTrackRef.current;
+
+    if (!track) return;
+
+    let frameId;
+
+    explorePositionRef.current = 0;
+    track.style.transform = "translate3d(0, 0, 0)";
+
+    const speed = 0.55;
+
+    const animate = () => {
+      if (!exploreDraggingRef.current && !explorePausedRef.current) {
+        explorePositionRef.current -= speed;
+
+        const halfWidth = track.scrollWidth / 2;
+
+        if (halfWidth > 0 && explorePositionRef.current <= -halfWidth) {
+          explorePositionRef.current += halfWidth;
+        }
+
+        track.style.transform =
+          `translate3d(${explorePositionRef.current}px, 0, 0)`;
+      }
+
+      frameId = requestAnimationFrame(animate);
+    };
+
+    frameId = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(frameId);
+
+      if (exploreResumeTimerRef.current) {
+        clearTimeout(exploreResumeTimerRef.current);
+      }
+    };
+  }, [featuredCategory, projects]);
 
   /* =====================================================
      HELPERS
@@ -915,45 +979,142 @@ const Home = () => {
                 }}
               >
                 <MotionBox
-                  animate={{
-                    x: ["0%", "-50%"],
-                  }}
-                  transition={{
-                    duration:
-                      filteredProjects.length <= 2
-                        ? 20
-                        : filteredProjects.length <= 4
-                          ? 28
-                          : 36,
-
-                    ease: "linear",
-
-                    repeat: Infinity,
-
-                    repeatType: "loop",
-                  }}
+                  ref={exploreTrackRef}
                   sx={{
                     display: "flex",
-
                     width: "max-content",
-
                     gap: {
-                      xs: 1.5,
+                      xs: 1,
                       sm: 2,
                       md: 2.5,
                     },
-
-                    /*
-                     * MOBILE:
-                     * One card fills almost the entire phone.
-                     */
                     px: {
-                      xs: 2,
+                      xs: 1.5,
                       sm: 4,
                       md: 7,
                     },
-
                     willChange: "transform",
+                    cursor: exploreIsDragging ? "grabbing" : "grab",
+                    userSelect: "none",
+                    touchAction: "pan-y",
+                    WebkitUserSelect: "none",
+                    WebkitTouchCallout: "none",
+                  }}
+                  onMouseEnter={() => {
+                    explorePausedRef.current = true;
+                  }}
+                  onMouseLeave={() => {
+                    if (exploreDraggingRef.current) return;
+
+                    if (exploreResumeTimerRef.current) {
+                      clearTimeout(exploreResumeTimerRef.current);
+                    }
+
+                    exploreResumeTimerRef.current = setTimeout(() => {
+                      explorePausedRef.current = false;
+                    }, 250);
+                  }}
+                  onPointerDown={(event) => {
+                    exploreDraggingRef.current = true;
+                    explorePausedRef.current = true;
+                    exploreDidDragRef.current = false;
+                    explorePointerIdRef.current = event.pointerId;
+
+                    explorePointerRef.current = {
+                      startX: event.clientX,
+                      startPosition: explorePositionRef.current,
+                    };
+
+                    setExploreIsDragging(true);
+
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                  }}
+                  onPointerMove={(event) => {
+                    if (
+                      !exploreDraggingRef.current ||
+                      explorePointerIdRef.current !== event.pointerId
+                    ) {
+                      return;
+                    }
+
+                    const delta =
+                      event.clientX - explorePointerRef.current.startX;
+
+                    if (Math.abs(delta) > 5) {
+                      exploreDidDragRef.current = true;
+                    }
+
+                    const trackElement = event.currentTarget;
+                    const halfWidth = trackElement.scrollWidth / 2;
+
+                    let nextPosition =
+                      explorePointerRef.current.startPosition + delta;
+
+                    if (halfWidth > 0) {
+                      while (nextPosition <= -halfWidth) {
+                        nextPosition += halfWidth;
+                      }
+
+                      while (nextPosition > 0) {
+                        nextPosition -= halfWidth;
+                      }
+                    }
+
+                    explorePositionRef.current = nextPosition;
+
+                    trackElement.style.transform =
+                      `translate3d(${nextPosition}px, 0, 0)`;
+                  }}
+                  onPointerUp={(event) => {
+                    if (explorePointerIdRef.current !== event.pointerId) {
+                      return;
+                    }
+
+                    exploreDraggingRef.current = false;
+                    explorePointerIdRef.current = null;
+                    setExploreIsDragging(false);
+
+                    try {
+                      event.currentTarget.releasePointerCapture(event.pointerId);
+                    } catch {}
+
+                    if (exploreResumeTimerRef.current) {
+                      clearTimeout(exploreResumeTimerRef.current);
+                    }
+
+                    exploreResumeTimerRef.current = setTimeout(() => {
+                      explorePausedRef.current = false;
+                      exploreDidDragRef.current = false;
+                    }, 450);
+                  }}
+                  onPointerCancel={(event) => {
+                    if (explorePointerIdRef.current !== event.pointerId) {
+                      return;
+                    }
+
+                    exploreDraggingRef.current = false;
+                    explorePointerIdRef.current = null;
+                    setExploreIsDragging(false);
+
+                    try {
+                      event.currentTarget.releasePointerCapture(event.pointerId);
+                    } catch {}
+
+                    if (exploreResumeTimerRef.current) {
+                      clearTimeout(exploreResumeTimerRef.current);
+                    }
+
+                    exploreResumeTimerRef.current = setTimeout(() => {
+                      explorePausedRef.current = false;
+                      exploreDidDragRef.current = false;
+                    }, 450);
+                  }}
+                  onClickCapture={(event) => {
+                    if (exploreDidDragRef.current) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      exploreDidDragRef.current = false;
+                    }
                   }}
                 >
                   {/* ================= FIRST SET ================= */}
@@ -967,22 +1128,21 @@ const Home = () => {
                       }}
                       sx={{
                         width: {
-                          xs: "calc(100vw - 32px)",
+                          xs: "calc((100vw - 24px) / 2)",
                           sm: 295,
                           md: 335,
                         },
-
                         maxWidth: {
-                          xs: "calc(100vw - 32px)",
+                          xs: "calc((100vw - 24px) / 2)",
                           sm: 295,
                           md: 335,
                         },
-
+                        minWidth: {
+                          xs: "calc((100vw - 24px) / 2)",
+                          sm: 295,
+                          md: 335,
+                        },
                         flexShrink: 0,
-
-                        /*
-                         * Make ProjectCard fill wrapper
-                         */
                         "& > *": {
                           width: "100%",
                           maxWidth: "100%",
@@ -1004,19 +1164,21 @@ const Home = () => {
                       }}
                       sx={{
                         width: {
-                          xs: "calc(100vw - 32px)",
+                          xs: "calc((100vw - 24px) / 2)",
                           sm: 295,
                           md: 335,
                         },
-
                         maxWidth: {
-                          xs: "calc(100vw - 32px)",
+                          xs: "calc((100vw - 24px) / 2)",
                           sm: 295,
                           md: 335,
                         },
-
+                        minWidth: {
+                          xs: "calc((100vw - 24px) / 2)",
+                          sm: 295,
+                          md: 335,
+                        },
                         flexShrink: 0,
-
                         "& > *": {
                           width: "100%",
                           maxWidth: "100%",
@@ -1113,7 +1275,16 @@ const Home = () => {
           },
         }}
       >
-        <Container maxWidth="lg">
+        <Container
+          maxWidth="lg"
+          sx={{
+            px: {
+              xs: 1.5,
+              sm: 3,
+              md: 0,
+            },
+          }}
+        >
           <Box
             sx={{
               mb: 3,
@@ -1197,7 +1368,7 @@ const Home = () => {
               </Box>
             ) : (
               projects.slice(0, 6).map((project) => (
-                <Grid item xs={12} sm={6} md={4} key={project._id}>
+                <Grid item xs={6} sm={6} md={4} key={project._id}>
                   <ProjectCard project={project} />
                 </Grid>
               ))
@@ -1884,8 +2055,14 @@ const Home = () => {
                 <Paper
                   key={project._id}
                   sx={{
-                    minWidth: 288,
-                    maxWidth: 288,
+                    minWidth: {
+                      xs: "78vw",
+                      sm: 288,
+                    },
+                    maxWidth: {
+                      xs: "78vw",
+                      sm: 288,
+                    },
 
                     position: "relative",
 
