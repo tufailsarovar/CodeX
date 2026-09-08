@@ -237,8 +237,8 @@ const Footer = () => {
                 }}
               >
                 CodeX is a curated platform for high-quality academic and
-                full-stack development projects, complete with source code,
-                documentation and presentation files.
+                professional projects, complete with source code, documentation,
+                presentations, and other ready-to-use project resources.
               </Typography>
 
               <Stack
@@ -247,26 +247,24 @@ const Footer = () => {
                 flexWrap="wrap"
                 sx={{ mt: 1.8 }}
               >
-                {["MERN", "Frontend", "Source Code", "Documentation"].map(
-                  (item) => (
-                    <Chip
-                      key={item}
-                      label={item}
-                      size="small"
-                      sx={{
-                        height: 24,
-                        bgcolor: "rgba(99,102,241,.08)",
-                        color: "#94a3b8",
-                        border: "1px solid rgba(148,163,184,.14)",
-                        fontSize: {
-                          xs: "8px",
-                          sm: "9px",
-                        },
-                        fontWeight: 800,
-                      }}
-                    />
-                  ),
-                )}
+                {["Source Code", "Documentation", "PPT"].map((item) => (
+                  <Chip
+                    key={item}
+                    label={item}
+                    size="small"
+                    sx={{
+                      height: 24,
+                      bgcolor: "rgba(99,102,241,.08)",
+                      color: "#94a3b8",
+                      border: "1px solid rgba(148,163,184,.14)",
+                      fontSize: {
+                        xs: "8px",
+                        sm: "9px",
+                      },
+                      fontWeight: 800,
+                    }}
+                  />
+                ))}
               </Stack>
             </Grid>
 
@@ -451,6 +449,10 @@ const Footer = () => {
             </Typography>
 
             <Typography
+              component="a"
+              href="https://tufailsarovar.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
               sx={{
                 color: "#475569",
                 fontSize: {
@@ -458,21 +460,14 @@ const Footer = () => {
                   sm: ".65rem",
                 },
                 fontWeight: 600,
-              }}
-            >
-              CodeX · Tufail Sarovar
-            </Typography>
-
-            <Typography
-              sx={{
-                color: "#475569",
-                fontSize: {
-                  xs: ".55rem",
-                  sm: ".65rem",
+                textDecoration: "none",
+                transition: "color .2s ease",
+                "&:hover": {
+                  color: "#818cf8",
                 },
               }}
             >
-              Built with MERN Stack
+              CodeX · Tufail Sarovar
             </Typography>
 
             <IconButton

@@ -15,45 +15,50 @@ import SchoolIcon from "@mui/icons-material/School";
 import SecurityIcon from "@mui/icons-material/Security";
 import PaymentIcon from "@mui/icons-material/Payment";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
-import EmailIcon from "@mui/icons-material/Email";
 import StorageIcon from "@mui/icons-material/Storage";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import LayersIcon from "@mui/icons-material/Layers";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+
+import { motion } from "framer-motion";
+
+const MotionBox = motion(Box);
+const MotionPaper = motion(Paper);
 
 const About = () => {
   const features = [
     {
       icon: <CodeIcon />,
       title: "Ready-to-Use Projects",
-      text: "Complete academic projects with organized source code and practical implementation.",
+      text: "Explore practical projects with organized resources, implementation files and useful materials.",
     },
     {
       icon: <MenuBookIcon />,
-      title: "Documentation",
-      text: "Project documentation helps students understand installation, functionality and implementation.",
+      title: "Complete Resources",
+      text: "Access documentation, guides, presentations and supporting files in one convenient place.",
     },
     {
-      icon: <SchoolIcon />,
-      title: "Student Focused",
-      text: "Designed especially for college students working on academic and final-year projects.",
+      icon: <LayersIcon />,
+      title: "Multiple Categories",
+      text: "Discover projects across different technologies, development stacks, industries and use cases.",
     },
     {
       icon: <PaymentIcon />,
-      title: "Online Payments",
-      text: "Integrated payment flow allows users to securely purchase digital project bundles.",
+      title: "Secure Payments",
+      text: "Purchase digital resources through a secure, simple and convenient online payment experience.",
     },
     {
       icon: <CloudDownloadIcon />,
       title: "Digital Delivery",
-      text: "Purchased project files are delivered digitally without any physical shipping.",
+      text: "Access purchased digital resources without physical shipping or unnecessary waiting.",
     },
     {
       icon: <SecurityIcon />,
-      title: "Secure Access",
-      text: "Authentication and protected access help keep purchased project resources secure.",
+      title: "Protected Access",
+      text: "Authentication and protected access help keep your account and purchased resources secure.",
     },
   ];
 
@@ -66,6 +71,38 @@ const About = () => {
     "Razorpay",
     "REST API",
     "JWT Authentication",
+  ];
+
+  const steps = [
+    {
+      number: "01",
+      title: "Explore",
+      text: "Browse projects and resources by category, technology and available options.",
+    },
+    {
+      number: "02",
+      title: "Review",
+      text: "Check project details, technologies, available resources and pricing before choosing.",
+    },
+    {
+      number: "03",
+      title: "Purchase",
+      text: "Complete your purchase through the available secure online payment process.",
+    },
+    {
+      number: "04",
+      title: "Access",
+      text: "Receive your digital resources and access the files included with your purchase.",
+    },
+  ];
+
+  const getItems = [
+    "Ready-to-use project resources",
+    "Complete source code",
+    "Documentation and guides",
+    "Presentation / PPT resources",
+    "Setup and usage information",
+    "Secure digital delivery",
   ];
 
   return (
@@ -83,7 +120,10 @@ const About = () => {
         overflow: "hidden",
       }}
     >
-      {/* Background */}
+      {/* =====================================================
+          BACKGROUND
+      ===================================================== */}
+
       <Box
         sx={{
           position: "absolute",
@@ -91,6 +131,54 @@ const About = () => {
           pointerEvents: "none",
           background:
             "radial-gradient(circle at 8% 5%, rgba(99,102,241,.16), transparent 30%), radial-gradient(circle at 92% 12%, rgba(249,115,22,.09), transparent 28%)",
+        }}
+      />
+
+      <MotionBox
+        animate={{
+          x: [0, 30, 0],
+          y: [0, 20, 0],
+          scale: [1, 1.08, 1],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        sx={{
+          position: "absolute",
+          width: 280,
+          height: 280,
+          borderRadius: "50%",
+          background: "rgba(99,102,241,.08)",
+          filter: "blur(80px)",
+          top: 180,
+          left: -120,
+          pointerEvents: "none",
+        }}
+      />
+
+      <MotionBox
+        animate={{
+          x: [0, -25, 0],
+          y: [0, -20, 0],
+          scale: [1, 1.06, 1],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        sx={{
+          position: "absolute",
+          width: 320,
+          height: 320,
+          borderRadius: "50%",
+          background: "rgba(37,99,235,.07)",
+          filter: "blur(90px)",
+          top: 650,
+          right: -150,
+          pointerEvents: "none",
         }}
       />
 
@@ -106,7 +194,10 @@ const About = () => {
           },
         }}
       >
-        {/* Hero */}
+        {/* =====================================================
+            HERO
+        ===================================================== */}
+
         <Box
           sx={{
             textAlign: "center",
@@ -119,76 +210,120 @@ const About = () => {
             },
           }}
         >
-          <Chip
-            icon={
-              <CodeIcon
-                sx={{
-                  fontSize:
-                    "15px !important",
-                }}
-              />
-            }
-            label="ABOUT CODEX"
-            sx={{
-              mb: 1.8,
-              height: 30,
-              bgcolor:
-                "rgba(99,102,241,.1)",
-              color: "#a5b4fc",
-              border:
-                "1px solid rgba(129,140,248,.2)",
-              fontSize: {
-                xs: 8,
-                sm: 10,
-              },
-              fontWeight: 900,
-              letterSpacing: 1,
+          <MotionBox
+            initial={{
+              opacity: 0,
+              y: -20,
             }}
-          />
-
-          <Typography
-            component="h1"
-            fontWeight={950}
-            sx={{
-              fontSize: {
-                xs: "2rem",
-                sm: "2.8rem",
-                md: "3.7rem",
-              },
-              lineHeight: 1.05,
-              letterSpacing: "-1.5px",
-              background:
-                "linear-gradient(90deg,#fff,#a5b4fc,#818cf8)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor:
-                "transparent",
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.65,
             }}
           >
-            Build. Learn. Submit.
-          </Typography>
+            <Chip
+              icon={
+                <CodeIcon
+                  sx={{
+                    fontSize: "15px !important",
+                  }}
+                />
+              }
+              label="ABOUT CODEX"
+              sx={{
+                mb: 1.8,
+                height: 32,
+                bgcolor: "rgba(99,102,241,.1)",
+                color: "#a5b4fc",
+                border: "1px solid rgba(129,140,248,.25)",
+                fontSize: {
+                  xs: 8,
+                  sm: 10,
+                },
+                fontWeight: 900,
+                letterSpacing: 1.2,
+              }}
+            />
+          </MotionBox>
 
-          <Typography
-            sx={{
-              mt: 1.5,
-              color: "#94a3b8",
-              fontSize: {
-                xs: ".78rem",
-                sm: ".95rem",
-                md: "1.05rem",
-              },
-              lineHeight: 1.7,
-              maxWidth: 720,
-              mx: "auto",
+          <MotionBox
+            initial={{
+              opacity: 0,
+              y: 30,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.8,
+              delay: 0.1,
             }}
           >
-            CodeX is a digital marketplace created
-            to help college students discover,
-            understand and work with ready-to-use
-            academic software projects.
-          </Typography>
+            <Typography
+              component="h1"
+              fontWeight={950}
+              sx={{
+                fontSize: {
+                  xs: "2rem",
+                  sm: "2.8rem",
+                  md: "3.7rem",
+                },
+                lineHeight: 1.05,
+                letterSpacing: "-1.5px",
+                background:
+                  "linear-gradient(90deg,#fff,#a5b4fc,#818cf8)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Discover. Build. Learn.
+            </Typography>
+          </MotionBox>
+
+          <MotionBox
+            initial={{
+              opacity: 0,
+              y: 25,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.8,
+              delay: 0.2,
+            }}
+          >
+            <Typography
+              sx={{
+                mt: 1.5,
+                color: "#94a3b8",
+                fontSize: {
+                  xs: ".78rem",
+                  sm: ".95rem",
+                  md: "1.05rem",
+                },
+                lineHeight: 1.75,
+                maxWidth: 760,
+                mx: "auto",
+              }}
+            >
+              CodeX is a digital project marketplace where you
+              can discover, explore and access ready-to-use
+              projects, source code, documentation,
+              presentations and other useful digital resources
+              — all in one place.
+            </Typography>
+          </MotionBox>
         </Box>
 
-        {/* About cards */}
+        {/* =====================================================
+            ABOUT CARDS
+        ===================================================== */}
+
         <Grid
           container
           spacing={{
@@ -196,10 +331,29 @@ const About = () => {
             sm: 2.5,
             md: 3,
           }}
-          sx={{ mb: 7 }}
+          sx={{
+            mb: 7,
+          }}
         >
+          {/* WHAT IS CODEX */}
+
           <Grid item xs={12} md={7}>
-            <Paper
+            <MotionPaper
+              initial={{
+                opacity: 0,
+                x: -45,
+              }}
+              whileInView={{
+                opacity: 1,
+                x: 0,
+              }}
+              viewport={{
+                once: true,
+                amount: 0.2,
+              }}
+              transition={{
+                duration: 0.7,
+              }}
               elevation={0}
               sx={{
                 height: "100%",
@@ -212,16 +366,27 @@ const About = () => {
                   xs: 3,
                   md: 4,
                 },
-                bgcolor:
-                  "rgba(15,23,42,.78)",
-                border:
-                  "1px solid rgba(148,163,184,.14)",
+                bgcolor: "rgba(15,23,42,.78)",
+                border: "1px solid rgba(148,163,184,.14)",
                 color: "#fff",
                 position: "relative",
                 overflow: "hidden",
+                transition: "border-color .3s ease, box-shadow .3s ease",
+                "&:hover": {
+                  borderColor: "rgba(129,140,248,.4)",
+                  boxShadow: "0 25px 70px rgba(0,0,0,.25)",
+                },
               }}
             >
-              <Box
+              <MotionBox
+                animate={{
+                  rotate: [0, 360],
+                }}
+                transition={{
+                  duration: 18,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
                 sx={{
                   position: "absolute",
                   top: -60,
@@ -229,8 +394,7 @@ const About = () => {
                   width: 160,
                   height: 160,
                   borderRadius: "50%",
-                  background:
-                    "rgba(99,102,241,.08)",
+                  background: "rgba(99,102,241,.08)",
                   filter: "blur(25px)",
                 }}
               />
@@ -239,9 +403,17 @@ const About = () => {
                 direction="row"
                 spacing={1}
                 alignItems="center"
-                sx={{ mb: 1.5 }}
+                sx={{
+                  mb: 1.5,
+                  position: "relative",
+                  zIndex: 1,
+                }}
               >
-                <Box
+                <MotionBox
+                  whileHover={{
+                    scale: 1.12,
+                    rotate: 6,
+                  }}
                   sx={{
                     width: 38,
                     height: 38,
@@ -249,15 +421,16 @@ const About = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    bgcolor:
-                      "rgba(99,102,241,.12)",
+                    bgcolor: "rgba(99,102,241,.12)",
                     color: "#818cf8",
                   }}
                 >
                   <RocketLaunchIcon
-                    sx={{ fontSize: 20 }}
+                    sx={{
+                      fontSize: 20,
+                    }}
                   />
-                </Box>
+                </MotionBox>
 
                 <Typography
                   fontWeight={900}
@@ -284,12 +457,12 @@ const About = () => {
                   mb: 1.5,
                 }}
               >
-                CodeX is a digital store focused on
-                college project selling. It is built
-                as a MERN full-stack application where
-                students can purchase ready-to-use
-                academic projects with source code,
-                documentation and presentation files.
+                CodeX is a digital marketplace built to make
+                project discovery and digital resources simple,
+                organized and accessible. Explore projects
+                across different technologies, categories and
+                use cases, with useful resources available
+                through one platform.
               </Typography>
 
               <Typography
@@ -303,18 +476,36 @@ const About = () => {
                   lineHeight: 1.8,
                 }}
               >
-                The platform itself demonstrates
-                real-world software development
-                concepts including authentication,
-                project management, payment processing,
-                protected digital downloads and email
-                notifications.
+                From source code and documentation to
+                presentations and other digital resources,
+                CodeX brings valuable project materials together
+                while providing a smooth experience for
+                browsing, purchasing and accessing digital
+                content.
               </Typography>
-            </Paper>
+            </MotionPaper>
           </Grid>
 
+          {/* WHAT YOU GET */}
+
           <Grid item xs={12} md={5}>
-            <Paper
+            <MotionPaper
+              initial={{
+                opacity: 0,
+                x: 45,
+              }}
+              whileInView={{
+                opacity: 1,
+                x: 0,
+              }}
+              viewport={{
+                once: true,
+                amount: 0.2,
+              }}
+              transition={{
+                duration: 0.7,
+                delay: 0.1,
+              }}
               elevation={0}
               sx={{
                 height: "100%",
@@ -327,20 +518,29 @@ const About = () => {
                   xs: 3,
                   md: 4,
                 },
-                bgcolor:
-                  "rgba(15,23,42,.78)",
-                border:
-                  "1px solid rgba(148,163,184,.14)",
+                bgcolor: "rgba(15,23,42,.78)",
+                border: "1px solid rgba(148,163,184,.14)",
                 color: "#fff",
+                transition: "border-color .3s ease, box-shadow .3s ease",
+                "&:hover": {
+                  borderColor: "rgba(251,146,60,.35)",
+                  boxShadow: "0 25px 70px rgba(0,0,0,.25)",
+                },
               }}
             >
               <Stack
                 direction="row"
                 spacing={1}
                 alignItems="center"
-                sx={{ mb: 2 }}
+                sx={{
+                  mb: 2,
+                }}
               >
-                <Box
+                <MotionBox
+                  whileHover={{
+                    scale: 1.12,
+                    rotate: -6,
+                  }}
                   sx={{
                     width: 38,
                     height: 38,
@@ -348,15 +548,16 @@ const About = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    bgcolor:
-                      "rgba(249,115,22,.1)",
+                    bgcolor: "rgba(249,115,22,.1)",
                     color: "#fb923c",
                   }}
                 >
                   <VerifiedIcon
-                    sx={{ fontSize: 20 }}
+                    sx={{
+                      fontSize: 20,
+                    }}
                   />
-                </Box>
+                </MotionBox>
 
                 <Typography
                   fontWeight={900}
@@ -372,84 +573,124 @@ const About = () => {
               </Stack>
 
               <Stack spacing={1.2}>
-                {[
-                  "Complete source code",
-                  "Project documentation",
-                  "Presentation / PPT",
-                  "Setup instructions",
-                  "Digital project delivery",
-                  "Learning-friendly structure",
-                ].map((item) => (
-                  <Stack
+                {getItems.map((item, index) => (
+                  <MotionBox
                     key={item}
-                    direction="row"
-                    spacing={1}
-                    alignItems="center"
+                    initial={{
+                      opacity: 0,
+                      x: 15,
+                    }}
+                    whileInView={{
+                      opacity: 1,
+                      x: 0,
+                    }}
+                    viewport={{
+                      once: true,
+                    }}
+                    transition={{
+                      duration: 0.4,
+                      delay: index * 0.07,
+                    }}
                   >
-                    <Box
-                      sx={{
-                        width: 7,
-                        height: 7,
-                        borderRadius: "50%",
-                        bgcolor: "#818cf8",
-                        flexShrink: 0,
-                        boxShadow:
-                          "0 0 10px rgba(129,140,248,.5)",
-                      }}
-                    />
-
-                    <Typography
-                      sx={{
-                        color: "#cbd5e1",
-                        fontSize: {
-                          xs: ".68rem",
-                          sm: ".78rem",
-                        },
-                      }}
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      alignItems="center"
                     >
-                      {item}
-                    </Typography>
-                  </Stack>
+                      <MotionBox
+                        animate={{
+                          scale: [1, 1.25, 1],
+                        }}
+                        transition={{
+                          duration: 2.2,
+                          repeat: Infinity,
+                          delay: index * 0.15,
+                        }}
+                        sx={{
+                          width: 7,
+                          height: 7,
+                          borderRadius: "50%",
+                          bgcolor: "#818cf8",
+                          flexShrink: 0,
+                          boxShadow:
+                            "0 0 10px rgba(129,140,248,.5)",
+                        }}
+                      />
+
+                      <Typography
+                        sx={{
+                          color: "#cbd5e1",
+                          fontSize: {
+                            xs: ".68rem",
+                            sm: ".78rem",
+                          },
+                        }}
+                      >
+                        {item}
+                      </Typography>
+                    </Stack>
+                  </MotionBox>
                 ))}
               </Stack>
-            </Paper>
+            </MotionPaper>
           </Grid>
         </Grid>
 
-        {/* Features */}
-        <Box sx={{ mb: 8 }}>
+        {/* =====================================================
+            FEATURES
+        ===================================================== */}
+
+        <Box
+          sx={{
+            mb: 8,
+          }}
+        >
           <Box
             sx={{
               textAlign: "center",
               mb: 3,
             }}
           >
-            <Typography
-              fontWeight={950}
-              sx={{
-                fontSize: {
-                  xs: "1.45rem",
-                  sm: "1.8rem",
-                  md: "2.1rem",
-                },
+            <MotionBox
+              initial={{
+                opacity: 0,
+                y: 20,
+              }}
+              whileInView={{
+                opacity: 1,
+                y: 0,
+              }}
+              viewport={{
+                once: true,
               }}
             >
-              Why CodeX?
-            </Typography>
+              <Typography
+                fontWeight={950}
+                sx={{
+                  fontSize: {
+                    xs: "1.45rem",
+                    sm: "1.8rem",
+                    md: "2.1rem",
+                  },
+                }}
+              >
+                Why CodeX?
+              </Typography>
 
-            <Typography
-              sx={{
-                mt: 0.7,
-                color: "#64748b",
-                fontSize: {
-                  xs: ".7rem",
-                  sm: ".8rem",
-                },
-              }}
-            >
-              Everything designed around the
-              student project experience.
-            </Typography>
+              <Typography
+                sx={{
+                  mt: 0.7,
+                  color: "#64748b",
+                  fontSize: {
+                    xs: ".7rem",
+                    sm: ".8rem",
+                  },
+                }}
+              >
+                Everything designed to make discovering and
+                using digital projects easier.
+              </Typography>
+            </MotionBox>
           </Box>
 
           <Grid
@@ -460,14 +701,34 @@ const About = () => {
               md: 2.5,
             }}
           >
-            {features.map((feature) => (
+            {features.map((feature, index) => (
               <Grid
                 item
                 xs={6}
                 md={4}
                 key={feature.title}
               >
-                <Paper
+                <MotionPaper
+                  initial={{
+                    opacity: 0,
+                    y: 35,
+                  }}
+                  whileInView={{
+                    opacity: 1,
+                    y: 0,
+                  }}
+                  viewport={{
+                    once: true,
+                    amount: 0.15,
+                  }}
+                  transition={{
+                    duration: 0.55,
+                    delay: index * 0.08,
+                  }}
+                  whileHover={{
+                    y: -8,
+                    scale: 1.015,
+                  }}
                   elevation={0}
                   sx={{
                     height: "100%",
@@ -480,24 +741,24 @@ const About = () => {
                       xs: 2.5,
                       sm: 3,
                     },
-                    bgcolor:
-                      "rgba(15,23,42,.65)",
-                    border:
-                      "1px solid rgba(148,163,184,.12)",
+                    bgcolor: "rgba(15,23,42,.65)",
+                    border: "1px solid rgba(148,163,184,.12)",
                     color: "#fff",
                     transition:
-                      "transform .25s ease, border-color .25s ease, background .25s ease",
+                      "border-color .3s ease, background .3s ease, box-shadow .3s ease",
                     "&:hover": {
-                      transform:
-                        "translateY(-5px)",
-                      borderColor:
-                        "rgba(129,140,248,.35)",
-                      bgcolor:
-                        "rgba(15,23,42,.9)",
+                      borderColor: "rgba(129,140,248,.4)",
+                      bgcolor: "rgba(15,23,42,.9)",
+                      boxShadow:
+                        "0 18px 45px rgba(0,0,0,.2)",
                     },
                   }}
                 >
-                  <Box
+                  <MotionBox
+                    whileHover={{
+                      scale: 1.12,
+                      rotate: 5,
+                    }}
                     sx={{
                       width: {
                         xs: 34,
@@ -512,23 +773,19 @@ const About = () => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      bgcolor:
-                        "rgba(99,102,241,.1)",
+                      bgcolor: "rgba(99,102,241,.1)",
                       color: "#818cf8",
                     }}
                   >
-                    {React.cloneElement(
-                      feature.icon,
-                      {
-                        sx: {
-                          fontSize: {
-                            xs: 18,
-                            sm: 21,
-                          },
+                    {React.cloneElement(feature.icon, {
+                      sx: {
+                        fontSize: {
+                          xs: 18,
+                          sm: 21,
                         },
                       },
-                    )}
-                  </Box>
+                    })}
+                  </MotionBox>
 
                   <Typography
                     fontWeight={850}
@@ -557,14 +814,32 @@ const About = () => {
                   >
                     {feature.text}
                   </Typography>
-                </Paper>
+                </MotionPaper>
               </Grid>
             ))}
           </Grid>
         </Box>
 
-        {/* How it works */}
-        <Paper
+        {/* =====================================================
+            HOW CODEX WORKS
+        ===================================================== */}
+
+        <MotionPaper
+          initial={{
+            opacity: 0,
+            y: 35,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+            amount: 0.15,
+          }}
+          transition={{
+            duration: 0.7,
+          }}
           elevation={0}
           sx={{
             p: {
@@ -577,14 +852,40 @@ const About = () => {
               xs: 3,
               md: 4,
             },
-            bgcolor:
-              "rgba(15,23,42,.7)",
-            border:
-              "1px solid rgba(148,163,184,.14)",
+            bgcolor: "rgba(15,23,42,.7)",
+            border: "1px solid rgba(148,163,184,.14)",
             color: "#fff",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
-          <Box sx={{ textAlign: "center", mb: 4 }}>
+          <MotionBox
+            animate={{
+              x: ["-100%", "100%"],
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "35%",
+              height: 1,
+              background:
+                "linear-gradient(90deg,transparent,#818cf8,transparent)",
+              opacity: 0.7,
+            }}
+          />
+
+          <Box
+            sx={{
+              textAlign: "center",
+              mb: 4,
+            }}
+          >
             <Typography
               fontWeight={950}
               sx={{
@@ -607,8 +908,8 @@ const About = () => {
                 },
               }}
             >
-              A simple digital project buying
-              experience.
+              A simple journey from discovering a project to
+              accessing the resources you need.
             </Typography>
           </Box>
 
@@ -619,35 +920,47 @@ const About = () => {
               md: 3,
             }}
           >
-            {[
-              {
-                number: "01",
-                title: "Explore",
-                text: "Browse projects and find one that matches your technology or academic requirements.",
-              },
-              {
-                number: "02",
-                title: "Choose",
-                text: "Open project details, review the available files, technologies and pricing.",
-              },
-              {
-                number: "03",
-                title: "Purchase",
-                text: "Complete the online payment through the integrated payment flow.",
-              },
-              {
-                number: "04",
-                title: "Receive",
-                text: "Access your purchased digital project bundle and use it for learning or academic work.",
-              },
-            ].map((step) => (
+            {steps.map((step, index) => (
               <Grid
                 item
                 xs={6}
                 md={3}
                 key={step.number}
               >
-                <Box sx={{ textAlign: "center" }}>
+                <MotionBox
+                  initial={{
+                    opacity: 0,
+                    y: 25,
+                  }}
+                  whileInView={{
+                    opacity: 1,
+                    y: 0,
+                  }}
+                  viewport={{
+                    once: true,
+                  }}
+                  transition={{
+                    duration: 0.5,
+                    delay: index * 0.1,
+                  }}
+                  whileHover={{
+                    y: -5,
+                  }}
+                  sx={{
+                    textAlign: "center",
+                    p: {
+                      xs: 1,
+                      sm: 1.5,
+                    },
+                    borderRadius: 3,
+                    transition:
+                      "background .3s ease",
+                    "&:hover": {
+                      background:
+                        "rgba(99,102,241,.05)",
+                    },
+                  }}
+                >
                   <Typography
                     fontWeight={950}
                     sx={{
@@ -688,15 +1001,27 @@ const About = () => {
                   >
                     {step.text}
                   </Typography>
-                </Box>
+                </MotionBox>
               </Grid>
             ))}
           </Grid>
-        </Paper>
+        </MotionPaper>
 
-        {/* Technology stack */}
-        <Box sx={{ mb: 8 }}>
-          <Box sx={{ textAlign: "center", mb: 2.5 }}>
+        {/* =====================================================
+            TECHNOLOGY STACK
+        ===================================================== */}
+
+        <Box
+          sx={{
+            mb: 8,
+          }}
+        >
+          <Box
+            sx={{
+              textAlign: "center",
+              mb: 2.5,
+            }}
+          >
             <Typography
               fontWeight={950}
               sx={{
@@ -719,8 +1044,8 @@ const About = () => {
                 },
               }}
             >
-              Built using modern full-stack
-              development technologies.
+              Built with modern technologies for a reliable
+              digital marketplace experience.
             </Typography>
           </Box>
 
@@ -730,50 +1055,100 @@ const About = () => {
             flexWrap="wrap"
             gap={1}
           >
-            {technologies.map((technology) => (
-              <Chip
+            {technologies.map((technology, index) => (
+              <MotionBox
                 key={technology}
-                icon={
-                  <LayersIcon
-                    sx={{
-                      fontSize:
-                        "15px !important",
-                    }}
-                  />
-                }
-                label={technology}
-                sx={{
-                  height: {
-                    xs: 27,
-                    sm: 32,
-                  },
-                  bgcolor:
-                    "rgba(15,23,42,.75)",
-                  color: "#cbd5e1",
-                  border:
-                    "1px solid rgba(148,163,184,.15)",
-                  fontSize: {
-                    xs: ".58rem",
-                    sm: ".68rem",
-                  },
-                  fontWeight: 700,
+                initial={{
+                  opacity: 0,
+                  scale: 0.85,
                 }}
-              />
+                whileInView={{
+                  opacity: 1,
+                  scale: 1,
+                }}
+                viewport={{
+                  once: true,
+                }}
+                transition={{
+                  duration: 0.35,
+                  delay: index * 0.05,
+                }}
+                whileHover={{
+                  y: -4,
+                  scale: 1.05,
+                }}
+              >
+                <Chip
+                  icon={
+                    <LayersIcon
+                      sx={{
+                        fontSize:
+                          "15px !important",
+                      }}
+                    />
+                  }
+                  label={technology}
+                  sx={{
+                    height: {
+                      xs: 27,
+                      sm: 32,
+                    },
+                    bgcolor:
+                      "rgba(15,23,42,.75)",
+                    color: "#cbd5e1",
+                    border:
+                      "1px solid rgba(148,163,184,.15)",
+                    fontSize: {
+                      xs: ".58rem",
+                      sm: ".68rem",
+                    },
+                    fontWeight: 700,
+                    transition:
+                      "border-color .25s ease",
+                    "&:hover": {
+                      borderColor:
+                        "rgba(129,140,248,.5)",
+                    },
+                  }}
+                />
+              </MotionBox>
             ))}
           </Stack>
         </Box>
 
-        {/* Student section */}
+        {/* =====================================================
+            AUDIENCE + DIGITAL EXPERIENCE
+        ===================================================== */}
+
         <Grid
           container
           spacing={{
             xs: 1.5,
             md: 3,
           }}
-          sx={{ mb: 7 }}
+          sx={{
+            mb: 7,
+          }}
         >
           <Grid item xs={12} md={6}>
-            <Paper
+            <MotionPaper
+              initial={{
+                opacity: 0,
+                x: -30,
+              }}
+              whileInView={{
+                opacity: 1,
+                x: 0,
+              }}
+              viewport={{
+                once: true,
+              }}
+              transition={{
+                duration: 0.6,
+              }}
+              whileHover={{
+                y: -5,
+              }}
               elevation={0}
               sx={{
                 p: {
@@ -782,17 +1157,26 @@ const About = () => {
                 },
                 height: "100%",
                 borderRadius: 3.5,
-                bgcolor:
-                  "rgba(15,23,42,.75)",
+                bgcolor: "rgba(15,23,42,.75)",
                 border:
                   "1px solid rgba(148,163,184,.14)",
+                transition:
+                  "border-color .3s ease, box-shadow .3s ease",
+                "&:hover": {
+                  borderColor:
+                    "rgba(129,140,248,.4)",
+                  boxShadow:
+                    "0 20px 55px rgba(0,0,0,.2)",
+                },
               }}
             >
               <Stack
                 direction="row"
                 spacing={1}
                 alignItems="center"
-                sx={{ mb: 1.2 }}
+                sx={{
+                  mb: 1.2,
+                }}
               >
                 <SchoolIcon
                   sx={{
@@ -809,7 +1193,7 @@ const About = () => {
                     },
                   }}
                 >
-                  For Students
+                  For Students & Learners
                 </Typography>
               </Stack>
 
@@ -823,20 +1207,37 @@ const About = () => {
                   lineHeight: 1.75,
                 }}
               >
-                Get complete projects with clean
-                code, documentation and PPT.
-                Explore real implementations to
-                understand how frontend and
-                full-stack applications are
-                structured. Use the projects as a
-                learning reference and for permitted
-                academic or personal work.
+                Discover complete projects and useful
+                resources that can help you explore real
+                implementations, understand development
+                concepts and build practical knowledge.
+                Use available resources responsibly for
+                learning, permitted academic work or
+                personal development.
               </Typography>
-            </Paper>
+            </MotionPaper>
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <Paper
+            <MotionPaper
+              initial={{
+                opacity: 0,
+                x: 30,
+              }}
+              whileInView={{
+                opacity: 1,
+                x: 0,
+              }}
+              viewport={{
+                once: true,
+              }}
+              transition={{
+                duration: 0.6,
+                delay: 0.1,
+              }}
+              whileHover={{
+                y: -5,
+              }}
               elevation={0}
               sx={{
                 p: {
@@ -845,17 +1246,26 @@ const About = () => {
                 },
                 height: "100%",
                 borderRadius: 3.5,
-                bgcolor:
-                  "rgba(15,23,42,.75)",
+                bgcolor: "rgba(15,23,42,.75)",
                 border:
                   "1px solid rgba(148,163,184,.14)",
+                transition:
+                  "border-color .3s ease, box-shadow .3s ease",
+                "&:hover": {
+                  borderColor:
+                    "rgba(251,146,60,.4)",
+                  boxShadow:
+                    "0 20px 55px rgba(0,0,0,.2)",
+                },
               }}
             >
               <Stack
                 direction="row"
                 spacing={1}
                 alignItems="center"
-                sx={{ mb: 1.2 }}
+                sx={{
+                  mb: 1.2,
+                }}
               >
                 <SupportAgentIcon
                   sx={{
@@ -872,7 +1282,7 @@ const About = () => {
                     },
                   }}
                 >
-                  Digital Experience
+                  Simple Digital Experience
                 </Typography>
               </Stack>
 
@@ -886,20 +1296,36 @@ const About = () => {
                   lineHeight: 1.75,
                 }}
               >
-                CodeX brings project discovery,
-                online purchasing and digital
-                delivery together in one platform.
-                The application demonstrates how a
-                modern digital marketplace can handle
-                users, projects, orders and protected
-                resources.
+                CodeX brings project discovery, online
+                purchasing and digital delivery together
+                in one platform. The experience is designed
+                to make it easier to find useful resources,
+                understand what is included and access
+                digital content efficiently.
               </Typography>
-            </Paper>
+            </MotionPaper>
           </Grid>
         </Grid>
 
-        {/* Project purpose */}
-        <Paper
+        {/* =====================================================
+            PLATFORM PURPOSE
+        ===================================================== */}
+
+        <MotionPaper
+          initial={{
+            opacity: 0,
+            y: 30,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+          }}
+          transition={{
+            duration: 0.65,
+          }}
           elevation={0}
           sx={{
             p: {
@@ -909,14 +1335,35 @@ const About = () => {
             },
             mb: 7,
             borderRadius: 4,
-            bgcolor:
-              "linear-gradient(135deg,rgba(30,41,59,.7),rgba(15,23,42,.8))",
             background:
               "linear-gradient(135deg,rgba(30,41,59,.7),rgba(15,23,42,.8))",
             border:
               "1px solid rgba(129,140,248,.15)",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
+          <MotionBox
+            animate={{
+              rotate: 360,
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+            sx={{
+              position: "absolute",
+              width: 180,
+              height: 180,
+              borderRadius: "50%",
+              border:
+                "1px solid rgba(129,140,248,.08)",
+              right: -80,
+              top: -80,
+            }}
+          />
+
           <Stack
             direction={{
               xs: "column",
@@ -928,7 +1375,11 @@ const About = () => {
               sm: "center",
             }}
           >
-            <Box
+            <MotionBox
+              whileHover={{
+                scale: 1.1,
+                rotate: 5,
+              }}
               sx={{
                 width: 50,
                 height: 50,
@@ -943,7 +1394,7 @@ const About = () => {
               }}
             >
               <StorageIcon />
-            </Box>
+            </MotionBox>
 
             <Box>
               <Typography
@@ -955,7 +1406,7 @@ const About = () => {
                   },
                 }}
               >
-                A Real-World MERN Project
+                Built for a Modern Digital Marketplace
               </Typography>
 
               <Typography
@@ -969,19 +1420,20 @@ const About = () => {
                   lineHeight: 1.7,
                 }}
               >
-                CodeX is itself designed as a
-                practical full-stack college project,
-                bringing together frontend UI, backend
-                APIs, database operations,
-                authentication, payments and digital
-                resource management in one
-                application.
+                CodeX brings together a modern frontend,
+                backend APIs, database operations,
+                authentication, payment processing and
+                digital resource management to create a
+                complete marketplace experience.
               </Typography>
             </Box>
           </Stack>
-        </Paper>
+        </MotionPaper>
 
-        {/* Divider */}
+        {/* =====================================================
+            DIVIDER
+        ===================================================== */}
+
         <Divider
           sx={{
             mb: 5,
@@ -990,7 +1442,10 @@ const About = () => {
           }}
         />
 
-        {/* Terms */}
+        {/* =====================================================
+            TERMS
+        ===================================================== */}
+
         <Box>
           <Typography
             variant="h5"
@@ -1153,8 +1608,25 @@ const About = () => {
           </Stack>
         </Box>
 
-        {/* Bottom note */}
-        <Box
+        {/* =====================================================
+            BOTTOM NOTE
+        ===================================================== */}
+
+        <MotionBox
+          initial={{
+            opacity: 0,
+            y: 15,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+          }}
+          transition={{
+            duration: 0.5,
+          }}
           sx={{
             mt: 5,
             p: {
@@ -1178,10 +1650,10 @@ const About = () => {
               },
             }}
           >
-            CodeX · Built as a MERN full-stack
-            college project by Tufail Sarovar.
+            CodeX · A modern digital marketplace for
+            projects and resources.
           </Typography>
-        </Box>
+        </MotionBox>
       </Container>
     </Box>
   );

@@ -10,15 +10,96 @@ import {
   CircularProgress,
   Stack,
   Button,
+  Paper,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
+
 import ExploreIcon from "@mui/icons-material/Explore";
-import CodeIcon from "@mui/icons-material/Code";
-import LayersIcon from "@mui/icons-material/Layers";
+import CategoryIcon from "@mui/icons-material/Category";
+
 import api from "../../api/axios";
 import ProjectCard from "../../components/Project/ProjectCard";
 
 const MotionBox = motion(Box);
+
+/* =========================
+   PROJECT CATEGORIES
+========================= */
+
+const PROJECT_CATEGORIES = [
+  {
+    value: "all",
+    label: "All Projects",
+  },
+  {
+    value: "frontend",
+    label: "Frontend",
+  },
+  {
+    value: "mern",
+    label: "MERN Full Stack",
+  },
+  {
+    value: "backend",
+    label: "Backend",
+  },
+  {
+    value: "javascript",
+    label: "JavaScript",
+  },
+  {
+    value: "python",
+    label: "Python",
+  },
+  {
+    value: "java",
+    label: "Java",
+  },
+  {
+    value: "c-cpp",
+    label: "C / C++",
+  },
+  {
+    value: "data-science",
+    label: "Data Science",
+  },
+  {
+    value: "data-analysis",
+    label: "Data Analysis",
+  },
+  {
+    value: "ai-ml",
+    label: "AI / ML",
+  },
+  {
+    value: "deep-learning",
+    label: "Deep Learning",
+  },
+  {
+    value: "mobile-app",
+    label: "Mobile Apps",
+  },
+  {
+    value: "cybersecurity",
+    label: "Cybersecurity",
+  },
+  {
+    value: "cloud-devops",
+    label: "Cloud / DevOps",
+  },
+  {
+    value: "automation",
+    label: "Automation",
+  },
+  {
+    value: "php",
+    label: "PHP",
+  },
+  {
+    value: "other",
+    label: "Other",
+  },
+];
 
 const ExploreProjects = () => {
   const [projects, setProjects] = useState([]);
@@ -48,19 +129,19 @@ const ExploreProjects = () => {
           setProjects(
             Array.isArray(res.data)
               ? res.data
-              : [],
+              : []
           );
         }
       } catch (err) {
         console.error(
           "Explore projects error:",
-          err,
+          err
         );
 
         if (mounted) {
           setProjects([]);
           setError(
-            "Unable to load projects. Please try again.",
+            "Unable to load projects. Please try again."
           );
         }
       } finally {
@@ -85,11 +166,16 @@ const ExploreProjects = () => {
     setCategory((current) =>
       current === "all"
         ? "all"
-        : current,
+        : current
     );
   };
 
   const categoryCount = projects.length;
+
+  const selectedCategory =
+    PROJECT_CATEGORIES.find(
+      (item) => item.value === category
+    );
 
   return (
     <Box
@@ -106,7 +192,10 @@ const ExploreProjects = () => {
         overflow: "hidden",
       }}
     >
-      {/* Background glow */}
+      {/* =========================
+          BACKGROUND
+      ========================= */}
+
       <Box
         sx={{
           position: "absolute",
@@ -114,6 +203,21 @@ const ExploreProjects = () => {
           pointerEvents: "none",
           background:
             "radial-gradient(circle at 8% 0%, rgba(99,102,241,.18), transparent 32%), radial-gradient(circle at 92% 15%, rgba(37,99,235,.13), transparent 30%)",
+        }}
+      />
+
+      <Box
+        sx={{
+          position: "absolute",
+          top: 140,
+          left: "50%",
+          width: 500,
+          height: 500,
+          transform: "translateX(-50%)",
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle, rgba(99,102,241,.055), transparent 68%)",
+          pointerEvents: "none",
         }}
       />
 
@@ -129,7 +233,10 @@ const ExploreProjects = () => {
           },
         }}
       >
-        {/* Header */}
+        {/* =========================
+            HEADER
+        ========================= */}
+
         <MotionBox
           initial={{
             opacity: 0,
@@ -235,25 +342,40 @@ const ExploreProjects = () => {
                   letterSpacing: "-.8px",
                 }}
               >
-                Explore Projects
+                Explore{" "}
+                <Box
+                  component="span"
+                  sx={{
+                    color: "transparent",
+                    background:
+                      "linear-gradient(90deg,#60a5fa,#818cf8,#c084fc)",
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor:
+                      "transparent",
+                  }}
+                >
+                  Projects
+                </Box>
               </Typography>
 
               <Typography
                 sx={{
                   mt: 0.8,
                   color: "#94a3b8",
-                  maxWidth: 650,
+                  maxWidth: 720,
                   fontSize: {
                     xs: ".75rem",
                     sm: ".9rem",
                     md: "1rem",
                   },
-                  lineHeight: 1.6,
+                  lineHeight: 1.65,
                 }}
               >
-                Find ready-to-use academic projects,
-                source code, presentations and
-                documentation for your submission.
+                Discover projects across software,
+                data, AI, development, automation
+                and more — with complete resources
+                to help you build, learn and deliver.
               </Typography>
             </Box>
 
@@ -262,6 +384,7 @@ const ExploreProjects = () => {
                 sx={{
                   px: 1.5,
                   py: 1,
+                  minWidth: 100,
                   borderRadius: 3,
                   bgcolor:
                     "rgba(15,23,42,.75)",
@@ -274,7 +397,8 @@ const ExploreProjects = () => {
                     color: "#64748b",
                     fontSize: ".62rem",
                     fontWeight: 800,
-                    textTransform: "uppercase",
+                    textTransform:
+                      "uppercase",
                   }}
                 >
                   Showing
@@ -299,7 +423,10 @@ const ExploreProjects = () => {
           </Stack>
         </MotionBox>
 
-        {/* Category tabs */}
+        {/* =========================
+            CATEGORY TABS
+        ========================= */}
+
         <MotionBox
           initial={{
             opacity: 0,
@@ -318,19 +445,30 @@ const ExploreProjects = () => {
               xs: 3,
               sm: 4,
             },
+
             p: {
-              xs: 0.55,
+              xs: 0.5,
               sm: 0.8,
             },
+
             borderRadius: {
               xs: 3,
               sm: 4,
             },
+
             bgcolor:
-              "rgba(15,23,42,.7)",
+              "rgba(15,23,42,.72)",
+
             border:
               "1px solid rgba(148,163,184,.14)",
+
+            boxShadow:
+              "0 18px 50px rgba(0,0,0,.12)",
+
             overflowX: "auto",
+
+            scrollbarWidth: "none",
+
             "&::-webkit-scrollbar": {
               display: "none",
             },
@@ -341,100 +479,159 @@ const ExploreProjects = () => {
             onChange={handleTabChange}
             variant="scrollable"
             scrollButtons={false}
+            allowScrollButtonsMobile
             sx={{
               minHeight: {
-                xs: 42,
-                sm: 48,
+                xs: 46,
+                sm: 52,
+              },
+
+              "& .MuiTabs-flexContainer": {
+                gap: {
+                  xs: 0.25,
+                  sm: 0.5,
+                },
               },
 
               "& .MuiTabs-indicator": {
                 height: 3,
                 borderRadius: 999,
                 background:
-                  "linear-gradient(90deg,#818cf8,#6366f1)",
+                  "linear-gradient(90deg,#818cf8,#6366f1,#a78bfa)",
+                boxShadow:
+                  "0 0 12px rgba(129,140,248,.45)",
               },
 
               "& .MuiTab-root": {
                 minHeight: {
-                  xs: 42,
-                  sm: 48,
+                  xs: 46,
+                  sm: 52,
                 },
+
                 minWidth: {
-                  xs: 82,
+                  xs: "auto",
                   sm: 120,
                 },
+
                 px: {
-                  xs: 1.4,
+                  xs: 1.5,
                   sm: 2,
                 },
+
                 borderRadius: 2.5,
+
                 color: "#64748b",
+
                 textTransform: "none",
+
                 fontSize: {
                   xs: ".68rem",
                   sm: ".8rem",
                 },
+
                 fontWeight: 800,
+
+                whiteSpace: "nowrap",
+
                 transition:
-                  "all .2s ease",
+                  "color .25s ease, background .25s ease, transform .25s ease",
+
+                "&:hover": {
+                  color: "#cbd5e1",
+                  bgcolor:
+                    "rgba(99,102,241,.06)",
+                },
               },
 
               "& .MuiTab-root.Mui-selected": {
                 color: "#fff",
+                bgcolor:
+                  "rgba(99,102,241,.08)",
               },
             }}
           >
-            <Tab
-              value="all"
-              icon={
-                <LayersIcon
-                  sx={{
-                    fontSize: {
-                      xs: 16,
-                      sm: 18,
-                    },
-                  }}
+            {PROJECT_CATEGORIES.map(
+              (item) => (
+                <Tab
+                  key={item.value}
+                  value={item.value}
+                  icon={
+                    <CategoryIcon
+                      sx={{
+                        fontSize: {
+                          xs: 15,
+                          sm: 17,
+                        },
+                      }}
+                    />
+                  }
+                  iconPosition="start"
+                  label={item.label}
                 />
-              }
-              iconPosition="start"
-              label="All Projects"
-            />
-
-            <Tab
-              value="frontend"
-              icon={
-                <CodeIcon
-                  sx={{
-                    fontSize: {
-                      xs: 16,
-                      sm: 18,
-                    },
-                  }}
-                />
-              }
-              iconPosition="start"
-              label="Frontend"
-            />
-
-            <Tab
-              value="mern"
-              icon={
-                <CodeIcon
-                  sx={{
-                    fontSize: {
-                      xs: 16,
-                      sm: 18,
-                    },
-                  }}
-                />
-              }
-              iconPosition="start"
-              label="MERN Full Stack"
-            />
+              )
+            )}
           </Tabs>
         </MotionBox>
 
-        {/* Loading */}
+        {/* Selected Category */}
+        {!loading && !error && (
+          <MotionBox
+            key={category}
+            initial={{
+              opacity: 0,
+              y: -5,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            sx={{
+              mb: 2.5,
+            }}
+          >
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={1}
+            >
+              <Box
+                sx={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  bgcolor: "#818cf8",
+                  boxShadow:
+                    "0 0 10px rgba(129,140,248,.7)",
+                }}
+              />
+
+              <Typography
+                sx={{
+                  color: "#64748b",
+                  fontSize: ".7rem",
+                  fontWeight: 700,
+                }}
+              >
+                Browsing:
+              </Typography>
+
+              <Typography
+                sx={{
+                  color: "#cbd5e1",
+                  fontSize: ".7rem",
+                  fontWeight: 900,
+                }}
+              >
+                {selectedCategory?.label}
+              </Typography>
+            </Stack>
+          </MotionBox>
+        )}
+
+        {/* =========================
+            LOADING
+        ========================= */}
+
         {loading && (
           <Box
             sx={{
@@ -468,7 +665,10 @@ const ExploreProjects = () => {
           </Box>
         )}
 
-        {/* Error */}
+        {/* =========================
+            ERROR
+        ========================= */}
+
         {!loading && error && (
           <MotionBox
             initial={{
@@ -487,6 +687,7 @@ const ExploreProjects = () => {
             }}
           >
             <Paper
+              elevation={0}
               sx={{
                 width: "100%",
                 maxWidth: 500,
@@ -538,7 +739,10 @@ const ExploreProjects = () => {
           </MotionBox>
         )}
 
-        {/* Projects */}
+        {/* =========================
+            PROJECTS
+        ========================= */}
+
         {!loading &&
           !error &&
           projects.length > 0 && (
@@ -589,11 +793,10 @@ const ExploreProjects = () => {
                           }}
                           transition={{
                             duration: 0.35,
-                            delay:
-                              Math.min(
-                                index * 0.045,
-                                0.45,
-                              ),
+                            delay: Math.min(
+                              index * 0.045,
+                              0.45
+                            ),
                           }}
                           sx={{
                             height: "100%",
@@ -604,14 +807,17 @@ const ExploreProjects = () => {
                           />
                         </MotionBox>
                       </Grid>
-                    ),
+                    )
                   )}
                 </Grid>
               </MotionBox>
             </AnimatePresence>
           )}
 
-        {/* Empty */}
+        {/* =========================
+            EMPTY
+        ========================= */}
+
         {!loading &&
           !error &&
           projects.length === 0 && (
@@ -632,6 +838,7 @@ const ExploreProjects = () => {
               }}
             >
               <Paper
+                elevation={0}
                 sx={{
                   width: "100%",
                   maxWidth: 520,

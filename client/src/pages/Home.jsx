@@ -227,8 +227,7 @@ const Home = () => {
           explorePositionRef.current += halfWidth;
         }
 
-        track.style.transform =
-          `translate3d(${explorePositionRef.current}px,0,0)`;
+        track.style.transform = `translate3d(${explorePositionRef.current}px,0,0)`;
       }
 
       frameId = requestAnimationFrame(animate);
@@ -339,7 +338,7 @@ const Home = () => {
           py: {
             xs: 4.5,
             sm: 6.5,
-            md: 10,
+            md: 2,
           },
 
           background:
@@ -366,20 +365,9 @@ const Home = () => {
 
             <Grid item xs={12} md={6}>
               <Typography
-                variant="body2"
-                sx={{
-                  color: "#c7d2fe",
-                  fontWeight: 700,
-                  mb: 1,
-                }}
-              >
-                CodeX | Tufail Sarovar
-              </Typography>
-
-              <Typography
                 variant="overline"
                 sx={{
-                  color: "#a5b4fc",
+                  color: "#f3e65b",
                   fontWeight: 800,
                   letterSpacing: "1.5px",
                 }}
@@ -586,18 +574,14 @@ const Home = () => {
                       <MotionBox
                         key={project._id}
                         animate={{
-                          y:
-                            position === 0
-                              ? 0
-                              : position === -1
-                                ? -95
-                                : 95,
+                          y: position === 0 ? 0 : position === -1 ? -95 : 95,
 
                           scale: position === 0 ? 1 : 0.9,
 
                           opacity: position === 0 ? 1 : 0.38,
 
-                          rotateX: position === 0 ? 0 : position === -1 ? 2 : -2,
+                          rotateX:
+                            position === 0 ? 0 : position === -1 ? 2 : -2,
                         }}
                         transition={{
                           duration: 0.55,
@@ -693,10 +677,7 @@ const Home = () => {
                               : "● Coming soon"}
                           </Typography>
 
-                          <Stack
-                            direction="row"
-                            spacing={{ xs: 1, sm: 1.3 }}
-                          >
+                          <Stack direction="row" spacing={{ xs: 1, sm: 1.3 }}>
                             <Button
                               component={Link}
                               to={`/projects/${project._id}`}
@@ -836,6 +817,66 @@ const Home = () => {
                 {
                   label: "MERN FULL STACK",
                   value: "mern",
+                },
+                {
+                  label: "BACKEND",
+                  value: "backend",
+                },
+                {
+                  label: "JAVASCRIPT",
+                  value: "javascript",
+                },
+                {
+                  label: "PYTHON",
+                  value: "python",
+                },
+                {
+                  label: "JAVA",
+                  value: "java",
+                },
+                {
+                  label: "C / C++",
+                  value: "c-cpp",
+                },
+                {
+                  label: "DATA SCIENCE",
+                  value: "data-science",
+                },
+                {
+                  label: "DATA ANALYSIS",
+                  value: "data-analysis",
+                },
+                {
+                  label: "AI / ML",
+                  value: "ai-ml",
+                },
+                {
+                  label: "DEEP LEARNING",
+                  value: "deep-learning",
+                },
+                {
+                  label: "MOBILE APPS",
+                  value: "mobile-app",
+                },
+                {
+                  label: "CYBERSECURITY",
+                  value: "cybersecurity",
+                },
+                {
+                  label: "CLOUD / DEVOPS",
+                  value: "cloud-devops",
+                },
+                {
+                  label: "AUTOMATION",
+                  value: "automation",
+                },
+                {
+                  label: "PHP",
+                  value: "php",
+                },
+                {
+                  label: "OTHER",
+                  value: "other",
                 },
               ].map((tab) => {
                 const active = featuredCategory === tab.value;
@@ -1128,8 +1169,7 @@ const Home = () => {
 
                     explorePositionRef.current = nextPosition;
 
-                    trackElement.style.transform =
-                      `translate3d(${nextPosition}px, 0, 0)`;
+                    trackElement.style.transform = `translate3d(${nextPosition}px, 0, 0)`;
                   }}
                   onPointerUp={(event) => {
                     if (explorePointerIdRef.current !== event.pointerId) {
@@ -1141,7 +1181,9 @@ const Home = () => {
                     setExploreIsDragging(false);
 
                     try {
-                      event.currentTarget.releasePointerCapture(event.pointerId);
+                      event.currentTarget.releasePointerCapture(
+                        event.pointerId,
+                      );
                     } catch {}
 
                     if (exploreResumeTimerRef.current) {
@@ -1163,7 +1205,9 @@ const Home = () => {
                     setExploreIsDragging(false);
 
                     try {
-                      event.currentTarget.releasePointerCapture(event.pointerId);
+                      event.currentTarget.releasePointerCapture(
+                        event.pointerId,
+                      );
                     } catch {}
 
                     if (exploreResumeTimerRef.current) {
@@ -1388,18 +1432,7 @@ const Home = () => {
               </Typography>
             </Box>
 
-            <Button
-              component={Link}
-              to="/projects"
-              variant="outlined"
-              sx={{
-                textTransform: "none",
-                borderRadius: 999,
-                fontWeight: 700,
-              }}
-            >
-              View Full List
-            </Button>
+            
           </Box>
 
           {/* PROJECT GRID */}
