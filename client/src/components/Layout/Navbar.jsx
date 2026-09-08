@@ -33,11 +33,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CodeIcon from "@mui/icons-material/Code";
 
-import {
-  Link,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const ElevationScroll = ({ children }) => {
   const trigger = useScrollTrigger({
@@ -48,17 +44,14 @@ const ElevationScroll = ({ children }) => {
   return React.cloneElement(children, {
     sx: {
       ...(children.props.sx || {}),
-      background: trigger
-        ? "rgba(2,6,23,0.97)"
-        : "rgba(2,6,23,0.88)",
+      background: trigger ? "rgba(2,6,23,0.97)" : "rgba(2,6,23,0.88)",
       backdropFilter: "blur(20px)",
       WebkitBackdropFilter: "blur(20px)",
       boxShadow: trigger
         ? "0 18px 50px rgba(0,0,0,.38)"
         : "0 1px 0 rgba(148,163,184,.12)",
       borderBottom: "1px solid rgba(148,163,184,.14)",
-      transition:
-        "background .3s ease, box-shadow .3s ease",
+      transition: "background .3s ease, box-shadow .3s ease",
     },
   });
 };
@@ -68,14 +61,10 @@ const Navbar = () => {
   const location = useLocation();
 
   const [open, setOpen] = useState(false);
-  const [token, setToken] = useState(
-    () => localStorage.getItem("codex_token"),
-  );
+  const [token, setToken] = useState(() => localStorage.getItem("codex_token"));
   const [user, setUser] = useState(() => {
     try {
-      return JSON.parse(
-        localStorage.getItem("codex_user"),
-      );
+      return JSON.parse(localStorage.getItem("codex_user"));
     } catch {
       return null;
     }
@@ -86,11 +75,7 @@ const Navbar = () => {
       setToken(localStorage.getItem("codex_token"));
 
       try {
-        setUser(
-          JSON.parse(
-            localStorage.getItem("codex_user"),
-          ),
-        );
+        setUser(JSON.parse(localStorage.getItem("codex_user")));
       } catch {
         setUser(null);
       }
@@ -100,14 +85,8 @@ const Navbar = () => {
     window.addEventListener("authChanged", syncAuth);
 
     return () => {
-      window.removeEventListener(
-        "storage",
-        syncAuth,
-      );
-      window.removeEventListener(
-        "authChanged",
-        syncAuth,
-      );
+      window.removeEventListener("storage", syncAuth);
+      window.removeEventListener("authChanged", syncAuth);
     };
   }, []);
 
@@ -149,15 +128,10 @@ const Navbar = () => {
     return location.pathname.startsWith(path);
   };
 
-  const isAktuActive =
-    location.pathname.startsWith("/aktu");
+  const isAktuActive = location.pathname.startsWith("/aktu");
 
   const toggleDrawer = (value) => {
-    setOpen(
-      typeof value === "boolean"
-        ? value
-        : !open,
-    );
+    setOpen(typeof value === "boolean" ? value : !open);
   };
 
   const navigateAndClose = (path) => {
@@ -173,9 +147,7 @@ const Navbar = () => {
     setUser(null);
     setOpen(false);
 
-    window.dispatchEvent(
-      new Event("authChanged"),
-    );
+    window.dispatchEvent(new Event("authChanged"));
 
     navigate("/");
   };
@@ -189,8 +161,7 @@ const Navbar = () => {
     fontSize: 13,
     fontWeight: active ? 800 : 600,
     color: active ? "#fff" : "#94a3b8",
-    transition:
-      "color .2s ease, background .2s ease, transform .2s ease",
+    transition: "color .2s ease, background .2s ease, transform .2s ease",
     "&::after": {
       content: '""',
       position: "absolute",
@@ -199,13 +170,9 @@ const Navbar = () => {
       bottom: 2,
       height: 2,
       borderRadius: 999,
-      background:
-        "linear-gradient(90deg,#6366f1,#8b5cf6)",
-      transform: active
-        ? "scaleX(1)"
-        : "scaleX(0)",
-      transition:
-        "transform .25s ease",
+      background: "linear-gradient(90deg,#6366f1,#8b5cf6)",
+      transform: active ? "scaleX(1)" : "scaleX(0)",
+      transition: "transform .25s ease",
     },
     "&:hover": {
       color: "#fff",
@@ -251,9 +218,7 @@ const Navbar = () => {
                 flexShrink: 0,
                 cursor: "pointer",
               }}
-              onClick={() =>
-                navigate("/")
-              }
+              onClick={() => navigate("/")}
             >
               <Box
                 sx={{
@@ -270,10 +235,8 @@ const Navbar = () => {
                     sm: 2.5,
                   },
                   p: "1px",
-                  background:
-                    "linear-gradient(135deg,#6366f1,#8b5cf6,#f97316)",
-                  boxShadow:
-                    "0 8px 25px rgba(99,102,241,.2)",
+                  background: "linear-gradient(135deg,#6366f1,#8b5cf6,#f97316)",
+                  boxShadow: "0 8px 25px rgba(99,102,241,.2)",
                 }}
               >
                 <Box
@@ -302,13 +265,11 @@ const Navbar = () => {
               <Box
                 sx={{
                   ml: {
-                    xs: 0.9,
+                    xs: 1,
                     sm: 1.2,
                   },
-                  display: {
-                    xs: "none",
-                    sm: "block",
-                  },
+                  minWidth: 0,
+                  display: "block",
                 }}
               >
                 <Typography
@@ -316,19 +277,19 @@ const Navbar = () => {
                   to="/"
                   sx={{
                     textDecoration: "none",
+                    display: "block",
                     fontSize: {
+                      xs: 17,
                       sm: 19,
                       md: 21,
                     },
                     fontWeight: 950,
                     lineHeight: 1,
                     letterSpacing: "-.5px",
-                    background:
-                      "linear-gradient(90deg,#fff,#a5b4fc)",
-                    WebkitBackgroundClip:
-                      "text",
-                    WebkitTextFillColor:
-                      "transparent",
+                    whiteSpace: "nowrap",
+                    background: "linear-gradient(90deg,#fff,#a5b4fc)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
                   }}
                 >
                   CodeX
@@ -338,11 +299,17 @@ const Navbar = () => {
                   sx={{
                     mt: 0.35,
                     color: "#64748b",
-                    fontSize: 8,
+                    fontSize: {
+                      xs: 7,
+                      sm: 8,
+                    },
                     fontWeight: 800,
-                    letterSpacing: ".7px",
-                    textTransform:
-                      "uppercase",
+                    letterSpacing: {
+                      xs: ".5px",
+                      sm: ".7px",
+                    },
+                    textTransform: "uppercase",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   Project Marketplace
@@ -364,24 +331,18 @@ const Navbar = () => {
               }}
             >
               {menuItems.map((item) => {
-                const active = isActive(
-                  item.to,
-                );
+                const active = isActive(item.to);
 
                 return (
                   <Button
                     key={item.to}
                     component={Link}
                     to={item.to}
-                    startIcon={React.cloneElement(
-                      item.icon,
-                      {
-                        sx: {
-                          fontSize:
-                            "17px !important",
-                        },
+                    startIcon={React.cloneElement(item.icon, {
+                      sx: {
+                        fontSize: "17px !important",
                       },
-                    )}
+                    })}
                     sx={navButtonSx(active)}
                   >
                     {item.text}
@@ -395,14 +356,11 @@ const Navbar = () => {
                 startIcon={
                   <SchoolIcon
                     sx={{
-                      fontSize:
-                        "17px !important",
+                      fontSize: "17px !important",
                     }}
                   />
                 }
-                sx={navButtonSx(
-                  isAktuActive,
-                )}
+                sx={navButtonSx(isAktuActive)}
               >
                 AKTU Study
               </Button>
@@ -424,35 +382,23 @@ const Navbar = () => {
               {token && isAdmin && (
                 <Tooltip title="Admin Dashboard">
                   <IconButton
-                    onClick={() =>
-                      navigate(
-                        "/admin/dashboard",
-                      )
-                    }
+                    onClick={() => navigate("/admin/dashboard")}
                     sx={{
                       width: 39,
                       height: 39,
                       borderRadius: 2.2,
                       color: "#a5b4fc",
-                      bgcolor:
-                        "rgba(99,102,241,.1)",
-                      border:
-                        "1px solid rgba(129,140,248,.18)",
-                      transition:
-                        "all .2s ease",
+                      bgcolor: "rgba(99,102,241,.1)",
+                      border: "1px solid rgba(129,140,248,.18)",
+                      transition: "all .2s ease",
                       "&:hover": {
-                        bgcolor:
-                          "rgba(99,102,241,.2)",
-                        borderColor:
-                          "rgba(129,140,248,.5)",
-                        transform:
-                          "translateY(-2px)",
+                        bgcolor: "rgba(99,102,241,.2)",
+                        borderColor: "rgba(129,140,248,.5)",
+                        transform: "translateY(-2px)",
                       },
                     }}
                   >
-                    <AdminPanelSettingsIcon
-                      sx={{ fontSize: 20 }}
-                    />
+                    <AdminPanelSettingsIcon sx={{ fontSize: 20 }} />
                   </IconButton>
                 </Tooltip>
               )}
@@ -465,8 +411,7 @@ const Navbar = () => {
                     startIcon={
                       <LoginIcon
                         sx={{
-                          fontSize:
-                            "17px !important",
+                          fontSize: "17px !important",
                         }}
                       />
                     }
@@ -475,16 +420,13 @@ const Navbar = () => {
                       px: 1.4,
                       borderRadius: 2,
                       color: "#cbd5e1",
-                      border:
-                        "1px solid rgba(148,163,184,.2)",
+                      border: "1px solid rgba(148,163,184,.2)",
                       textTransform: "none",
                       fontSize: 12,
                       fontWeight: 800,
                       "&:hover": {
-                        borderColor:
-                          "#6366f1",
-                        bgcolor:
-                          "rgba(99,102,241,.08)",
+                        borderColor: "#6366f1",
+                        bgcolor: "rgba(99,102,241,.08)",
                       },
                     }}
                   >
@@ -497,8 +439,7 @@ const Navbar = () => {
                     endIcon={
                       <ArrowForwardIcon
                         sx={{
-                          fontSize:
-                            "16px !important",
+                          fontSize: "16px !important",
                         }}
                       />
                     }
@@ -507,20 +448,15 @@ const Navbar = () => {
                       px: 1.5,
                       borderRadius: 2,
                       color: "#fff",
-                      background:
-                        "linear-gradient(135deg,#6366f1,#4f46e5)",
+                      background: "linear-gradient(135deg,#6366f1,#4f46e5)",
                       textTransform: "none",
                       fontSize: 12,
                       fontWeight: 900,
-                      boxShadow:
-                        "0 8px 22px rgba(79,70,229,.22)",
+                      boxShadow: "0 8px 22px rgba(79,70,229,.22)",
                       "&:hover": {
-                        background:
-                          "linear-gradient(135deg,#818cf8,#6366f1)",
-                        transform:
-                          "translateY(-1px)",
-                        boxShadow:
-                          "0 12px 28px rgba(79,70,229,.3)",
+                        background: "linear-gradient(135deg,#818cf8,#6366f1)",
+                        transform: "translateY(-1px)",
+                        boxShadow: "0 12px 28px rgba(79,70,229,.3)",
                       },
                     }}
                   >
@@ -533,8 +469,7 @@ const Navbar = () => {
                   startIcon={
                     <LogoutIcon
                       sx={{
-                        fontSize:
-                          "17px !important",
+                        fontSize: "17px !important",
                       }}
                     />
                   }
@@ -543,17 +478,14 @@ const Navbar = () => {
                     px: 1.5,
                     borderRadius: 2,
                     color: "#cbd5e1",
-                    border:
-                      "1px solid rgba(148,163,184,.2)",
+                    border: "1px solid rgba(148,163,184,.2)",
                     textTransform: "none",
                     fontSize: 12,
                     fontWeight: 800,
                     "&:hover": {
                       color: "#fca5a5",
-                      borderColor:
-                        "rgba(248,113,113,.5)",
-                      bgcolor:
-                        "rgba(248,113,113,.06)",
+                      borderColor: "rgba(248,113,113,.5)",
+                      bgcolor: "rgba(248,113,113,.06)",
                     },
                   }}
                 >
@@ -564,9 +496,7 @@ const Navbar = () => {
 
             {/* Mobile menu */}
             <IconButton
-              onClick={() =>
-                toggleDrawer()
-              }
+              onClick={() => toggleDrawer()}
               aria-label="Open menu"
               sx={{
                 display: {
@@ -578,15 +508,11 @@ const Navbar = () => {
                 height: 40,
                 borderRadius: 2.2,
                 color: "#fff",
-                bgcolor:
-                  "rgba(15,23,42,.7)",
-                border:
-                  "1px solid rgba(148,163,184,.16)",
+                bgcolor: "rgba(15,23,42,.7)",
+                border: "1px solid rgba(148,163,184,.16)",
                 "&:hover": {
-                  bgcolor:
-                    "rgba(99,102,241,.12)",
-                  borderColor:
-                    "rgba(129,140,248,.4)",
+                  bgcolor: "rgba(99,102,241,.12)",
+                  borderColor: "rgba(129,140,248,.4)",
                 },
               }}
             >
@@ -600,9 +526,7 @@ const Navbar = () => {
       <Drawer
         anchor="right"
         open={open}
-        onClose={() =>
-          toggleDrawer(false)
-        }
+        onClose={() => toggleDrawer(false)}
         ModalProps={{
           keepMounted: true,
         }}
@@ -615,8 +539,7 @@ const Navbar = () => {
             maxWidth: 360,
             bgcolor: "#020617",
             color: "#fff",
-            borderLeft:
-              "1px solid rgba(148,163,184,.14)",
+            borderLeft: "1px solid rgba(148,163,184,.14)",
             backgroundImage:
               "radial-gradient(circle at 100% 0%, rgba(99,102,241,.14), transparent 35%)",
           },
@@ -630,15 +553,10 @@ const Navbar = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            borderBottom:
-              "1px solid rgba(148,163,184,.12)",
+            borderBottom: "1px solid rgba(148,163,184,.12)",
           }}
         >
-          <Stack
-            direction="row"
-            spacing={1}
-            alignItems="center"
-          >
+          <Stack direction="row" spacing={1} alignItems="center">
             <Avatar
               src="/images/logo.png"
               alt="CodeX"
@@ -647,8 +565,7 @@ const Navbar = () => {
                 height: 38,
                 borderRadius: 2,
                 bgcolor: "#0f172a",
-                border:
-                  "1px solid rgba(129,140,248,.25)",
+                border: "1px solid rgba(129,140,248,.25)",
               }}
             />
 
@@ -678,9 +595,7 @@ const Navbar = () => {
           </Stack>
 
           <IconButton
-            onClick={() =>
-              toggleDrawer(false)
-            }
+            onClick={() => toggleDrawer(false)}
             sx={{
               width: 36,
               height: 36,
@@ -688,14 +603,11 @@ const Navbar = () => {
               borderRadius: 2,
               "&:hover": {
                 color: "#fff",
-                bgcolor:
-                  "rgba(148,163,184,.08)",
+                bgcolor: "rgba(148,163,184,.08)",
               },
             }}
           >
-            <CloseIcon
-              sx={{ fontSize: 20 }}
-            />
+            <CloseIcon sx={{ fontSize: 20 }} />
           </IconButton>
         </Box>
 
@@ -707,35 +619,22 @@ const Navbar = () => {
               mt: 1.2,
               p: 1.3,
               borderRadius: 3,
-              bgcolor:
-                "rgba(15,23,42,.7)",
-              border:
-                "1px solid rgba(148,163,184,.12)",
+              bgcolor: "rgba(15,23,42,.7)",
+              border: "1px solid rgba(148,163,184,.12)",
             }}
           >
-            <Stack
-              direction="row"
-              spacing={1}
-              alignItems="center"
-            >
+            <Stack direction="row" spacing={1} alignItems="center">
               <Avatar
                 sx={{
                   width: 34,
                   height: 34,
-                  bgcolor:
-                    "rgba(99,102,241,.18)",
+                  bgcolor: "rgba(99,102,241,.18)",
                   color: "#a5b4fc",
                   fontSize: 14,
                   fontWeight: 900,
                 }}
               >
-                {(
-                  user?.name ||
-                  user?.email ||
-                  "U"
-                )
-                  .charAt(0)
-                  .toUpperCase()}
+                {(user?.name || user?.email || "U").charAt(0).toUpperCase()}
               </Avatar>
 
               <Box
@@ -750,8 +649,7 @@ const Navbar = () => {
                     fontSize: ".75rem",
                   }}
                 >
-                  {user?.name ||
-                    "Welcome back"}
+                  {user?.name || "Welcome back"}
                 </Typography>
 
                 <Typography
@@ -785,68 +683,48 @@ const Navbar = () => {
           </Typography>
 
           {menuItems.map((item) => {
-            const active = isActive(
-              item.to,
-            );
+            const active = isActive(item.to);
 
             return (
               <ListItemButton
                 key={item.to}
-                onClick={() =>
-                  navigateAndClose(
-                    item.to,
-                  )
-                }
+                onClick={() => navigateAndClose(item.to)}
                 sx={{
                   minHeight: 46,
                   mb: 0.5,
                   px: 1.2,
                   borderRadius: 2.5,
-                  color: active
-                    ? "#fff"
-                    : "#94a3b8",
-                  bgcolor: active
-                    ? "rgba(99,102,241,.12)"
-                    : "transparent",
+                  color: active ? "#fff" : "#94a3b8",
+                  bgcolor: active ? "rgba(99,102,241,.12)" : "transparent",
                   border: active
                     ? "1px solid rgba(129,140,248,.12)"
                     : "1px solid transparent",
-                  transition:
-                    "all .2s ease",
+                  transition: "all .2s ease",
                   "&:hover": {
                     color: "#fff",
-                    bgcolor:
-                      "rgba(99,102,241,.08)",
-                    transform:
-                      "translateX(2px)",
+                    bgcolor: "rgba(99,102,241,.08)",
+                    transform: "translateX(2px)",
                   },
                 }}
               >
                 <ListItemIcon
                   sx={{
                     minWidth: 38,
-                    color: active
-                      ? "#818cf8"
-                      : "#64748b",
+                    color: active ? "#818cf8" : "#64748b",
                   }}
                 >
-                  {React.cloneElement(
-                    item.icon,
-                    {
-                      sx: {
-                        fontSize: 20,
-                      },
+                  {React.cloneElement(item.icon, {
+                    sx: {
+                      fontSize: 20,
                     },
-                  )}
+                  })}
                 </ListItemIcon>
 
                 <ListItemText
                   primary={item.text}
                   primaryTypographyProps={{
                     fontSize: 13,
-                    fontWeight: active
-                      ? 800
-                      : 600,
+                    fontWeight: active ? 800 : 600,
                   }}
                 />
 
@@ -857,8 +735,7 @@ const Navbar = () => {
                       height: 5,
                       borderRadius: "50%",
                       bgcolor: "#818cf8",
-                      boxShadow:
-                        "0 0 10px rgba(129,140,248,.8)",
+                      boxShadow: "0 0 10px rgba(129,140,248,.8)",
                     }}
                   />
                 )}
@@ -867,50 +744,37 @@ const Navbar = () => {
           })}
 
           <ListItemButton
-            onClick={() =>
-              navigateAndClose("/aktu")
-            }
+            onClick={() => navigateAndClose("/aktu")}
             sx={{
               minHeight: 46,
               mb: 0.5,
               px: 1.2,
               borderRadius: 2.5,
-              color: isAktuActive
-                ? "#fff"
-                : "#94a3b8",
-              bgcolor: isAktuActive
-                ? "rgba(99,102,241,.12)"
-                : "transparent",
+              color: isAktuActive ? "#fff" : "#94a3b8",
+              bgcolor: isAktuActive ? "rgba(99,102,241,.12)" : "transparent",
               border: isAktuActive
                 ? "1px solid rgba(129,140,248,.12)"
                 : "1px solid transparent",
               "&:hover": {
                 color: "#fff",
-                bgcolor:
-                  "rgba(99,102,241,.08)",
+                bgcolor: "rgba(99,102,241,.08)",
               },
             }}
           >
             <ListItemIcon
               sx={{
                 minWidth: 38,
-                color: isAktuActive
-                  ? "#818cf8"
-                  : "#64748b",
+                color: isAktuActive ? "#818cf8" : "#64748b",
               }}
             >
-              <SchoolIcon
-                sx={{ fontSize: 20 }}
-              />
+              <SchoolIcon sx={{ fontSize: 20 }} />
             </ListItemIcon>
 
             <ListItemText
               primary="AKTU Study"
               primaryTypographyProps={{
                 fontSize: 13,
-                fontWeight: isAktuActive
-                  ? 800
-                  : 600,
+                fontWeight: isAktuActive ? 800 : 600,
               }}
             />
 
@@ -919,11 +783,9 @@ const Navbar = () => {
               size="small"
               sx={{
                 height: 20,
-                bgcolor:
-                  "rgba(99,102,241,.1)",
+                bgcolor: "rgba(99,102,241,.1)",
                 color: "#818cf8",
-                border:
-                  "1px solid rgba(129,140,248,.15)",
+                border: "1px solid rgba(129,140,248,.15)",
                 fontSize: 8,
                 fontWeight: 900,
               }}
@@ -933,8 +795,7 @@ const Navbar = () => {
 
         <Divider
           sx={{
-            borderColor:
-              "rgba(148,163,184,.12)",
+            borderColor: "rgba(148,163,184,.12)",
           }}
         />
 
@@ -956,22 +817,16 @@ const Navbar = () => {
 
           {token && isAdmin && (
             <ListItemButton
-              onClick={() =>
-                navigateAndClose(
-                  "/admin/dashboard",
-                )
-              }
+              onClick={() => navigateAndClose("/admin/dashboard")}
               sx={{
                 minHeight: 46,
                 mb: 0.5,
                 px: 1.2,
                 borderRadius: 2.5,
                 color: "#a5b4fc",
-                bgcolor:
-                  "rgba(99,102,241,.08)",
+                bgcolor: "rgba(99,102,241,.08)",
                 "&:hover": {
-                  bgcolor:
-                    "rgba(99,102,241,.15)",
+                  bgcolor: "rgba(99,102,241,.15)",
                 },
               }}
             >
@@ -981,9 +836,7 @@ const Navbar = () => {
                   color: "#818cf8",
                 }}
               >
-                <AdminPanelSettingsIcon
-                  sx={{ fontSize: 20 }}
-                />
+                <AdminPanelSettingsIcon sx={{ fontSize: 20 }} />
               </ListItemIcon>
 
               <ListItemText
@@ -999,11 +852,7 @@ const Navbar = () => {
           {!token ? (
             <>
               <ListItemButton
-                onClick={() =>
-                  navigateAndClose(
-                    "/login",
-                  )
-                }
+                onClick={() => navigateAndClose("/login")}
                 sx={{
                   minHeight: 46,
                   mb: 0.5,
@@ -1011,8 +860,7 @@ const Navbar = () => {
                   borderRadius: 2.5,
                   color: "#cbd5e1",
                   "&:hover": {
-                    bgcolor:
-                      "rgba(99,102,241,.08)",
+                    bgcolor: "rgba(99,102,241,.08)",
                   },
                 }}
               >
@@ -1035,25 +883,17 @@ const Navbar = () => {
               </ListItemButton>
 
               <ListItemButton
-                onClick={() =>
-                  navigateAndClose(
-                    "/signup",
-                  )
-                }
+                onClick={() => navigateAndClose("/signup")}
                 sx={{
                   minHeight: 46,
                   px: 1.2,
                   borderRadius: 2.5,
                   color: "#fff",
-                  bgcolor:
-                    "linear-gradient(135deg,#6366f1,#4f46e5)",
-                  background:
-                    "linear-gradient(135deg,#6366f1,#4f46e5)",
-                  boxShadow:
-                    "0 8px 24px rgba(79,70,229,.2)",
+                  bgcolor: "linear-gradient(135deg,#6366f1,#4f46e5)",
+                  background: "linear-gradient(135deg,#6366f1,#4f46e5)",
+                  boxShadow: "0 8px 24px rgba(79,70,229,.2)",
                   "&:hover": {
-                    background:
-                      "linear-gradient(135deg,#818cf8,#6366f1)",
+                    background: "linear-gradient(135deg,#818cf8,#6366f1)",
                   },
                 }}
               >
@@ -1084,8 +924,7 @@ const Navbar = () => {
                 borderRadius: 2.5,
                 color: "#fca5a5",
                 "&:hover": {
-                  bgcolor:
-                    "rgba(248,113,113,.07)",
+                  bgcolor: "rgba(248,113,113,.07)",
                 },
               }}
             >
@@ -1120,10 +959,8 @@ const Navbar = () => {
             sx={{
               p: 1.5,
               borderRadius: 3,
-              bgcolor:
-                "rgba(15,23,42,.65)",
-              border:
-                "1px solid rgba(148,163,184,.1)",
+              bgcolor: "rgba(15,23,42,.65)",
+              border: "1px solid rgba(148,163,184,.1)",
               textAlign: "center",
             }}
           >
@@ -1142,8 +979,7 @@ const Navbar = () => {
                 lineHeight: 1.5,
               }}
             >
-              CodeX · Academic Project
-              Marketplace
+              CodeX · Academic Project Marketplace
             </Typography>
           </Box>
         </Box>
