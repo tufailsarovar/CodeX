@@ -1779,62 +1779,68 @@ const Home = () => {
           </MotionBox>
         </Container>
       </Box>
+
       {/* =================================================
-          AKTU STUDY HUB
-      ================================================= */}
+    AKTU STUDY HUB
+================================================= */}
 
       <Box
         sx={{
-          py: {
-            xs: 6,
-            md: 9,
-          },
-
-          background:
-            "linear-gradient(180deg,#020617 0%,#0f172a 50%,#020617 100%)",
-
-          color: "#fff",
-
           position: "relative",
-
           overflow: "hidden",
+          py: { xs: 4, sm: 5.5, md: 7 },
+          px: { xs: 1.5, sm: 2, md: 3 },
+          color: "#fff",
+          background:
+            "linear-gradient(180deg,#020617 0%,#07112b 50%,#020617 100%)",
         }}
       >
-        {/* BACKGROUND GLOW */}
-
-        <Box
+        {/* Soft animated background glows */}
+        <MotionBox
+          animate={{
+            x: [0, 35, 0],
+            y: [0, 20, 0],
+            scale: [1, 1.08, 1],
+          }}
+          transition={{
+            duration: 9,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
           sx={{
             position: "absolute",
-
-            width: 350,
-            height: 350,
-
+            width: { xs: 180, sm: 280, md: 360 },
+            height: { xs: 180, sm: 280, md: 360 },
             borderRadius: "50%",
-
-            background: "rgba(79,70,229,.18)",
-
-            filter: "blur(100px)",
-
-            top: -150,
-            left: -100,
+            background: "rgba(99,102,241,.10)",
+            filter: "blur(75px)",
+            top: { xs: -90, sm: -130 },
+            left: { xs: -70, sm: -100 },
+            pointerEvents: "none",
           }}
         />
 
-        <Box
+        <MotionBox
+          animate={{
+            x: [0, -30, 0],
+            y: [0, -20, 0],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
           sx={{
             position: "absolute",
-
-            width: 350,
-            height: 350,
-
+            width: { xs: 180, sm: 280, md: 360 },
+            height: { xs: 180, sm: 280, md: 360 },
             borderRadius: "50%",
-
-            background: "rgba(14,165,233,.12)",
-
-            filter: "blur(100px)",
-
-            bottom: -150,
-            right: -100,
+            background: "rgba(37,99,235,.08)",
+            filter: "blur(80px)",
+            right: { xs: -80, sm: -100 },
+            bottom: { xs: -80, sm: -120 },
+            pointerEvents: "none",
           }}
         />
 
@@ -1845,62 +1851,65 @@ const Home = () => {
             zIndex: 1,
           }}
         >
-          {/* AKTU HEADER */}
-
-          <Box
+          {/* HEADER */}
+          <MotionBox
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.55 }}
             sx={{
               textAlign: "center",
-
-              maxWidth: 800,
-
+              maxWidth: 720,
               mx: "auto",
-
-              mb: {
-                xs: 4,
-                md: 6,
-              },
+              mb: { xs: 3, sm: 4.5, md: 5.5 },
             }}
           >
-            <Box
+            {/* Icon */}
+            <MotionBox
+              animate={{
+                y: [0, -5, 0],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
               sx={{
-                width: 72,
-                height: 72,
-
+                width: { xs: 48, sm: 62, md: 70 },
+                height: { xs: 48, sm: 62, md: 70 },
                 mx: "auto",
-                mb: 2.5,
-
+                mb: { xs: 1.5, sm: 2 },
                 display: "flex",
-
                 alignItems: "center",
                 justifyContent: "center",
-
-                borderRadius: 4,
-
+                borderRadius: { xs: 2.5, sm: 3.5 },
                 background: "linear-gradient(135deg,#6366f1,#2563eb)",
-
-                boxShadow: "0 15px 45px rgba(79,70,229,.3)",
+                boxShadow: "0 12px 35px rgba(79,70,229,.25)",
               }}
             >
               <SchoolIcon
                 sx={{
-                  fontSize: 40,
+                  fontSize: { xs: 27, sm: 34, md: 39 },
                   color: "#fff",
                 }}
               />
-            </Box>
+            </MotionBox>
 
             <Chip
               label="AKTU STUDY RESOURCES"
+              size="small"
               sx={{
-                mb: 1.5,
-
-                color: "#c7d2fe",
-
-                background: "rgba(99,102,241,.12)",
-
-                border: "1px solid rgba(129,140,248,.3)",
-
-                fontWeight: 800,
+                mb: { xs: 1, sm: 1.3 },
+                height: { xs: 24, sm: 28 },
+                color: "#a5b4fc",
+                background: "rgba(99,102,241,.09)",
+                border: "1px solid rgba(129,140,248,.20)",
+                fontWeight: 900,
+                fontSize: {
+                  xs: ".52rem",
+                  sm: ".62rem",
+                },
+                letterSpacing: ".5px",
               }}
             />
 
@@ -1909,14 +1918,18 @@ const Home = () => {
               fontWeight={950}
               sx={{
                 fontSize: {
-                  xs: "2rem",
-                  sm: "2.7rem",
-                  md: "3.4rem",
+                  xs: "1.55rem",
+                  sm: "2.25rem",
+                  md: "3rem",
                 },
-
                 lineHeight: 1.1,
-
-                letterSpacing: "-1px",
+                letterSpacing: {
+                  xs: "-.6px",
+                  sm: "-1px",
+                },
+                background: "linear-gradient(90deg,#fff,#c7d2fe,#818cf8)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
               }}
             >
               AKTU Study Hub
@@ -1924,208 +1937,271 @@ const Home = () => {
 
             <Typography
               sx={{
-                mt: 1.8,
-
+                mt: { xs: 1, sm: 1.3 },
+                mx: "auto",
+                maxWidth: 590,
                 color: "#94a3b8",
-
                 fontSize: {
-                  xs: ".95rem",
-                  md: "1.08rem",
+                  xs: ".68rem",
+                  sm: ".8rem",
+                  md: ".92rem",
                 },
-
-                lineHeight: 1.8,
+                lineHeight: 1.7,
               }}
             >
-              Everything you need for AKTU preparation in one place — organized
+              Everything you need for AKTU preparation in one place, organized
               by branch and academic year.
             </Typography>
-          </Box>
+          </MotionBox>
 
-          {/* AKTU GRID
-              PHONE = 2
-              TABLET = 2
-              DESKTOP = 3
-          */}
-
+          {/* RESOURCE CARDS */}
           <Grid
             container
             spacing={{
-              xs: 1.2,
-              sm: 2,
-              md: 2.5,
+              xs: 1,
+              sm: 1.8,
+              md: 2.3,
             }}
           >
-            {aktuResources.map((resource) => (
+            {aktuResources.map((resource, index) => (
               <Grid item xs={6} sm={6} md={4} key={resource.title}>
-                <Paper
+                <MotionBox
+                  initial={{
+                    opacity: 0,
+                    y: 18,
+                  }}
+                  whileInView={{
+                    opacity: 1,
+                    y: 0,
+                  }}
+                  viewport={{
+                    once: true,
+                    amount: 0.15,
+                  }}
+                  transition={{
+                    duration: 0.4,
+                    delay: index * 0.05,
+                  }}
+                  whileHover={{
+                    y: -5,
+                  }}
                   sx={{
                     height: "100%",
-
-                    p: {
-                      xs: 1.5,
-                      sm: 2.5,
-                      md: 3,
-                    },
-
-                    borderRadius: {
-                      xs: 2.5,
-                      md: 4,
-                    },
-
-                    background: "rgba(15,23,42,.75)",
-
-                    border: "1px solid rgba(148,163,184,.16)",
-
-                    color: "#fff",
-
-                    backdropFilter: "blur(12px)",
-
-                    transition: "all .3s ease",
-
-                    "&:hover": {
-                      transform: "translateY(-6px)",
-
-                      borderColor: "rgba(99,102,241,.55)",
-
-                      boxShadow: "0 20px 45px rgba(0,0,0,.25)",
-                    },
                   }}
                 >
-                  <Stack
-                    direction="row"
-                    alignItems="flex-start"
-                    justifyContent="space-between"
-                    spacing={0.5}
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      height: "100%",
+                      minHeight: {
+                        xs: 145,
+                        sm: 180,
+                        md: 205,
+                      },
+
+                      p: {
+                        xs: 1.25,
+                        sm: 2,
+                        md: 2.5,
+                      },
+
+                      borderRadius: {
+                        xs: 2.2,
+                        sm: 3,
+                        md: 3.5,
+                      },
+
+                      background:
+                        "linear-gradient(145deg,rgba(15,23,42,.90),rgba(8,15,35,.82))",
+
+                      border: "1px solid rgba(148,163,184,.12)",
+
+                      color: "#fff",
+
+                      backdropFilter: "blur(12px)",
+
+                      transition:
+                        "border-color .25s ease, box-shadow .25s ease",
+
+                      "&:hover": {
+                        borderColor: "rgba(99,102,241,.45)",
+                        boxShadow: "0 14px 35px rgba(0,0,0,.22)",
+                      },
+                    }}
                   >
-                    <Box
+                    <Stack
+                      direction="row"
+                      alignItems="flex-start"
+                      justifyContent="space-between"
+                      spacing={0.5}
+                    >
+                      {/* Icon */}
+                      <MotionBox
+                        whileHover={{
+                          rotate: 5,
+                          scale: 1.08,
+                        }}
+                        sx={{
+                          width: {
+                            xs: 34,
+                            sm: 44,
+                            md: 48,
+                          },
+                          height: {
+                            xs: 34,
+                            sm: 44,
+                            md: 48,
+                          },
+
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+
+                          flexShrink: 0,
+
+                          borderRadius: {
+                            xs: 1.8,
+                            sm: 2.5,
+                          },
+
+                          background: "rgba(99,102,241,.10)",
+
+                          color: "#818cf8",
+
+                          "& svg": {
+                            fontSize: {
+                              xs: 18,
+                              sm: 24,
+                              md: 27,
+                            },
+                          },
+                        }}
+                      >
+                        {resource.icon}
+                      </MotionBox>
+
+                      <Chip
+                        size="small"
+                        label={resource.tag}
+                        color={resource.tagColor}
+                        sx={{
+                          height: {
+                            xs: 19,
+                            sm: 23,
+                          },
+
+                          fontWeight: 900,
+
+                          fontSize: {
+                            xs: 7,
+                            sm: 9,
+                          },
+
+                          "& .MuiChip-label": {
+                            px: {
+                              xs: 0.65,
+                              sm: 0.9,
+                            },
+                          },
+                        }}
+                      />
+                    </Stack>
+
+                    <Typography
+                      fontWeight={900}
                       sx={{
-                        width: {
-                          xs: 38,
-                          sm: 52,
+                        mt: {
+                          xs: 1.1,
+                          sm: 1.7,
                         },
 
-                        height: {
-                          xs: 38,
-                          sm: 52,
+                        mb: {
+                          xs: 0.45,
+                          sm: 0.7,
                         },
 
-                        flexShrink: 0,
+                        fontSize: {
+                          xs: ".76rem",
+                          sm: ".95rem",
+                          md: "1.05rem",
+                        },
 
-                        display: "flex",
+                        lineHeight: 1.25,
+                      }}
+                    >
+                      {resource.title}
+                    </Typography>
 
-                        alignItems: "center",
+                    <Typography
+                      sx={{
+                        color: "#64748b",
 
-                        justifyContent: "center",
+                        fontSize: {
+                          xs: ".58rem",
+                          sm: ".7rem",
+                          md: ".8rem",
+                        },
 
-                        borderRadius: {
-                          xs: 2,
+                        lineHeight: 1.5,
+
+                        display: "-webkit-box",
+                        WebkitBoxOrient: "vertical",
+
+                        WebkitLineClamp: {
+                          xs: 3,
                           sm: 3,
                         },
 
-                        background: resource.iconBackground,
-
-                        color: "#818cf8",
-
-                        "& svg": {
-                          fontSize: {
-                            xs: 21,
-                            sm: 29,
-                          },
-                        },
+                        overflow: "hidden",
                       }}
                     >
-                      {resource.icon}
-                    </Box>
-
-                    <Chip
-                      size="small"
-                      label={resource.tag}
-                      color={resource.tagColor}
-                      sx={{
-                        fontWeight: 800,
-
-                        fontSize: {
-                          xs: 9,
-                          sm: 11,
-                        },
-
-                        height: {
-                          xs: 22,
-                          sm: 28,
-                        },
-                      }}
-                    />
-                  </Stack>
-
-                  <Typography
-                    fontWeight={900}
-                    sx={{
-                      mt: {
-                        xs: 1.4,
-                        sm: 2.2,
-                      },
-
-                      mb: 0.8,
-
-                      fontSize: {
-                        xs: ".88rem",
-                        sm: "1.1rem",
-                      },
-
-                      lineHeight: 1.25,
-                    }}
-                  >
-                    {resource.title}
-                  </Typography>
-
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "#94a3b8",
-
-                      lineHeight: 1.55,
-
-                      fontSize: {
-                        xs: ".72rem",
-                        sm: ".875rem",
-                      },
-
-                      display: "-webkit-box",
-
-                      WebkitBoxOrient: "vertical",
-
-                      WebkitLineClamp: {
-                        xs: 3,
-                        sm: 4,
-                      },
-
-                      overflow: "hidden",
-                    }}
-                  >
-                    {resource.description}
-                  </Typography>
-                </Paper>
+                      {resource.description}
+                    </Typography>
+                  </Paper>
+                </MotionBox>
               </Grid>
             ))}
           </Grid>
 
-          {/* AKTU CTA */}
-
-          <Box
+          {/* CTA */}
+          <MotionBox
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+            whileInView={{
+              opacity: 1,
+              y: 0,
+            }}
+            viewport={{
+              once: true,
+              amount: 0.2,
+            }}
+            transition={{
+              duration: 0.5,
+            }}
             sx={{
-              mt: 4.5,
-
-              p: {
-                xs: 2,
+              mt: {
+                xs: 2.5,
                 sm: 3.5,
+                md: 4.5,
               },
 
-              borderRadius: 4,
+              p: {
+                xs: 1.5,
+                sm: 2.5,
+                md: 3,
+              },
+
+              borderRadius: {
+                xs: 2.5,
+                sm: 3,
+              },
 
               background:
-                "linear-gradient(135deg,rgba(79,70,229,.2),rgba(14,165,233,.1))",
+                "linear-gradient(135deg,rgba(99,102,241,.10),rgba(37,99,235,.07))",
 
-              border: "1px solid rgba(129,140,248,.25)",
+              border: "1px solid rgba(129,140,248,.16)",
             }}
           >
             <Stack
@@ -2133,7 +2209,10 @@ const Home = () => {
                 xs: "column",
                 sm: "row",
               }}
-              spacing={2}
+              spacing={{
+                xs: 1.5,
+                sm: 2,
+              }}
               alignItems={{
                 xs: "stretch",
                 sm: "center",
@@ -2145,29 +2224,28 @@ const Home = () => {
                   fontWeight={900}
                   sx={{
                     fontSize: {
-                      xs: "1rem",
-                      sm: "1.15rem",
+                      xs: ".82rem",
+                      sm: "1rem",
+                      md: "1.1rem",
                     },
                   }}
                 >
-                  Looking for AKTU study material?
+                  Ready to explore AKTU resources?
                 </Typography>
 
                 <Typography
-                  variant="body2"
                   sx={{
-                    color: "#94a3b8",
-
-                    mt: 0.5,
-
+                    mt: 0.35,
+                    color: "#64748b",
                     fontSize: {
-                      xs: ".75rem",
-                      sm: ".875rem",
+                      xs: ".59rem",
+                      sm: ".7rem",
+                      md: ".8rem",
                     },
+                    lineHeight: 1.5,
                   }}
                 >
-                  Select your branch, year and resource type from the AKTU Study
-                  page.
+                  Choose your branch, year and study material.
                 </Typography>
               </Box>
 
@@ -2175,111 +2253,121 @@ const Home = () => {
                 component={Link}
                 to="/aktu"
                 variant="contained"
-                size="large"
                 endIcon={<ArrowForwardIcon />}
                 sx={{
                   flexShrink: 0,
 
-                  borderRadius: 3,
+                  minHeight: {
+                    xs: 36,
+                    sm: 42,
+                  },
+
+                  px: {
+                    xs: 1.8,
+                    sm: 2.4,
+                  },
+
+                  borderRadius: 999,
 
                   textTransform: "none",
 
                   fontWeight: 900,
 
-                  minHeight: 50,
+                  fontSize: {
+                    xs: ".62rem",
+                    sm: ".72rem",
+                  },
 
-                  px: 3,
+                  background: "linear-gradient(135deg,#6366f1,#4f46e5)",
+
+                  boxShadow: "0 8px 22px rgba(79,70,229,.22)",
+
+                  "&:hover": {
+                    background: "linear-gradient(135deg,#818cf8,#6366f1)",
+                    transform: "translateY(-2px)",
+                  },
+
+                  transition: "all .25s ease",
                 }}
               >
                 Explore AKTU
               </Button>
             </Stack>
-          </Box>
+          </MotionBox>
 
-          {/* AKTU FEATURES */}
-
-          <Grid
-            container
-            spacing={2}
+          {/* FEATURES */}
+          <MotionBox
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.15 }}
             sx={{
-              mt: 3,
+              mt: {
+                xs: 2,
+                sm: 2.8,
+                md: 3.5,
+              },
+
+              display: "flex",
+              justifyContent: "center",
+              flexWrap: "wrap",
+              gap: {
+                xs: 1.2,
+                sm: 2.5,
+              },
             }}
           >
-            <Grid item xs={12} sm={4}>
+            {[
+              {
+                icon: <SchoolIcon />,
+                text: "Branch-wise",
+              },
+              {
+                icon: <MenuBookIcon />,
+                text: "1st–4th Year",
+              },
+              {
+                icon: <PictureAsPdfIcon />,
+                text: "PDF Material",
+              },
+            ].map((feature) => (
               <Stack
+                key={feature.text}
                 direction="row"
-                spacing={1.2}
+                spacing={0.55}
                 alignItems="center"
-                justifyContent={{
-                  xs: "center",
-                  sm: "flex-start",
-                }}
               >
-                <SchoolIcon
+                <Box
                   sx={{
+                    display: "flex",
                     color: "#818cf8",
+
+                    "& svg": {
+                      fontSize: {
+                        xs: 14,
+                        sm: 17,
+                      },
+                    },
                   }}
-                />
+                >
+                  {feature.icon}
+                </Box>
 
                 <Typography
-                  variant="body2"
-                  fontWeight={700}
-                  color="text.secondary"
-                >
-                  Branch-wise resources
-                </Typography>
-              </Stack>
-            </Grid>
-
-            <Grid item xs={12} sm={4}>
-              <Stack
-                direction="row"
-                spacing={1.2}
-                alignItems="center"
-                justifyContent="center"
-              >
-                <MenuBookIcon
                   sx={{
-                    color: "#818cf8",
+                    color: "#64748b",
+                    fontSize: {
+                      xs: ".55rem",
+                      sm: ".65rem",
+                    },
+                    fontWeight: 800,
                   }}
-                />
-
-                <Typography
-                  variant="body2"
-                  fontWeight={700}
-                  color="text.secondary"
                 >
-                  1st to 4th Year
+                  {feature.text}
                 </Typography>
               </Stack>
-            </Grid>
-
-            <Grid item xs={12} sm={4}>
-              <Stack
-                direction="row"
-                spacing={1.2}
-                alignItems="center"
-                justifyContent={{
-                  xs: "center",
-                  sm: "flex-end",
-                }}
-              >
-                <PictureAsPdfIcon
-                  sx={{
-                    color: "#818cf8",
-                  }}
-                />
-
-                <Typography
-                  variant="body2"
-                  fontWeight={700}
-                  color="text.secondary"
-                >
-                  PDF study material
-                </Typography>
-              </Stack>
-            </Grid>
-          </Grid>
+            ))}
+          </MotionBox>
         </Container>
       </Box>
 
