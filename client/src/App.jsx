@@ -1,9 +1,5 @@
 import React, { useEffect } from "react";
-import {
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import { Box } from "@mui/material";
 
@@ -26,6 +22,7 @@ import ProjectDetails from "./pages/Projects/ProjectDetails";
 
 import Contact from "./pages/Contact";
 import AllFreeProjects from "./pages/AllFreeProjects";
+import ProjectRequest from "./pages/ProjectRequest";
 
 /* =========================================================
    AKTU PUBLIC
@@ -55,11 +52,7 @@ const App = () => {
   let user = null;
 
   try {
-    user = JSON.parse(
-      localStorage.getItem(
-        "codex_user"
-      )
-    );
+    user = JSON.parse(localStorage.getItem("codex_user"));
   } catch {
     user = null;
   }
@@ -69,28 +62,16 @@ const App = () => {
   ======================================================= */
 
   useEffect(() => {
-    fetch(
-      "https://codex-server-eight.vercel.app/health"
-    ).catch(() => {});
+    fetch("https://codex-server-eight.vercel.app/health").catch(() => {});
   }, []);
 
   /* =======================================================
      ADMIN ROUTE
   ======================================================= */
 
-  const AdminRoute = ({
-    children,
-  }) => {
-    if (
-      !user ||
-      user.isAdmin !== true
-    ) {
-      return (
-        <Navigate
-          to="/"
-          replace
-        />
-      );
+  const AdminRoute = ({ children }) => {
+    if (!user || user.isAdmin !== true) {
+      return <Navigate to="/" replace />;
     }
 
     return children;
@@ -128,69 +109,30 @@ const App = () => {
               PUBLIC
           ================================================= */}
 
-          <Route
-            path="/"
-            element={<Home />}
-          />
+          <Route path="/" element={<Home />} />
 
-          <Route
-            path="/about"
-            element={<About />}
-          />
+          <Route path="/about" element={<About />} />
 
-          <Route
-            path="/login"
-            element={<Login />}
-          />
+          <Route path="/login" element={<Login />} />
 
-          <Route
-            path="/signup"
-            element={<Signup />}
-          />
+          <Route path="/signup" element={<Signup />} />
 
-          <Route
-            path="/projects"
-            element={
-              <AllProjects />
-            }
-          />
+          <Route path="/project-request" element={<ProjectRequest />} />
+          <Route path="/projects" element={<AllProjects />} />
 
-          <Route
-            path="/explore"
-            element={
-              <ExploreProjects />
-            }
-          />
+          <Route path="/explore" element={<ExploreProjects />} />
 
-          <Route
-            path="/projects/:id"
-            element={
-              <ProjectDetails />
-            }
-          />
+          <Route path="/projects/:id" element={<ProjectDetails />} />
 
-          <Route
-            path="/contact"
-            element={<Contact />}
-          />
+          <Route path="/contact" element={<Contact />} />
 
-          <Route
-            path="/free-projects"
-            element={
-              <AllFreeProjects />
-            }
-          />
+          <Route path="/free-projects" element={<AllFreeProjects />} />
 
           {/* =================================================
               AKTU — SINGLE STUDENT PAGE
           ================================================= */}
 
-          <Route
-            path="/aktu"
-            element={
-              <AKTUStudy />
-            }
-          />
+          <Route path="/aktu" element={<AKTUStudy />} />
 
           {/* =================================================
               ADMIN DASHBOARD
@@ -275,15 +217,7 @@ const App = () => {
               FALLBACK
           ================================================= */}
 
-          <Route
-            path="*"
-            element={
-              <Navigate
-                to="/"
-                replace
-              />
-            }
-          />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Box>
 

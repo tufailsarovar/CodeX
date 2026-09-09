@@ -20,6 +20,7 @@ import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import AssignmentIcon from "@mui/icons-material/Assignment";
 
 import { Link } from "react-router-dom";
 
@@ -1431,8 +1432,6 @@ const Home = () => {
                 Browse all available academic projects.
               </Typography>
             </Box>
-
-            
           </Box>
 
           {/* PROJECT GRID */}
@@ -1516,6 +1515,270 @@ const Home = () => {
         </Container>
       </Box>
 
+      {/* =================================================
+    PROJECT REQUEST CTA
+================================================= */}
+
+      <Box
+        sx={{
+          py: { xs: 3, sm: 4, md: 5 },
+          px: { xs: 1.5, sm: 2, md: 3 },
+          background: "#0b1228",
+          overflow: "hidden",
+        }}
+      >
+        <Container maxWidth="lg">
+          <MotionBox
+            initial={{ opacity: 0, y: 35, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{
+              duration: 0.65,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            sx={{
+              position: "relative",
+              overflow: "hidden",
+              textAlign: "center",
+
+              py: {
+                xs: 3.2,
+                sm: 4,
+                md: 4.8,
+              },
+
+              px: {
+                xs: 1.8,
+                sm: 3,
+                md: 5,
+              },
+
+              borderRadius: {
+                xs: 2.5,
+                sm: 3.5,
+                md: 4,
+              },
+
+              border: "1px solid rgba(99,102,241,.20)",
+
+              background:
+                "linear-gradient(135deg, rgba(30,41,85,.72) 0%, rgba(17,27,58,.88) 55%, rgba(15,23,42,.96) 100%)",
+
+              boxShadow: "0 18px 50px rgba(0,0,0,.20)",
+
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                width: { xs: 140, sm: 220, md: 280 },
+                height: { xs: 140, sm: 220, md: 280 },
+                borderRadius: "50%",
+                background: "rgba(99,102,241,.10)",
+                filter: "blur(45px)",
+                top: -100,
+                left: "50%",
+                transform: "translateX(-50%)",
+                pointerEvents: "none",
+              },
+
+              "&::after": {
+                content: '""',
+                position: "absolute",
+                width: 100,
+                height: 100,
+                borderRadius: "50%",
+                border: "1px solid rgba(129,140,248,.08)",
+                right: { xs: -45, sm: -30 },
+                bottom: -45,
+                pointerEvents: "none",
+              },
+            }}
+          >
+            {/* Small Badge */}
+            <MotionBox
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.15, duration: 0.4 }}
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.7,
+                mb: { xs: 1.2, sm: 1.5 },
+
+                px: { xs: 1.2, sm: 1.5 },
+                py: { xs: 0.55, sm: 0.65 },
+
+                borderRadius: 999,
+
+                background: "rgba(99,102,241,.10)",
+
+                border: "1px solid rgba(129,140,248,.20)",
+
+                color: "#a5b4fc",
+
+                fontSize: {
+                  xs: "0.56rem",
+                  sm: "0.64rem",
+                },
+
+                fontWeight: 900,
+                letterSpacing: ".5px",
+              }}
+            >
+              <AssignmentIcon
+                sx={{
+                  fontSize: {
+                    xs: 13,
+                    sm: 15,
+                  },
+                }}
+              />
+              CAN'T FIND WHAT YOU NEED?
+            </MotionBox>
+
+            {/* Heading */}
+            <MotionBox
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.22, duration: 0.45 }}
+            >
+              <Typography
+                component="h2"
+                fontWeight={950}
+                sx={{
+                  position: "relative",
+                  zIndex: 1,
+
+                  fontSize: {
+                    xs: "1.35rem",
+                    sm: "1.8rem",
+                    md: "2.25rem",
+                  },
+
+                  lineHeight: 1.15,
+                  letterSpacing: "-.6px",
+
+                  color: "#ffffff",
+                }}
+              >
+                Need a Custom Project?
+              </Typography>
+            </MotionBox>
+
+            {/* Description */}
+            <MotionBox
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              <Typography
+                sx={{
+                  position: "relative",
+                  zIndex: 1,
+
+                  mt: { xs: 1, sm: 1.2 },
+
+                  mx: "auto",
+
+                  maxWidth: {
+                    xs: 330,
+                    sm: 580,
+                    md: 650,
+                  },
+
+                  color: "#94a3c7",
+
+                  fontSize: {
+                    xs: "0.68rem",
+                    sm: "0.78rem",
+                    md: "0.88rem",
+                  },
+
+                  lineHeight: {
+                    xs: 1.65,
+                    sm: 1.7,
+                  },
+                }}
+              >
+                Can't find the exact project you're looking for? Tell us what
+                you need and we'll help you with the right source code,
+                documentation, PPT, or complete project.
+              </Typography>
+            </MotionBox>
+
+            {/* Button */}
+            <MotionBox
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.38, duration: 0.45 }}
+              whileHover={{ y: -3 }}
+              sx={{
+                display: "inline-block",
+                mt: { xs: 1.8, sm: 2.2 },
+                position: "relative",
+                zIndex: 2,
+              }}
+            >
+              <Button
+                component={Link}
+                to="/project-request"
+                variant="contained"
+                endIcon={
+                  <ArrowForwardIcon
+                    sx={{
+                      fontSize: {
+                        xs: "16px !important",
+                        sm: "18px !important",
+                      },
+                    }}
+                  />
+                }
+                sx={{
+                  minHeight: {
+                    xs: 40,
+                    sm: 44,
+                  },
+
+                  px: {
+                    xs: 2,
+                    sm: 2.7,
+                  },
+
+                  borderRadius: 999,
+
+                  textTransform: "none",
+
+                  fontWeight: 900,
+
+                  fontSize: {
+                    xs: "0.68rem",
+                    sm: "0.78rem",
+                  },
+
+                  color: "#fff",
+
+                  background: "linear-gradient(135deg,#6366f1,#4f46e5)",
+
+                  boxShadow: "0 10px 28px rgba(79,70,229,.28)",
+
+                  transition: "all .25s ease",
+
+                  "&:hover": {
+                    background: "linear-gradient(135deg,#818cf8,#6366f1)",
+
+                    boxShadow: "0 14px 32px rgba(79,70,229,.38)",
+                  },
+                }}
+              >
+                Request a Project
+              </Button>
+            </MotionBox>
+          </MotionBox>
+        </Container>
+      </Box>
       {/* =================================================
           AKTU STUDY HUB
       ================================================= */}
