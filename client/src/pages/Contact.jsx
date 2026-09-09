@@ -25,9 +25,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import SecurityIcon from "@mui/icons-material/Security";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import emailjs from "@emailjs/browser";
-
-emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
+import api from "../api/axios";
 
 const MotionBox = motion(Box);
 const MotionPaper = motion(Paper);
@@ -52,8 +50,7 @@ const Logo = ({ size = "normal" }) => {
         borderRadius: dimensions.radius,
         p: "1px",
         flexShrink: 0,
-        background:
-          "linear-gradient(135deg,#6366f1,#8b5cf6,#f97316)",
+        background: "linear-gradient(135deg,#6366f1,#8b5cf6,#f97316)",
         boxShadow: "0 10px 28px rgba(99,102,241,.22)",
       }}
     >
@@ -126,31 +123,33 @@ const Contact = () => {
     setError("");
 
     try {
-      await emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        {
-          name,
-          email,
-          subject,
-          message,
-        },
-      );
-
-      setSuccess(
-        "Your message has been sent successfully. We'll get back to you soon!",
-      );
-
-      setForm({
-        name: "",
-        email: "",
-        subject: "",
-        message: "",
+      const response = await api.post("/contact", {
+        name,
+        email,
+        subject,
+        message,
       });
+
+      if (response.data?.success) {
+        setSuccess(
+          "Your message has been sent successfully. We'll get back to you soon!",
+        );
+
+        setForm({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+        });
+      } else {
+        throw new Error(response.data?.message || "Email sending failed.");
+      }
     } catch (err) {
-      console.error("EmailJS error:", err);
+      console.error("Contact SMTP error:", err);
+
       setError(
-        "Unable to send your message right now. Please try again.",
+        err.response?.data?.message ||
+          "Unable to send your message right now. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -262,8 +261,7 @@ const Contact = () => {
                   fontSize: { xs: "1rem", sm: "1.2rem" },
                   fontWeight: 950,
                   lineHeight: 1,
-                  background:
-                    "linear-gradient(90deg,#fff,#a5b4fc)",
+                  background: "linear-gradient(90deg,#fff,#a5b4fc)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
@@ -285,11 +283,7 @@ const Contact = () => {
           </Stack>
 
           <Chip
-            icon={
-              <SupportAgentIcon
-                sx={{ fontSize: "15px !important" }}
-              />
-            }
+            icon={<SupportAgentIcon sx={{ fontSize: "15px !important" }} />}
             label="GET IN TOUCH"
             sx={{
               mb: 1.4,
@@ -321,8 +315,12 @@ const Contact = () => {
             }}
           >
             Let's build something
-            <Box component="span" sx={{ display: { xs: "block", sm: "inline" } }}>
-              {" "}great together.
+            <Box
+              component="span"
+              sx={{ display: { xs: "block", sm: "inline" } }}
+            >
+              {" "}
+              great together.
             </Box>
           </Typography>
 
@@ -336,25 +334,15 @@ const Contact = () => {
               lineHeight: 1.7,
             }}
           >
-            Have a question about a project, purchase, submission,
-            or the CodeX platform? Send us a message and our team
-            will help you.
+            Have a question about a project, purchase, submission, or the CodeX
+            platform? Send us a message and our team will help you.
           </Typography>
         </MotionBox>
 
         {/* Main content */}
-        <Grid
-          container
-          spacing={{ xs: 2, md: 3 }}
-          alignItems="stretch"
-        >
+        <Grid container spacing={{ xs: 2, md: 3 }} alignItems="stretch">
           {/* Contact form - FIRST on phone */}
-          <Grid
-            item
-            xs={12}
-            md={8}
-            sx={{ order: { xs: 1, md: 2 } }}
-          >
+          <Grid item xs={12} md={8} sx={{ order: { xs: 1, md: 2 } }}>
             <MotionPaper
               initial={{ opacity: 0, y: 25 }}
               animate={{ opacity: 1, y: 0 }}
@@ -367,8 +355,7 @@ const Contact = () => {
                 bgcolor: "rgba(15,23,42,.82)",
                 border: "1px solid rgba(148,163,184,.14)",
                 color: "#fff",
-                boxShadow:
-                  "0 25px 70px rgba(0,0,0,.22)",
+                boxShadow: "0 25px 70px rgba(0,0,0,.22)",
                 position: "relative",
                 overflow: "hidden",
               }}
@@ -381,8 +368,7 @@ const Contact = () => {
                   left: 0,
                   right: 0,
                   height: 2,
-                  background:
-                    "linear-gradient(90deg,#6366f1,#8b5cf6,#f97316)",
+                  background: "linear-gradient(90deg,#6366f1,#8b5cf6,#f97316)",
                 }}
               />
 
@@ -531,8 +517,7 @@ const Contact = () => {
                         borderRadius: 2.5,
                         bgcolor: "rgba(34,197,94,.08)",
                         color: "#86efac",
-                        border:
-                          "1px solid rgba(34,197,94,.18)",
+                        border: "1px solid rgba(34,197,94,.18)",
                         "& .MuiAlert-icon": {
                           color: "#4ade80",
                         },
@@ -549,8 +534,7 @@ const Contact = () => {
                         borderRadius: 2.5,
                         bgcolor: "rgba(239,68,68,.08)",
                         color: "#fca5a5",
-                        border:
-                          "1px solid rgba(239,68,68,.18)",
+                        border: "1px solid rgba(239,68,68,.18)",
                         "& .MuiAlert-icon": {
                           color: "#f87171",
                         },
@@ -567,9 +551,7 @@ const Contact = () => {
                     fullWidth
                     endIcon={
                       !loading && (
-                        <SendIcon
-                          sx={{ fontSize: "17px !important" }}
-                        />
+                        <SendIcon sx={{ fontSize: "17px !important" }} />
                       )
                     }
                     sx={{
@@ -578,16 +560,12 @@ const Contact = () => {
                       textTransform: "none",
                       fontWeight: 900,
                       fontSize: { xs: ".75rem", sm: ".82rem" },
-                      background:
-                        "linear-gradient(135deg,#6366f1,#4f46e5)",
-                      boxShadow:
-                        "0 12px 30px rgba(79,70,229,.22)",
+                      background: "linear-gradient(135deg,#6366f1,#4f46e5)",
+                      boxShadow: "0 12px 30px rgba(79,70,229,.22)",
                       "&:hover": {
-                        background:
-                          "linear-gradient(135deg,#818cf8,#6366f1)",
+                        background: "linear-gradient(135deg,#818cf8,#6366f1)",
                         transform: "translateY(-1px)",
-                        boxShadow:
-                          "0 16px 35px rgba(79,70,229,.3)",
+                        boxShadow: "0 16px 35px rgba(79,70,229,.3)",
                       },
                       "&.Mui-disabled": {
                         color: "#94a3b8",
@@ -603,12 +581,7 @@ const Contact = () => {
           </Grid>
 
           {/* Support card - SECOND on phone */}
-          <Grid
-            item
-            xs={12}
-            md={4}
-            sx={{ order: { xs: 2, md: 1 } }}
-          >
+          <Grid item xs={12} md={4} sx={{ order: { xs: 2, md: 1 } }}>
             <MotionPaper
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -662,9 +635,9 @@ const Contact = () => {
                   mb: 2.2,
                 }}
               >
-                Whether you need help choosing a project,
-                understanding a purchase, or using the platform,
-                send us your question through the form.
+                Whether you need help choosing a project, understanding a
+                purchase, or using the platform, send us your question through
+                the form.
               </Typography>
 
               <Stack spacing={1.1}>
@@ -673,15 +646,10 @@ const Contact = () => {
                     p: 1.45,
                     borderRadius: 2.5,
                     bgcolor: "rgba(2,6,23,.45)",
-                    border:
-                      "1px solid rgba(148,163,184,.1)",
+                    border: "1px solid rgba(148,163,184,.1)",
                   }}
                 >
-                  <Stack
-                    direction="row"
-                    spacing={1.1}
-                    alignItems="center"
-                  >
+                  <Stack direction="row" spacing={1.1} alignItems="center">
                     <Box
                       sx={{
                         width: 34,
@@ -720,8 +688,6 @@ const Contact = () => {
                     </Box>
                   </Stack>
                 </Box>
-
-              
               </Stack>
 
               <Box
@@ -730,8 +696,7 @@ const Contact = () => {
                   p: 1.5,
                   borderRadius: 2.5,
                   bgcolor: "rgba(99,102,241,.055)",
-                  border:
-                    "1px solid rgba(129,140,248,.12)",
+                  border: "1px solid rgba(129,140,248,.12)",
                 }}
               >
                 <Typography
@@ -818,14 +783,8 @@ const Contact = () => {
             justifyContent="center"
             alignItems="center"
           >
-            <Stack
-              direction="row"
-              spacing={0.7}
-              alignItems="center"
-            >
-              <SecurityIcon
-                sx={{ color: "#818cf8", fontSize: 17 }}
-              />
+            <Stack direction="row" spacing={0.7} alignItems="center">
+              <SecurityIcon sx={{ color: "#818cf8", fontSize: 17 }} />
               <Typography
                 sx={{
                   color: "#64748b",
@@ -836,16 +795,8 @@ const Contact = () => {
               </Typography>
             </Stack>
 
-            
-
-            <Stack
-              direction="row"
-              spacing={0.7}
-              alignItems="center"
-            >
-              <SupportAgentIcon
-                sx={{ color: "#818cf8", fontSize: 17 }}
-              />
+            <Stack direction="row" spacing={0.7} alignItems="center">
+              <SupportAgentIcon sx={{ color: "#818cf8", fontSize: 17 }} />
               <Typography
                 sx={{
                   color: "#64748b",
