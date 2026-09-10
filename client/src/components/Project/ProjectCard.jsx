@@ -16,11 +16,7 @@ const ProjectCard = ({ project }) => {
   const navigate = useNavigate();
 
   const isAnyFileAvailable = () => {
-    const files = project.files || {};
-
-    return Object.values(files).some(
-      (url) => typeof url === "string" && url.trim() !== "",
-    );
+    return true;
   };
 
   const wholePrice =
