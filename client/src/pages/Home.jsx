@@ -48,6 +48,25 @@ const Home = () => {
   });
 
   const [featuredCategory, setFeaturedCategory] = useState("all");
+  /* =====================================================
+     EXPLORE PROJECTS INTERACTION REFS
+  ===================================================== */
+
+  const exploreTrackRef = useRef(null);
+  const explorePositionRef = useRef(0);
+  const exploreDraggingRef = useRef(false);
+  const explorePausedRef = useRef(false);
+  const exploreDidDragRef = useRef(false);
+  const explorePointerIdRef = useRef(null);
+
+  const explorePointerRef = useRef({
+    startX: 0,
+    startPosition: 0,
+  });
+
+  const exploreResumeTimerRef = useRef(null);
+
+  const [exploreIsDragging, setExploreIsDragging] = useState(false);
 
   const [freeProjects, setFreeProjects] = useState([]);
 
