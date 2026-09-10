@@ -29,6 +29,8 @@ const MotionBox = motion(Box);
 const MotionPaper = motion(Paper);
 
 const ProjectDetails = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [project, setProject] = useState(() => {
     try {
       const cached = localStorage.getItem(`codex_project_${id}`);
