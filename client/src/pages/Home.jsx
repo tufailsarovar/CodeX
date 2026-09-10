@@ -38,30 +38,26 @@ const Home = () => {
      PROJECT STATES
   ===================================================== */
 
-  const [projects, setProjects] = useState([]);
-  const [featuredCategory, setFeaturedCategory] = useState("all");
-
-  /* =====================================================
-     EXPLORE PROJECTS INTERACTION REFS
-  ===================================================== */
-
-  const exploreTrackRef = useRef(null);
-  const explorePositionRef = useRef(0);
-  const exploreDraggingRef = useRef(false);
-  const explorePausedRef = useRef(false);
-  const exploreDidDragRef = useRef(false);
-  const explorePointerIdRef = useRef(null);
-  const explorePointerRef = useRef({
-    startX: 0,
-    startPosition: 0,
+  const [projects, setProjects] = useState(() => {
+    try {
+      const cached = localStorage.getItem("codex_home_projects");
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
   });
-  const exploreResumeTimerRef = useRef(null);
 
-  const [exploreIsDragging, setExploreIsDragging] = useState(false);
+  const [featuredCategory, setFeaturedCategory] = useState("all");
 
   const [freeProjects, setFreeProjects] = useState([]);
 
-  const [projectsLoading, setProjectsLoading] = useState(true);
+  const [projectsLoading, setProjectsLoading] = useState(() => {
+    try {
+      return !localStorage.getItem("codex_home_projects");
+    } catch {
+      return true;
+    }
+  });
 
   const [freeProjectsLoading, setFreeProjectsLoading] = useState(true);
 
@@ -101,72 +97,101 @@ const Home = () => {
 
   /* =====================================================
      FETCH PROJECTS
+     CACHE FIRST + BACKGROUND REFRESH
   ===================================================== */
-
-  /* =====================================================
-   FETCH PROJECTS
-===================================================== */
 
   useEffect(() => {
     let cancelled = false;
     let timeoutId;
 
     const fetchProjects = async () => {
-      setProjectsLoading(true);
-      setProjectsTimedOut(false);
+      try {
+        const cached = localStorage.getItem("codex_home_projects");
 
-      const maxRetries = 3;
+        if (cached && !cancelled) {
+          try {
+            const cachedProjects = JSON.parse(cached);
 
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-          const res = await api.get("/projects", {
-            timeout: 15000,
-          });
-
-          if (cancelled) return;
-
-          const projectData = Array.isArray(res.data) ? res.data : [];
-
-          const sortedProjects = [...projectData].sort((a, b) => {
-            const aAvailable = Object.values(a.files || {}).some(
-              (url) => typeof url === "string" && url.trim() !== "",
-            );
-
-            const bAvailable = Object.values(b.files || {}).some(
-              (url) => typeof url === "string" && url.trim() !== "",
-            );
-
-            return Number(bAvailable) - Number(aAvailable);
-          });
-
-          setProjects(sortedProjects);
-          setProjectsLoading(false);
-          setProjectsTimedOut(false);
-
-          return;
-        } catch (error) {
-          console.error(
-            `Projects request failed (attempt ${attempt}/${maxRetries}):`,
-            error,
-          );
-
-          if (attempt < maxRetries) {
-            await new Promise((resolve) => setTimeout(resolve, attempt * 1500));
+            if (Array.isArray(cachedProjects)) {
+              setProjects(cachedProjects);
+              setProjectsLoading(false);
+            }
+          } catch {
+            localStorage.removeItem("codex_home_projects");
           }
         }
+
+        const maxRetries = 3;
+
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+          try {
+            const res = await api.get("/projects", {
+              timeout: 15000,
+            });
+
+            if (cancelled) return;
+
+            const projectData = Array.isArray(res.data) ? res.data : [];
+
+            const sortedProjects = [...projectData].sort((a, b) => {
+              const aAvailable = Object.values(a.files || {}).some(
+                (url) => typeof url === "string" && url.trim() !== "",
+              );
+
+              const bAvailable = Object.values(b.files || {}).some(
+                (url) => typeof url === "string" && url.trim() !== "",
+              );
+
+              return Number(bAvailable) - Number(aAvailable);
+            });
+
+            setProjects(sortedProjects);
+            setProjectsLoading(false);
+            setProjectsTimedOut(false);
+
+            try {
+              localStorage.setItem(
+                "codex_home_projects",
+                JSON.stringify(sortedProjects),
+              );
+            } catch (cacheError) {
+              console.error("Home projects cache error:", cacheError);
+            }
+
+            return;
+          } catch (error) {
+            console.error(
+              `Projects request failed (attempt ${attempt}/${maxRetries}):`,
+              error,
+            );
+
+            if (attempt < maxRetries) {
+              await new Promise((resolve) =>
+                setTimeout(resolve, attempt * 1500),
+              );
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Home projects error:", error);
       }
 
       if (!cancelled) {
-        setProjects([]);
         setProjectsLoading(false);
-        setProjectsTimedOut(true);
+
+        if (projects.length === 0) {
+          setProjectsTimedOut(true);
+        }
       }
     };
 
     timeoutId = setTimeout(() => {
       if (!cancelled) {
         setProjectsLoading(false);
-        setProjectsTimedOut(true);
+
+        if (projects.length === 0) {
+          setProjectsTimedOut(true);
+        }
       }
     }, 30000);
 

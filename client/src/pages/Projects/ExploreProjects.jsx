@@ -102,47 +102,78 @@ const PROJECT_CATEGORIES = [
 ];
 
 const ExploreProjects = () => {
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState(() => {
+    try {
+      const cached = localStorage.getItem("codex_explore_projects_all");
+
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [category, setCategory] = useState("all");
-  const [loading, setLoading] = useState(true);
+
+  const [loading, setLoading] = useState(() => {
+    try {
+      return !localStorage.getItem("codex_explore_projects_all");
+    } catch {
+      return true;
+    }
+  });
+
   const [error, setError] = useState("");
 
   useEffect(() => {
     let mounted = true;
 
     const fetchProjects = async () => {
-      setLoading(true);
-      setError("");
-
       try {
-        const params =
+        const params = category === "all" ? {} : { category };
+
+        const cacheKey =
           category === "all"
-            ? {}
-            : { category };
+            ? "codex_explore_projects_all"
+            : `codex_explore_projects_${category}`;
+
+        const cached = localStorage.getItem(cacheKey);
+
+        if (cached && mounted) {
+          try {
+            const cachedProjects = JSON.parse(cached);
+
+            if (Array.isArray(cachedProjects)) {
+              setProjects(cachedProjects);
+              setLoading(false);
+            }
+          } catch {
+            localStorage.removeItem(cacheKey);
+          }
+        }
 
         const res = await api.get("/projects", {
           params,
           timeout: 15000,
         });
 
-        if (mounted) {
-          setProjects(
-            Array.isArray(res.data)
-              ? res.data
-              : []
-          );
+        if (!mounted) return;
+
+        const freshProjects = Array.isArray(res.data) ? res.data : [];
+
+        setProjects(freshProjects);
+        setError("");
+
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify(freshProjects));
+        } catch (cacheError) {
+          console.error("Explore projects cache error:", cacheError);
         }
       } catch (err) {
-        console.error(
-          "Explore projects error:",
-          err
-        );
+        console.error("Explore projects error:", err);
 
-        if (mounted) {
+        if (mounted && projects.length === 0) {
           setProjects([]);
-          setError(
-            "Unable to load projects. Please try again."
-          );
+          setError("Unable to load projects. Please try again.");
         }
       } finally {
         if (mounted) {
@@ -163,19 +194,14 @@ const ExploreProjects = () => {
   };
 
   const handleRetry = () => {
-    setCategory((current) =>
-      current === "all"
-        ? "all"
-        : current
-    );
+    setCategory((current) => (current === "all" ? "all" : current));
   };
 
   const categoryCount = projects.length;
 
-  const selectedCategory =
-    PROJECT_CATEGORIES.find(
-      (item) => item.value === category
-    );
+  const selectedCategory = PROJECT_CATEGORIES.find(
+    (item) => item.value === category,
+  );
 
   return (
     <Box
@@ -289,10 +315,8 @@ const ExploreProjects = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    bgcolor:
-                      "rgba(99,102,241,.12)",
-                    border:
-                      "1px solid rgba(129,140,248,.2)",
+                    bgcolor: "rgba(99,102,241,.12)",
+                    border: "1px solid rgba(129,140,248,.2)",
                     color: "#818cf8",
                   }}
                 >
@@ -314,11 +338,9 @@ const ExploreProjects = () => {
                       xs: 23,
                       sm: 27,
                     },
-                    bgcolor:
-                      "rgba(99,102,241,.1)",
+                    bgcolor: "rgba(99,102,241,.1)",
                     color: "#a5b4fc",
-                    border:
-                      "1px solid rgba(129,140,248,.2)",
+                    border: "1px solid rgba(129,140,248,.2)",
                     fontSize: {
                       xs: 8,
                       sm: 10,
@@ -351,8 +373,7 @@ const ExploreProjects = () => {
                       "linear-gradient(90deg,#60a5fa,#818cf8,#c084fc)",
                     backgroundClip: "text",
                     WebkitBackgroundClip: "text",
-                    WebkitTextFillColor:
-                      "transparent",
+                    WebkitTextFillColor: "transparent",
                   }}
                 >
                   Projects
@@ -372,10 +393,9 @@ const ExploreProjects = () => {
                   lineHeight: 1.65,
                 }}
               >
-                Discover projects across software,
-                data, AI, development, automation
-                and more — with complete resources
-                to help you build, learn and deliver.
+                Discover projects across software, data, AI, development,
+                automation and more — with complete resources to help you build,
+                learn and deliver.
               </Typography>
             </Box>
 
@@ -386,10 +406,8 @@ const ExploreProjects = () => {
                   py: 1,
                   minWidth: 100,
                   borderRadius: 3,
-                  bgcolor:
-                    "rgba(15,23,42,.75)",
-                  border:
-                    "1px solid rgba(148,163,184,.14)",
+                  bgcolor: "rgba(15,23,42,.75)",
+                  border: "1px solid rgba(148,163,184,.14)",
                 }}
               >
                 <Typography
@@ -397,8 +415,7 @@ const ExploreProjects = () => {
                     color: "#64748b",
                     fontSize: ".62rem",
                     fontWeight: 800,
-                    textTransform:
-                      "uppercase",
+                    textTransform: "uppercase",
                   }}
                 >
                   Showing
@@ -413,10 +430,7 @@ const ExploreProjects = () => {
                     },
                   }}
                 >
-                  {categoryCount}{" "}
-                  {categoryCount === 1
-                    ? "Project"
-                    : "Projects"}
+                  {categoryCount} {categoryCount === 1 ? "Project" : "Projects"}
                 </Typography>
               </Box>
             )}
@@ -456,14 +470,11 @@ const ExploreProjects = () => {
               sm: 4,
             },
 
-            bgcolor:
-              "rgba(15,23,42,.72)",
+            bgcolor: "rgba(15,23,42,.72)",
 
-            border:
-              "1px solid rgba(148,163,184,.14)",
+            border: "1px solid rgba(148,163,184,.14)",
 
-            boxShadow:
-              "0 18px 50px rgba(0,0,0,.12)",
+            boxShadow: "0 18px 50px rgba(0,0,0,.12)",
 
             overflowX: "auto",
 
@@ -496,10 +507,8 @@ const ExploreProjects = () => {
               "& .MuiTabs-indicator": {
                 height: 3,
                 borderRadius: 999,
-                background:
-                  "linear-gradient(90deg,#818cf8,#6366f1,#a78bfa)",
-                boxShadow:
-                  "0 0 12px rgba(129,140,248,.45)",
+                background: "linear-gradient(90deg,#818cf8,#6366f1,#a78bfa)",
+                boxShadow: "0 0 12px rgba(129,140,248,.45)",
               },
 
               "& .MuiTab-root": {
@@ -538,38 +547,34 @@ const ExploreProjects = () => {
 
                 "&:hover": {
                   color: "#cbd5e1",
-                  bgcolor:
-                    "rgba(99,102,241,.06)",
+                  bgcolor: "rgba(99,102,241,.06)",
                 },
               },
 
               "& .MuiTab-root.Mui-selected": {
                 color: "#fff",
-                bgcolor:
-                  "rgba(99,102,241,.08)",
+                bgcolor: "rgba(99,102,241,.08)",
               },
             }}
           >
-            {PROJECT_CATEGORIES.map(
-              (item) => (
-                <Tab
-                  key={item.value}
-                  value={item.value}
-                  icon={
-                    <CategoryIcon
-                      sx={{
-                        fontSize: {
-                          xs: 15,
-                          sm: 17,
-                        },
-                      }}
-                    />
-                  }
-                  iconPosition="start"
-                  label={item.label}
-                />
-              )
-            )}
+            {PROJECT_CATEGORIES.map((item) => (
+              <Tab
+                key={item.value}
+                value={item.value}
+                icon={
+                  <CategoryIcon
+                    sx={{
+                      fontSize: {
+                        xs: 15,
+                        sm: 17,
+                      },
+                    }}
+                  />
+                }
+                iconPosition="start"
+                label={item.label}
+              />
+            ))}
           </Tabs>
         </MotionBox>
 
@@ -589,19 +594,14 @@ const ExploreProjects = () => {
               mb: 2.5,
             }}
           >
-            <Stack
-              direction="row"
-              alignItems="center"
-              spacing={1}
-            >
+            <Stack direction="row" alignItems="center" spacing={1}>
               <Box
                 sx={{
                   width: 6,
                   height: 6,
                   borderRadius: "50%",
                   bgcolor: "#818cf8",
-                  boxShadow:
-                    "0 0 10px rgba(129,140,248,.7)",
+                  boxShadow: "0 0 10px rgba(129,140,248,.7)",
                 }}
               />
 
@@ -641,10 +641,7 @@ const ExploreProjects = () => {
               justifyContent: "center",
             }}
           >
-            <Stack
-              alignItems="center"
-              spacing={1.5}
-            >
+            <Stack alignItems="center" spacing={1.5}>
               <CircularProgress
                 size={34}
                 thickness={4}
@@ -696,11 +693,9 @@ const ExploreProjects = () => {
                   sm: 4,
                 },
                 textAlign: "center",
-                bgcolor:
-                  "rgba(15,23,42,.9)",
+                bgcolor: "rgba(15,23,42,.9)",
                 color: "#fff",
-                border:
-                  "1px solid rgba(248,113,113,.18)",
+                border: "1px solid rgba(248,113,113,.18)",
                 borderRadius: 4,
               }}
             >
@@ -743,85 +738,10 @@ const ExploreProjects = () => {
             PROJECTS
         ========================= */}
 
-        {!loading &&
-          !error &&
-          projects.length > 0 && (
-            <AnimatePresence mode="wait">
-              <MotionBox
-                key={category}
-                initial={{
-                  opacity: 0,
-                  y: 15,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                exit={{
-                  opacity: 0,
-                  y: -10,
-                }}
-                transition={{
-                  duration: 0.35,
-                }}
-              >
-                <Grid
-                  container
-                  spacing={{
-                    xs: 1.2,
-                    sm: 2,
-                    md: 3,
-                  }}
-                >
-                  {projects.map(
-                    (project, index) => (
-                      <Grid
-                        item
-                        xs={6}
-                        sm={6}
-                        md={4}
-                        key={project._id}
-                      >
-                        <MotionBox
-                          initial={{
-                            opacity: 0,
-                            y: 25,
-                          }}
-                          animate={{
-                            opacity: 1,
-                            y: 0,
-                          }}
-                          transition={{
-                            duration: 0.35,
-                            delay: Math.min(
-                              index * 0.045,
-                              0.45
-                            ),
-                          }}
-                          sx={{
-                            height: "100%",
-                          }}
-                        >
-                          <ProjectCard
-                            project={project}
-                          />
-                        </MotionBox>
-                      </Grid>
-                    )
-                  )}
-                </Grid>
-              </MotionBox>
-            </AnimatePresence>
-          )}
-
-        {/* =========================
-            EMPTY
-        ========================= */}
-
-        {!loading &&
-          !error &&
-          projects.length === 0 && (
+        {!loading && !error && projects.length > 0 && (
+          <AnimatePresence mode="wait">
             <MotionBox
+              key={category}
               initial={{
                 opacity: 0,
                 y: 15,
@@ -830,78 +750,131 @@ const ExploreProjects = () => {
                 opacity: 1,
                 y: 0,
               }}
-              sx={{
-                minHeight: 300,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+              exit={{
+                opacity: 0,
+                y: -10,
+              }}
+              transition={{
+                duration: 0.35,
               }}
             >
-              <Paper
-                elevation={0}
-                sx={{
-                  width: "100%",
-                  maxWidth: 520,
-                  p: {
-                    xs: 3,
-                    sm: 5,
-                  },
-                  textAlign: "center",
-                  bgcolor:
-                    "rgba(15,23,42,.78)",
-                  color: "#fff",
-                  border:
-                    "1px solid rgba(148,163,184,.14)",
-                  borderRadius: 4,
+              <Grid
+                container
+                spacing={{
+                  xs: 1.2,
+                  sm: 2,
+                  md: 3,
                 }}
               >
-                <Box
-                  sx={{
-                    width: 58,
-                    height: 58,
-                    mx: "auto",
-                    mb: 1.5,
-                    borderRadius: 3,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    bgcolor:
-                      "rgba(99,102,241,.1)",
-                    color: "#818cf8",
-                  }}
-                >
-                  <ExploreIcon />
-                </Box>
-
-                <Typography
-                  fontWeight={900}
-                  sx={{
-                    fontSize: {
-                      xs: "1rem",
-                      sm: "1.15rem",
-                    },
-                  }}
-                >
-                  No projects found
-                </Typography>
-
-                <Typography
-                  sx={{
-                    mt: 0.8,
-                    color: "#64748b",
-                    fontSize: {
-                      xs: ".7rem",
-                      sm: ".78rem",
-                    },
-                  }}
-                >
-                  There are currently no
-                  projects available in this
-                  category.
-                </Typography>
-              </Paper>
+                {projects.map((project, index) => (
+                  <Grid item xs={6} sm={6} md={4} key={project._id}>
+                    <MotionBox
+                      initial={{
+                        opacity: 0,
+                        y: 25,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                      }}
+                      transition={{
+                        duration: 0.35,
+                        delay: Math.min(index * 0.045, 0.45),
+                      }}
+                      sx={{
+                        height: "100%",
+                      }}
+                    >
+                      <ProjectCard project={project} />
+                    </MotionBox>
+                  </Grid>
+                ))}
+              </Grid>
             </MotionBox>
-          )}
+          </AnimatePresence>
+        )}
+
+        {/* =========================
+            EMPTY
+        ========================= */}
+
+        {!loading && !error && projects.length === 0 && (
+          <MotionBox
+            initial={{
+              opacity: 0,
+              y: 15,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            sx={{
+              minHeight: 300,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Paper
+              elevation={0}
+              sx={{
+                width: "100%",
+                maxWidth: 520,
+                p: {
+                  xs: 3,
+                  sm: 5,
+                },
+                textAlign: "center",
+                bgcolor: "rgba(15,23,42,.78)",
+                color: "#fff",
+                border: "1px solid rgba(148,163,184,.14)",
+                borderRadius: 4,
+              }}
+            >
+              <Box
+                sx={{
+                  width: 58,
+                  height: 58,
+                  mx: "auto",
+                  mb: 1.5,
+                  borderRadius: 3,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  bgcolor: "rgba(99,102,241,.1)",
+                  color: "#818cf8",
+                }}
+              >
+                <ExploreIcon />
+              </Box>
+
+              <Typography
+                fontWeight={900}
+                sx={{
+                  fontSize: {
+                    xs: "1rem",
+                    sm: "1.15rem",
+                  },
+                }}
+              >
+                No projects found
+              </Typography>
+
+              <Typography
+                sx={{
+                  mt: 0.8,
+                  color: "#64748b",
+                  fontSize: {
+                    xs: ".7rem",
+                    sm: ".78rem",
+                  },
+                }}
+              >
+                There are currently no projects available in this category.
+              </Typography>
+            </Paper>
+          </MotionBox>
+        )}
       </Container>
     </Box>
   );

@@ -29,11 +29,24 @@ const MotionBox = motion(Box);
 const MotionPaper = motion(Paper);
 
 const ProjectDetails = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+  const [project, setProject] = useState(() => {
+    try {
+      const cached = localStorage.getItem(`codex_project_${id}`);
 
-  const [project, setProject] = useState(null);
-  const [loading, setLoading] = useState(true);
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [loading, setLoading] = useState(() => {
+    try {
+      return !localStorage.getItem(`codex_project_${id}`);
+    } catch {
+      return true;
+    }
+  });
+
   const [error, setError] = useState("");
 
   const [selectedItems, setSelectedItems] = useState({
@@ -51,15 +64,30 @@ const ProjectDetails = () => {
       try {
         const res = await api.get(`/projects/${id}`);
 
-        if (mounted) {
-          setProject(res.data);
+        if (!mounted) return;
+
+        const freshProject = res.data;
+
+        setProject(freshProject);
+        setError("");
+        setLoading(false);
+
+        try {
+          localStorage.setItem(
+            `codex_project_${id}`,
+            JSON.stringify(freshProject),
+          );
+        } catch (cacheError) {
+          console.error("Project cache error:", cacheError);
         }
-      } catch {
+      } catch (err) {
+        console.error("Project details error:", err);
+
         if (mounted) {
-          setError("Failed to load project");
-        }
-      } finally {
-        if (mounted) {
+          if (!project) {
+            setError("Failed to load project");
+          }
+
           setLoading(false);
         }
       }
@@ -85,10 +113,7 @@ const ProjectDetails = () => {
       total += project.itemPrices?.ppt || 0;
     }
 
-    if (
-      selectedItems.documentation &&
-      project.files?.documentation
-    ) {
+    if (selectedItems.documentation && project.files?.documentation) {
       total += project.itemPrices?.documentation || 0;
     }
 
@@ -109,14 +134,11 @@ const ProjectDetails = () => {
     }
 
     try {
-      const { data } = await api.post(
-        "/orders/create-order",
-        {
-          projectId: id,
-          items: selectedItems,
-          amount,
-        },
-      );
+      const { data } = await api.post("/orders/create-order", {
+        projectId: id,
+        items: selectedItems,
+        amount,
+      });
 
       const existingScript = document.querySelector(
         'script[src="https://checkout.razorpay.com/v1/checkout.js"]',
@@ -134,24 +156,17 @@ const ProjectDetails = () => {
           handler: async function (response) {
             try {
               await api.post("/orders/verify", {
-                razorpay_order_id:
-                  response.razorpay_order_id,
-                razorpay_payment_id:
-                  response.razorpay_payment_id,
-                razorpay_signature:
-                  response.razorpay_signature,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
                 project: id,
                 items: selectedItems,
                 amount,
               });
 
-              alert(
-                "Payment successful! Download link sent to email.",
-              );
+              alert("Payment successful! Download link sent to email.");
             } catch {
-              alert(
-                "Payment verification failed. Please contact support.",
-              );
+              alert("Payment verification failed. Please contact support.");
             }
           },
 
@@ -169,11 +184,7 @@ const ProjectDetails = () => {
         if (window.Razorpay) {
           openCheckout();
         } else {
-          existingScript.addEventListener(
-            "load",
-            openCheckout,
-            { once: true },
-          );
+          existingScript.addEventListener("load", openCheckout, { once: true });
         }
 
         return;
@@ -181,8 +192,7 @@ const ProjectDetails = () => {
 
       const script = document.createElement("script");
 
-      script.src =
-        "https://checkout.razorpay.com/v1/checkout.js";
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
 
       script.async = true;
 
@@ -204,17 +214,14 @@ const ProjectDetails = () => {
    */
   const mediaUrl = project?.screenshotUrl || "";
 
-  const hasImage =
-    typeof mediaUrl === "string" &&
-    mediaUrl.trim() !== "";
+  const hasImage = typeof mediaUrl === "string" && mediaUrl.trim() !== "";
 
   /*
    * Kept as fallback only if an older project document
    * still contains videoUrl.
    */
   const hasVideo = Boolean(
-    project?.videoUrl &&
-      String(project.videoUrl).trim() !== "",
+    project?.videoUrl && String(project.videoUrl).trim() !== "",
   );
 
   const resourceItems = [
@@ -224,8 +231,7 @@ const ProjectDetails = () => {
       price: project?.itemPrices?.sourceCode || 0,
       available: Boolean(project?.files?.sourceCode),
       icon: <CodeIcon />,
-      description:
-        "Complete project source files and implementation.",
+      description: "Complete project source files and implementation.",
     },
     {
       key: "ppt",
@@ -233,20 +239,15 @@ const ProjectDetails = () => {
       price: project?.itemPrices?.ppt || 0,
       available: Boolean(project?.files?.ppt),
       icon: <SlideshowIcon />,
-      description:
-        "Ready-to-use project presentation for submission.",
+      description: "Ready-to-use project presentation for submission.",
     },
     {
       key: "documentation",
       title: "Documentation",
-      price:
-        project?.itemPrices?.documentation || 0,
-      available: Boolean(
-        project?.files?.documentation,
-      ),
+      price: project?.itemPrices?.documentation || 0,
+      available: Boolean(project?.files?.documentation),
       icon: <DescriptionIcon />,
-      description:
-        "Project documentation with setup and usage details.",
+      description: "Project documentation with setup and usage details.",
     },
   ];
 
@@ -263,10 +264,7 @@ const ProjectDetails = () => {
           px: 2,
         }}
       >
-        <Stack
-          alignItems="center"
-          spacing={2}
-        >
+        <Stack alignItems="center" spacing={2}>
           <CircularProgress
             sx={{
               color: "#818cf8",
@@ -321,8 +319,7 @@ const ProjectDetails = () => {
             textAlign: "center",
             bgcolor: "rgba(15,23,42,.95)",
             color: "#fff",
-            border:
-              "1px solid rgba(148,163,184,.18)",
+            border: "1px solid rgba(148,163,184,.18)",
             borderRadius: 4,
           }}
         >
@@ -367,17 +364,11 @@ const ProjectDetails = () => {
 
   const currentPrice = calculatePrice();
 
-  const availableCount =
-    resourceItems.filter(
-      (item) => item.available,
-    ).length;
+  const availableCount = resourceItems.filter((item) => item.available).length;
 
-  const selectedCount =
-    resourceItems.filter(
-      (item) =>
-        item.available &&
-        selectedItems[item.key],
-    ).length;
+  const selectedCount = resourceItems.filter(
+    (item) => item.available && selectedItems[item.key],
+  ).length;
 
   return (
     <Box
@@ -462,8 +453,7 @@ const ProjectDetails = () => {
                 sm: ".84rem",
               },
               "&:hover": {
-                bgcolor:
-                  "rgba(148,163,184,.08)",
+                bgcolor: "rgba(148,163,184,.08)",
                 color: "#fff",
               },
             }}
@@ -507,16 +497,11 @@ const ProjectDetails = () => {
               >
                 <Chip
                   label={
-                    project.category ===
-                    "mern"
+                    project.category === "mern"
                       ? "MERN FULL STACK"
-                      : project.category ===
-                          "frontend"
+                      : project.category === "frontend"
                         ? "FRONTEND"
-                        : String(
-                            project.category ||
-                              "PROJECT",
-                          ).toUpperCase()
+                        : String(project.category || "PROJECT").toUpperCase()
                   }
                   size="small"
                   sx={{
@@ -524,11 +509,9 @@ const ProjectDetails = () => {
                       xs: 25,
                       sm: 29,
                     },
-                    bgcolor:
-                      "rgba(99,102,241,.14)",
+                    bgcolor: "rgba(99,102,241,.14)",
                     color: "#a5b4fc",
-                    border:
-                      "1px solid rgba(129,140,248,.28)",
+                    border: "1px solid rgba(129,140,248,.28)",
                     fontWeight: 900,
                     fontSize: {
                       xs: 9,
@@ -541,8 +524,7 @@ const ProjectDetails = () => {
                   icon={
                     <ShieldIcon
                       sx={{
-                        fontSize:
-                          "15px !important",
+                        fontSize: "15px !important",
                       }}
                     />
                   }
@@ -553,11 +535,9 @@ const ProjectDetails = () => {
                       xs: 25,
                       sm: 29,
                     },
-                    bgcolor:
-                      "rgba(34,197,94,.08)",
+                    bgcolor: "rgba(34,197,94,.08)",
                     color: "#86efac",
-                    border:
-                      "1px solid rgba(34,197,94,.18)",
+                    border: "1px solid rgba(34,197,94,.18)",
                     fontWeight: 800,
                     fontSize: {
                       xs: 8.5,
@@ -604,8 +584,7 @@ const ProjectDetails = () => {
                 {project.description}
               </Typography>
 
-              {project.techStack?.length >
-                0 && (
+              {project.techStack?.length > 0 && (
                 <Stack
                   direction="row"
                   spacing={0.7}
@@ -622,32 +601,28 @@ const ProjectDetails = () => {
                     },
                   }}
                 >
-                  {project.techStack.map(
-                    (tech) => (
-                      <Chip
-                        key={tech}
-                        label={tech}
-                        size="small"
-                        variant="outlined"
-                        sx={{
-                          height: {
-                            xs: 25,
-                            sm: 29,
-                          },
-                          color: "#c7d2fe",
-                          borderColor:
-                            "rgba(129,140,248,.3)",
-                          bgcolor:
-                            "rgba(99,102,241,.05)",
-                          fontSize: {
-                            xs: 9,
-                            sm: 11,
-                          },
-                          fontWeight: 700,
-                        }}
-                      />
-                    ),
-                  )}
+                  {project.techStack.map((tech) => (
+                    <Chip
+                      key={tech}
+                      label={tech}
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        height: {
+                          xs: 25,
+                          sm: 29,
+                        },
+                        color: "#c7d2fe",
+                        borderColor: "rgba(129,140,248,.3)",
+                        bgcolor: "rgba(99,102,241,.05)",
+                        fontSize: {
+                          xs: 9,
+                          sm: 11,
+                        },
+                        fontWeight: 700,
+                      }}
+                    />
+                  ))}
                 </Stack>
               )}
             </MotionBox>
@@ -680,15 +655,11 @@ const ProjectDetails = () => {
                   xs: 3,
                   sm: 4,
                 },
-                bgcolor:
-                  "rgba(15,23,42,.72)",
-                border:
-                  "1px solid rgba(148,163,184,.16)",
+                bgcolor: "rgba(15,23,42,.72)",
+                border: "1px solid rgba(148,163,184,.16)",
                 color: "#fff",
-                backdropFilter:
-                  "blur(18px)",
-                boxShadow:
-                  "0 24px 70px rgba(0,0,0,.18)",
+                backdropFilter: "blur(18px)",
+                boxShadow: "0 24px 70px rgba(0,0,0,.18)",
               }}
             >
               <Stack
@@ -715,8 +686,7 @@ const ProjectDetails = () => {
                         sm: ".72rem",
                       },
                       fontWeight: 800,
-                      textTransform:
-                        "uppercase",
+                      textTransform: "uppercase",
                       letterSpacing: ".8px",
                     }}
                   >
@@ -732,8 +702,7 @@ const ProjectDetails = () => {
                     {project.originalPrice && (
                       <Typography
                         sx={{
-                          textDecoration:
-                            "line-through",
+                          textDecoration: "line-through",
                           color: "#64748b",
                           fontSize: {
                             xs: ".8rem",
@@ -769,10 +738,8 @@ const ProjectDetails = () => {
                       sm: "center",
                     },
                     color: "#86efac",
-                    bgcolor:
-                      "rgba(34,197,94,.09)",
-                    border:
-                      "1px solid rgba(34,197,94,.18)",
+                    bgcolor: "rgba(34,197,94,.09)",
+                    border: "1px solid rgba(34,197,94,.18)",
                     fontWeight: 800,
                     fontSize: {
                       xs: 9,
@@ -788,8 +755,7 @@ const ProjectDetails = () => {
                     xs: 1.5,
                     sm: 2.2,
                   },
-                  borderColor:
-                    "rgba(148,163,184,.12)",
+                  borderColor: "rgba(148,163,184,.12)",
                 }}
               />
 
@@ -807,254 +773,199 @@ const ProjectDetails = () => {
               </Typography>
 
               <Stack spacing={1}>
-                {resourceItems.map(
-                  (item, index) => {
-                    const checked =
-                      selectedItems[
-                        item.key
-                      ];
+                {resourceItems.map((item, index) => {
+                  const checked = selectedItems[item.key];
 
-                    return (
-                      <MotionBox
-                        key={item.key}
-                        initial={{
-                          opacity: 0,
-                          x: -12,
-                        }}
-                        animate={{
-                          opacity: 1,
-                          x: 0,
-                        }}
-                        transition={{
-                          duration: 0.35,
-                          delay:
-                            0.1 +
-                            index * 0.06,
-                        }}
-                        onClick={() => {
-                          if (
-                            !item.available
-                          )
-                            return;
+                  return (
+                    <MotionBox
+                      key={item.key}
+                      initial={{
+                        opacity: 0,
+                        x: -12,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        x: 0,
+                      }}
+                      transition={{
+                        duration: 0.35,
+                        delay: 0.1 + index * 0.06,
+                      }}
+                      onClick={() => {
+                        if (!item.available) return;
 
+                        setSelectedItems({
+                          ...selectedItems,
+                          [item.key]: !checked,
+                        });
+                      }}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: {
+                          xs: 0.8,
+                          sm: 1.2,
+                        },
+                        p: {
+                          xs: 1,
+                          sm: 1.35,
+                        },
+                        borderRadius: {
+                          xs: 2,
+                          sm: 2.5,
+                        },
+                        cursor: item.available ? "pointer" : "default",
+                        bgcolor:
+                          checked && item.available
+                            ? "rgba(99,102,241,.09)"
+                            : "rgba(2,6,23,.34)",
+                        border: "1px solid",
+                        borderColor:
+                          checked && item.available
+                            ? "rgba(129,140,248,.3)"
+                            : "rgba(148,163,184,.1)",
+                        opacity: item.available ? 1 : 0.48,
+                        transition: "all .2s ease",
+                        "&:hover": item.available
+                          ? {
+                              borderColor: "rgba(129,140,248,.4)",
+                              transform: "translateX(3px)",
+                            }
+                          : {},
+                      }}
+                    >
+                      <Checkbox
+                        checked={Boolean(checked && item.available)}
+                        disabled={!item.available}
+                        onClick={(event) => event.stopPropagation()}
+                        onChange={(event) =>
                           setSelectedItems({
                             ...selectedItems,
-                            [item.key]:
-                              !checked,
-                          });
-                        }}
+                            [item.key]: event.target.checked,
+                          })
+                        }
                         sx={{
+                          p: 0.3,
+                          color: "#475569",
+                          "&.Mui-checked": {
+                            color: "#6366f1",
+                          },
+                        }}
+                      />
+
+                      <Box
+                        sx={{
+                          width: {
+                            xs: 34,
+                            sm: 42,
+                          },
+                          height: {
+                            xs: 34,
+                            sm: 42,
+                          },
+                          flexShrink: 0,
                           display: "flex",
-                          alignItems:
-                            "center",
-                          gap: {
-                            xs: 0.8,
-                            sm: 1.2,
-                          },
-                          p: {
-                            xs: 1,
-                            sm: 1.35,
-                          },
+                          alignItems: "center",
+                          justifyContent: "center",
                           borderRadius: {
-                            xs: 2,
-                            sm: 2.5,
+                            xs: 1.7,
+                            sm: 2,
                           },
-                          cursor:
-                            item.available
-                              ? "pointer"
-                              : "default",
-                          bgcolor:
-                            checked &&
-                            item.available
-                              ? "rgba(99,102,241,.09)"
-                              : "rgba(2,6,23,.34)",
-                          border:
-                            "1px solid",
-                          borderColor:
-                            checked &&
-                            item.available
-                              ? "rgba(129,140,248,.3)"
-                              : "rgba(148,163,184,.1)",
-                          opacity:
-                            item.available
-                              ? 1
-                              : 0.48,
-                          transition:
-                            "all .2s ease",
-                          "&:hover":
-                            item.available
-                              ? {
-                                  borderColor:
-                                    "rgba(129,140,248,.4)",
-                                  transform:
-                                    "translateX(3px)",
-                                }
-                              : {},
+                          color: item.available ? "#a5b4fc" : "#64748b",
+                          bgcolor: item.available
+                            ? "rgba(99,102,241,.1)"
+                            : "rgba(100,116,139,.08)",
+                          "& svg": {
+                            fontSize: {
+                              xs: 18,
+                              sm: 21,
+                            },
+                          },
                         }}
                       >
-                        <Checkbox
-                          checked={Boolean(
-                            checked &&
-                              item.available,
-                          )}
-                          disabled={
-                            !item.available
-                          }
-                          onClick={(event) =>
-                            event.stopPropagation()
-                          }
-                          onChange={(event) =>
-                            setSelectedItems(
-                              {
-                                ...selectedItems,
-                                [item.key]:
-                                  event.target
-                                    .checked,
-                              },
-                            )
-                          }
-                          sx={{
-                            p: 0.3,
-                            color: "#475569",
-                            "&.Mui-checked": {
-                              color:
-                                "#6366f1",
-                            },
-                          }}
-                        />
+                        {item.icon}
+                      </Box>
 
-                        <Box
-                          sx={{
-                            width: {
-                              xs: 34,
-                              sm: 42,
-                            },
-                            height: {
-                              xs: 34,
-                              sm: 42,
-                            },
-                            flexShrink: 0,
-                            display: "flex",
-                            alignItems:
-                              "center",
-                            justifyContent:
-                              "center",
-                            borderRadius: {
-                              xs: 1.7,
-                              sm: 2,
-                            },
-                            color:
-                              item.available
-                                ? "#a5b4fc"
-                                : "#64748b",
-                            bgcolor:
-                              item.available
-                                ? "rgba(99,102,241,.1)"
-                                : "rgba(100,116,139,.08)",
-                            "& svg": {
-                              fontSize: {
-                                xs: 18,
-                                sm: 21,
-                              },
-                            },
-                          }}
+                      <Box
+                        sx={{
+                          flex: 1,
+                          minWidth: 0,
+                        }}
+                      >
+                        <Stack
+                          direction="row"
+                          spacing={0.7}
+                          alignItems="center"
+                          flexWrap="wrap"
                         >
-                          {item.icon}
-                        </Box>
-
-                        <Box
-                          sx={{
-                            flex: 1,
-                            minWidth: 0,
-                          }}
-                        >
-                          <Stack
-                            direction="row"
-                            spacing={0.7}
-                            alignItems="center"
-                            flexWrap="wrap"
-                          >
-                            <Typography
-                              fontWeight={800}
-                              sx={{
-                                fontSize: {
-                                  xs: ".76rem",
-                                  sm: ".9rem",
-                                },
-                              }}
-                            >
-                              {item.title}
-                            </Typography>
-
-                            <Typography
-                              fontWeight={900}
-                              sx={{
-                                fontSize: {
-                                  xs: ".72rem",
-                                  sm: ".82rem",
-                                },
-                                color:
-                                  item.available
-                                    ? "#fff"
-                                    : "#64748b",
-                              }}
-                            >
-                              ₹{item.price}
-                            </Typography>
-                          </Stack>
-
                           <Typography
+                            fontWeight={800}
                             sx={{
-                              mt: 0.2,
-                              color: "#64748b",
                               fontSize: {
-                                xs: ".61rem",
-                                sm: ".72rem",
+                                xs: ".76rem",
+                                sm: ".9rem",
                               },
-                              lineHeight: 1.4,
                             }}
                           >
-                            {item.available
-                              ? item.description
-                              : "This resource has not been uploaded yet."}
+                            {item.title}
                           </Typography>
-                        </Box>
+
+                          <Typography
+                            fontWeight={900}
+                            sx={{
+                              fontSize: {
+                                xs: ".72rem",
+                                sm: ".82rem",
+                              },
+                              color: item.available ? "#fff" : "#64748b",
+                            }}
+                          >
+                            ₹{item.price}
+                          </Typography>
+                        </Stack>
 
                         <Typography
                           sx={{
-                            flexShrink: 0,
+                            mt: 0.2,
+                            color: "#64748b",
                             fontSize: {
-                              xs: ".58rem",
-                              sm: ".66rem",
+                              xs: ".61rem",
+                              sm: ".72rem",
                             },
-                            fontWeight: 900,
-                            color:
-                              item.available
-                                ? "#4ade80"
-                                : "#facc15",
+                            lineHeight: 1.4,
                           }}
                         >
                           {item.available
-                            ? "AVAILABLE"
-                            : "COMING SOON"}
+                            ? item.description
+                            : "This resource has not been uploaded yet."}
                         </Typography>
-                      </MotionBox>
-                    );
-                  },
-                )}
+                      </Box>
+
+                      <Typography
+                        sx={{
+                          flexShrink: 0,
+                          fontSize: {
+                            xs: ".58rem",
+                            sm: ".66rem",
+                          },
+                          fontWeight: 900,
+                          color: item.available ? "#4ade80" : "#facc15",
+                        }}
+                      >
+                        {item.available ? "AVAILABLE" : "COMING SOON"}
+                      </Typography>
+                    </MotionBox>
+                  );
+                })}
               </Stack>
 
               <Button
                 fullWidth
                 variant="contained"
                 size="large"
-                disabled={
-                  currentPrice === 0
-                }
+                disabled={currentPrice === 0}
                 onClick={handleBuy}
-                startIcon={
-                  <ShoppingCartCheckoutIcon />
-                }
+                startIcon={<ShoppingCartCheckoutIcon />}
                 sx={{
                   mt: {
                     xs: 1.6,
@@ -1074,21 +985,15 @@ const ProjectDetails = () => {
                     xs: ".78rem",
                     sm: ".92rem",
                   },
-                  background:
-                    "linear-gradient(90deg,#6366f1,#4f46e5)",
-                  boxShadow:
-                    "0 14px 35px rgba(79,70,229,.25)",
+                  background: "linear-gradient(90deg,#6366f1,#4f46e5)",
+                  boxShadow: "0 14px 35px rgba(79,70,229,.25)",
                   "&:hover": {
-                    background:
-                      "linear-gradient(90deg,#818cf8,#6366f1)",
-                    boxShadow:
-                      "0 18px 45px rgba(79,70,229,.35)",
+                    background: "linear-gradient(90deg,#818cf8,#6366f1)",
+                    boxShadow: "0 18px 45px rgba(79,70,229,.35)",
                   },
                 }}
               >
-                {token
-                  ? `Buy Now • ₹${currentPrice}`
-                  : "Login to Buy"}
+                {token ? `Buy Now • ₹${currentPrice}` : "Login to Buy"}
               </Button>
 
               <Stack
@@ -1115,8 +1020,7 @@ const ProjectDetails = () => {
                     textAlign: "center",
                   }}
                 >
-                  Secure Razorpay payment •
-                  Instant access after verification
+                  Secure Razorpay payment • Instant access after verification
                 </Typography>
               </Stack>
             </MotionPaper>
@@ -1158,10 +1062,8 @@ const ProjectDetails = () => {
                     sm: 4,
                   },
                   bgcolor: "#0f172a",
-                  border:
-                    "1px solid rgba(148,163,184,.2)",
-                  boxShadow:
-                    "0 30px 80px rgba(0,0,0,.35)",
+                  border: "1px solid rgba(148,163,184,.2)",
+                  boxShadow: "0 30px 80px rgba(0,0,0,.35)",
                 }}
               >
                 {/* THIS IS THE IMAGE SECTION */}
@@ -1189,26 +1091,19 @@ const ProjectDetails = () => {
                     <Box
                       component="img"
                       src={mediaUrl}
-                      alt={
-                        project.title ||
-                        "Project preview"
-                      }
+                      alt={project.title || "Project preview"}
                       loading="eager"
                       decoding="async"
                       onError={(event) => {
-                        event.currentTarget.style.display =
-                          "none";
+                        event.currentTarget.style.display = "none";
 
                         const fallback =
-                          event.currentTarget
-                            .parentElement
-                            ?.querySelector(
-                              ".project-image-fallback",
-                            );
+                          event.currentTarget.parentElement?.querySelector(
+                            ".project-image-fallback",
+                          );
 
                         if (fallback) {
-                          fallback.style.display =
-                            "flex";
+                          fallback.style.display = "flex";
                         }
                       }}
                       sx={{
@@ -1216,18 +1111,14 @@ const ProjectDetails = () => {
                         height: "100%",
                         display: "block",
                         objectFit: "cover",
-                        objectPosition:
-                          "center",
-                        backgroundColor:
-                          "#020617",
+                        objectPosition: "center",
+                        backgroundColor: "#020617",
                       }}
                     />
                   ) : hasVideo ? (
                     <Box
                       component="video"
-                      src={
-                        project.videoUrl
-                      }
+                      src={project.videoUrl}
                       autoPlay
                       muted
                       loop
@@ -1239,8 +1130,7 @@ const ProjectDetails = () => {
                         height: "100%",
                         display: "block",
                         objectFit: "cover",
-                        backgroundColor:
-                          "#020617",
+                        backgroundColor: "#020617",
                       }}
                     />
                   ) : null}
@@ -1249,20 +1139,13 @@ const ProjectDetails = () => {
                   <Stack
                     className="project-image-fallback"
                     sx={{
-                      display:
-                        hasImage ||
-                        hasVideo
-                          ? "none"
-                          : "flex",
-                      position:
-                        "absolute",
+                      display: hasImage || hasVideo ? "none" : "flex",
+                      position: "absolute",
                       inset: 0,
                       width: "100%",
                       height: "100%",
-                      alignItems:
-                        "center",
-                      justifyContent:
-                        "center",
+                      alignItems: "center",
+                      justifyContent: "center",
                       color: "#64748b",
                       px: 3,
                       textAlign: "center",
@@ -1298,17 +1181,14 @@ const ProjectDetails = () => {
                         color: "#475569",
                       }}
                     >
-                      Preview media will
-                      appear here when
-                      uploaded.
+                      Preview media will appear here when uploaded.
                     </Typography>
                   </Stack>
 
                   {/* LABEL */}
                   <Box
                     sx={{
-                      position:
-                        "absolute",
+                      position: "absolute",
                       top: {
                         xs: 10,
                         sm: 14,
@@ -1320,12 +1200,9 @@ const ProjectDetails = () => {
                       px: 1,
                       py: 0.45,
                       borderRadius: 999,
-                      bgcolor:
-                        "rgba(2,6,23,.72)",
-                      backdropFilter:
-                        "blur(8px)",
-                      border:
-                        "1px solid rgba(255,255,255,.12)",
+                      bgcolor: "rgba(2,6,23,.72)",
+                      backdropFilter: "blur(8px)",
+                      border: "1px solid rgba(255,255,255,.12)",
                     }}
                   >
                     <Typography
@@ -1375,9 +1252,8 @@ const ProjectDetails = () => {
                       lineHeight: 1.55,
                     }}
                   >
-                    Preview the project before
-                    choosing the resources you
-                    want to purchase.
+                    Preview the project before choosing the resources you want
+                    to purchase.
                   </Typography>
 
                   {project.livePreviewUrl && (
@@ -1388,8 +1264,7 @@ const ProjectDetails = () => {
                       endIcon={
                         <OpenInNewIcon
                           sx={{
-                            fontSize:
-                              "15px !important",
+                            fontSize: "15px !important",
                           }}
                         />
                       }
@@ -1404,15 +1279,13 @@ const ProjectDetails = () => {
                         mt: 1.4,
                         borderRadius: 2.5,
                         minHeight: 36,
-                        textTransform:
-                          "none",
+                        textTransform: "none",
                         fontWeight: 800,
                         fontSize: {
                           xs: ".68rem",
                           sm: ".76rem",
                         },
-                        borderColor:
-                          "rgba(129,140,248,.35)",
+                        borderColor: "rgba(129,140,248,.35)",
                         color: "#a5b4fc",
                       }}
                     >
@@ -1446,11 +1319,9 @@ const ProjectDetails = () => {
                     xs: 3,
                     sm: 4,
                   },
-                  bgcolor:
-                    "rgba(15,23,42,.75)",
+                  bgcolor: "rgba(15,23,42,.75)",
                   color: "#fff",
-                  border:
-                    "1px solid rgba(148,163,184,.14)",
+                  border: "1px solid rgba(148,163,184,.14)",
                 }}
               >
                 <Typography
@@ -1465,10 +1336,7 @@ const ProjectDetails = () => {
                   What you will get
                 </Typography>
 
-                <Stack
-                  spacing={1.15}
-                  sx={{ mt: 1.5 }}
-                >
+                <Stack spacing={1.15} sx={{ mt: 1.5 }}>
                   {[
                     "Complete source code",
                     "Documentation (DOC/PDF)",
@@ -1534,30 +1402,21 @@ const ProjectDetails = () => {
                     xs: 3,
                     sm: 4,
                   },
-                  bgcolor:
-                    "rgba(30,41,59,.45)",
+                  bgcolor: "rgba(30,41,59,.45)",
                   color: "#fff",
-                  border:
-                    "1px solid rgba(129,140,248,.14)",
+                  border: "1px solid rgba(129,140,248,.14)",
                 }}
               >
-                <Stack
-                  direction="row"
-                  spacing={1.2}
-                  alignItems="center"
-                >
+                <Stack direction="row" spacing={1.2} alignItems="center">
                   <Box
                     sx={{
                       width: 36,
                       height: 36,
                       borderRadius: 2,
                       display: "flex",
-                      alignItems:
-                        "center",
-                      justifyContent:
-                        "center",
-                      bgcolor:
-                        "rgba(99,102,241,.12)",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      bgcolor: "rgba(99,102,241,.12)",
                       color: "#818cf8",
                       flexShrink: 0,
                     }}
@@ -1592,9 +1451,7 @@ const ProjectDetails = () => {
                         },
                       }}
                     >
-                      Your payment is
-                      processed securely
-                      through Razorpay.
+                      Your payment is processed securely through Razorpay.
                     </Typography>
                   </Box>
                 </Stack>
