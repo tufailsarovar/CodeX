@@ -18,9 +18,35 @@ import ProjectCard from "../../components/Project/ProjectCard";
 
 const MotionBox = motion(Box);
 
+const PROJECTS_CACHE_KEY = "codex_projects_cache";
+const PROJECTS_CACHE_TIME = "codex_projects_cache_time";
+const CACHE_DURATION = 5 * 60 * 1000;
+
 const AllProjects = () => {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [projects, setProjects] = useState(() => {
+    try {
+      const cached = localStorage.getItem(PROJECTS_CACHE_KEY);
+
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        return Array.isArray(parsed) ? parsed : [];
+      }
+    } catch (error) {
+      console.error("Projects cache read error:", error);
+    }
+
+    return [];
+  });
+
+  const [loading, setLoading] = useState(() => {
+    try {
+      const cached = localStorage.getItem(PROJECTS_CACHE_KEY);
+      return !cached;
+    } catch {
+      return true;
+    }
+  });
+
   const [error, setError] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -28,26 +54,44 @@ const AllProjects = () => {
     let mounted = true;
 
     const fetchProjects = async () => {
-      setLoading(true);
-      setError("");
-
       try {
         const res = await api.get("/projects", {
           timeout: 15000,
-          headers: {
-            "Cache-Control": "max-age=60",
-          },
         });
 
-        if (mounted) {
-          setProjects(Array.isArray(res.data) ? res.data : []);
+        if (!mounted) return;
+
+        const freshProjects = Array.isArray(res.data)
+          ? res.data
+          : [];
+
+        setProjects(freshProjects);
+        setError("");
+
+        try {
+          localStorage.setItem(
+            PROJECTS_CACHE_KEY,
+            JSON.stringify(freshProjects)
+          );
+
+          localStorage.setItem(
+            PROJECTS_CACHE_TIME,
+            Date.now().toString()
+          );
+        } catch (cacheError) {
+          console.error(
+            "Projects cache write error:",
+            cacheError
+          );
         }
       } catch (err) {
         console.error("All projects error:", err);
 
-        if (mounted) {
+        if (mounted && projects.length === 0) {
           setProjects([]);
-          setError("Unable to load projects. Please try again.");
+          setError(
+            "Unable to load projects. Please try again."
+          );
         }
       } finally {
         if (mounted) {
@@ -64,6 +108,8 @@ const AllProjects = () => {
   }, [refreshKey]);
 
   const handleRetry = () => {
+    setLoading(true);
+    setError("");
     setRefreshKey((prev) => prev + 1);
   };
 
@@ -82,7 +128,6 @@ const AllProjects = () => {
         overflow: "hidden",
       }}
     >
-      {/* Background glow */}
       <Box
         sx={{
           position: "absolute",
@@ -105,7 +150,6 @@ const AllProjects = () => {
           },
         }}
       >
-        {/* Header */}
         <MotionBox
           initial={{
             opacity: 0,
@@ -158,8 +202,10 @@ const AllProjects = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    bgcolor: "rgba(99,102,241,.12)",
-                    border: "1px solid rgba(129,140,248,.2)",
+                    bgcolor:
+                      "rgba(99,102,241,.12)",
+                    border:
+                      "1px solid rgba(129,140,248,.2)",
                     color: "#818cf8",
                   }}
                 >
@@ -181,9 +227,11 @@ const AllProjects = () => {
                       xs: 23,
                       sm: 27,
                     },
-                    bgcolor: "rgba(99,102,241,.1)",
+                    bgcolor:
+                      "rgba(99,102,241,.1)",
                     color: "#a5b4fc",
-                    border: "1px solid rgba(129,140,248,.2)",
+                    border:
+                      "1px solid rgba(129,140,248,.2)",
                     fontSize: {
                       xs: 8,
                       sm: 10,
@@ -223,8 +271,9 @@ const AllProjects = () => {
                   lineHeight: 1.6,
                 }}
               >
-                Browse our complete collection of academic projects, source
-                code, presentations and documentation.
+                Browse our complete collection of academic
+                projects, source code, presentations and
+                documentation.
               </Typography>
             </Box>
 
@@ -238,8 +287,10 @@ const AllProjects = () => {
                     sm: 120,
                   },
                   borderRadius: 3,
-                  bgcolor: "rgba(15,23,42,.75)",
-                  border: "1px solid rgba(148,163,184,.14)",
+                  bgcolor:
+                    "rgba(15,23,42,.75)",
+                  border:
+                    "1px solid rgba(148,163,184,.14)",
                 }}
               >
                 <Typography
@@ -263,15 +314,16 @@ const AllProjects = () => {
                   }}
                 >
                   {projects.length}{" "}
-                  {projects.length === 1 ? "Project" : "Projects"}
+                  {projects.length === 1
+                    ? "Project"
+                    : "Projects"}
                 </Typography>
               </Box>
             )}
           </Stack>
         </MotionBox>
 
-        {/* Loading */}
-        {loading && (
+        {loading && projects.length === 0 && (
           <MotionBox
             initial={{
               opacity: 0,
@@ -286,7 +338,10 @@ const AllProjects = () => {
               justifyContent: "center",
             }}
           >
-            <Stack alignItems="center" spacing={1.5}>
+            <Stack
+              alignItems="center"
+              spacing={1.5}
+            >
               <CircularProgress
                 size={36}
                 thickness={4}
@@ -307,8 +362,7 @@ const AllProjects = () => {
           </MotionBox>
         )}
 
-        {/* Error */}
-        {!loading && error && (
+        {!loading && error && projects.length === 0 && (
           <MotionBox
             initial={{
               opacity: 0,
@@ -335,9 +389,11 @@ const AllProjects = () => {
                   sm: 4,
                 },
                 textAlign: "center",
-                bgcolor: "rgba(15,23,42,.9)",
+                bgcolor:
+                  "rgba(15,23,42,.9)",
                 color: "#fff",
-                border: "1px solid rgba(248,113,113,.18)",
+                border:
+                  "1px solid rgba(248,113,113,.18)",
                 borderRadius: 4,
               }}
             >
@@ -379,8 +435,7 @@ const AllProjects = () => {
           </MotionBox>
         )}
 
-        {/* Projects */}
-        {!loading && !error && projects.length > 0 && (
+        {projects.length > 0 && (
           <AnimatePresence mode="wait">
             <MotionBox
               key={refreshKey}
@@ -432,7 +487,10 @@ const AllProjects = () => {
                       }}
                       transition={{
                         duration: 0.35,
-                        delay: Math.min(index * 0.045, 0.45),
+                        delay: Math.min(
+                          index * 0.045,
+                          0.45
+                        ),
                       }}
                       sx={{
                         width: "100%",
@@ -449,86 +507,92 @@ const AllProjects = () => {
           </AnimatePresence>
         )}
 
-        {/* Empty */}
-        {!loading && !error && projects.length === 0 && (
-          <MotionBox
-            initial={{
-              opacity: 0,
-              y: 15,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            sx={{
-              minHeight: 330,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Paper
-              elevation={0}
+        {!loading &&
+          !error &&
+          projects.length === 0 && (
+            <MotionBox
+              initial={{
+                opacity: 0,
+                y: 15,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
               sx={{
-                width: "100%",
-                maxWidth: 520,
-                p: {
-                  xs: 3,
-                  sm: 5,
-                },
-                textAlign: "center",
-                bgcolor: "rgba(15,23,42,.78)",
-                color: "#fff",
-                border: "1px solid rgba(148,163,184,.14)",
-                borderRadius: 4,
+                minHeight: 330,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              <Box
+              <Paper
+                elevation={0}
                 sx={{
-                  width: 60,
-                  height: 60,
-                  mx: "auto",
-                  mb: 1.5,
-                  borderRadius: 3,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  bgcolor: "rgba(99,102,241,.1)",
-                  border: "1px solid rgba(129,140,248,.14)",
-                  color: "#818cf8",
-                }}
-              >
-                <AppsIcon />
-              </Box>
-
-              <Typography
-                fontWeight={900}
-                sx={{
-                  fontSize: {
-                    xs: "1rem",
-                    sm: "1.15rem",
+                  width: "100%",
+                  maxWidth: 520,
+                  p: {
+                    xs: 3,
+                    sm: 5,
                   },
+                  textAlign: "center",
+                  bgcolor:
+                    "rgba(15,23,42,.78)",
+                  color: "#fff",
+                  border:
+                    "1px solid rgba(148,163,184,.14)",
+                  borderRadius: 4,
                 }}
               >
-                No projects available
-              </Typography>
+                <Box
+                  sx={{
+                    width: 60,
+                    height: 60,
+                    mx: "auto",
+                    mb: 1.5,
+                    borderRadius: 3,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    bgcolor:
+                      "rgba(99,102,241,.1)",
+                    border:
+                      "1px solid rgba(129,140,248,.14)",
+                    color: "#818cf8",
+                  }}
+                >
+                  <AppsIcon />
+                </Box>
 
-              <Typography
-                sx={{
-                  mt: 0.8,
-                  color: "#64748b",
-                  fontSize: {
-                    xs: ".7rem",
-                    sm: ".78rem",
-                  },
-                  lineHeight: 1.5,
-                }}
-              >
-                There are currently no projects available in the marketplace.
-              </Typography>
-            </Paper>
-          </MotionBox>
-        )}
+                <Typography
+                  fontWeight={900}
+                  sx={{
+                    fontSize: {
+                      xs: "1rem",
+                      sm: "1.15rem",
+                    },
+                  }}
+                >
+                  No projects available
+                </Typography>
+
+                <Typography
+                  sx={{
+                    mt: 0.8,
+                    color: "#64748b",
+                    fontSize: {
+                      xs: ".7rem",
+                      sm: ".78rem",
+                    },
+                    lineHeight: 1.5,
+                  }}
+                >
+                  There are currently no projects
+                  available in the marketplace.
+                </Typography>
+              </Paper>
+            </MotionBox>
+          )}
       </Container>
     </Box>
   );
